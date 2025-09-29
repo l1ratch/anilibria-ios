@@ -1,55 +1,51 @@
-name: Build Anilibria iOS
+name: Build Unsigned IPA
 
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  workflow_dispatch:    # ← добавляет кнопку "Run workflow" в Actions
+  workflow_dispatch:
 
 jobs:
   build:
+    name: Build unsigned IPA
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ Клонирование репозитория
+      - name: Checkout
         uses: actions/checkout@v4
 
+      # 2️⃣ Установка CocoaPods (если проект их использует)
       - name: Install CocoaPods
-        run: |
-          sudo gem install cocoapods
-          pod install --repo-update || echo "No Podfile found, skipping"
+        run: sudo gem install cocoapods
 
-      - name: Set default scheme
-        id: scheme
-        run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['schemes'][0]")
-          echo "default_scheme=$default" >> $GITHUB_ENV
-          echo Using default scheme: $default
+      # 3️⃣ Установка xcpretty (для красивого вывода xcodebuild)
+      - name: Install xcpretty
+        run: sudo gem install xcpretty
 
-      - name: Build iOS app
+      # 4️⃣ Сборка и архивирование
+      - name: Build Archive
         run: |
           xcodebuild clean archive \
-            -project Anilibria.xcodeproj \
-            -scheme "$default_scheme" \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -archivePath ${{ github.workspace }}/build/AniLiberty.xcarchive \
-            CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM=XXXXXXX \
+            -scheme "AniLiberty" \
+            -workspace "AniLiberty.xcworkspace" \ # или -project "AniLiberty.xcodeproj" если нет workspace
+            -archivePath build/AniLiberty.xcarchive \
             | xcpretty
 
-      - name: Export .ipa
+      # 5️⃣ Экспорт unsigned IPA
+      - name: Export IPA
         run: |
           mkdir -p build/ipa
           xcodebuild -exportArchive \
-            -archivePath ${{ github.workspace }}/build/AniLiberty.xcarchive \
+            -archivePath build/AniLiberty.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath ${{ github.workspace }}/build/ipa \
+            -exportPath build/ipa \
             | xcpretty
 
-      - name: Upload IPA artifact
+      # 6️⃣ Загрузка IPA как артефакта
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: AniLiberty-unsigned
