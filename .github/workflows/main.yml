@@ -1,8 +1,10 @@
-name: Build Unsigned IPA
+name: Build unsigned IPA
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
   workflow_dispatch:
 
 jobs:
@@ -16,11 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Ruby Gems
+      - name: Install gems
         run: sudo gem install xcpretty cocoapods
 
       - name: Determine project type
-        id: project_info
+        id: detect
         run: |
           ws=$(ls *.xcworkspace 2>/dev/null | head -n1)
           proj=$(ls *.xcodeproj 2>/dev/null | head -n1)
@@ -63,3 +65,4 @@ jobs:
         with:
           name: AniLiberty-unsigned
           path: build/ipa/*.ipa
+          if-no-files-found: warn
