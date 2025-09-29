@@ -1,15 +1,16 @@
-name: Build unsigned IPA
+name: Build iOS Unsigned IPA
 
 on:
   push:
-    branches: ["master"]
+    branches: [ "master" ]
   pull_request:
-    branches: ["master"]
+    branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
+
     env:
       SCHEME: AniLiberty
       EXPORT_OPTIONS_PLIST: ExportOptions.plist
@@ -19,9 +20,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install gems
-        run: sudo gem install xcpretty cocoapods
+        run: |
+          sudo gem install xcpretty cocoapods
 
-      - name: Determine project type
+      - name: Detect Xcode project or workspace
         id: detect
         run: |
           ws=$(ls *.xcworkspace 2>/dev/null | head -n1)
@@ -51,6 +53,7 @@ jobs:
               -project "$FILE" \
               -scheme "$SCHEME" \
               -archivePath "build/$SCHEME.xcarchive" | xcpretty
+          fi
 
       - name: Export unsigned IPA
         run: |
@@ -58,7 +61,7 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath "build/$SCHEME.xcarchive" \
             -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
-            -exportPath build/ipa | xcpretty
+            -exportPath "build/ipa" | xcpretty
 
       - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
