@@ -1,4 +1,4 @@
-name: Build unsigned IPA
+name: Build Unsigned IPA
 
 on:
   push:
@@ -9,17 +9,16 @@ on:
 
 jobs:
   build:
-    name: Build and export unsigned IPA
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Ruby gems
+      - name: Install gems
         run: sudo gem install xcpretty cocoapods
 
-      - name: Determine project/workspace
+      - name: Determine project or workspace
         id: detect
         run: |
           ws=$(ls *.xcworkspace 2>/dev/null || true)
@@ -34,35 +33,32 @@ jobs:
           else
             echo "No Xcode project or workspace found!"
             exit 1
+          fi
         shell: bash
 
-      - name: Set scheme
-        id: scheme
-        run: |
-          default_scheme=$(xcodebuild -list -json | tr -d "\n" | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo "scheme=$default_scheme" >> $GITHUB_OUTPUT
+      - name: Create build directories
+        run: mkdir -p build/ipa
 
-      - name: Build archive
+      - name: Archive project
         run: |
           if [ "${{ steps.detect.outputs.type }}" = "workspace" ]; then
             xcodebuild clean archive \
               -workspace "${{ steps.detect.outputs.file }}" \
-              -scheme "${{ steps.scheme.outputs.scheme }}" \
-              -archivePath build/${{ steps.scheme.outputs.scheme }}.xcarchive | xcpretty
+              -scheme "AniLiberty" \
+              -archivePath build/AniLiberty.xcarchive | xcpretty
           else
             xcodebuild clean archive \
               -project "${{ steps.detect.outputs.file }}" \
-              -scheme "${{ steps.scheme.outputs.scheme }}" \
-              -archivePath build/${{ steps.scheme.outputs.scheme }}.xcarchive | xcpretty
+              -scheme "AniLiberty" \
+              -archivePath build/AniLiberty.xcarchive | xcpretty
         shell: bash
 
       - name: Export unsigned IPA
         run: |
-          mkdir -p build/ipa
           xcodebuild -exportArchive \
-            -archivePath build/${{ steps.scheme.outputs.scheme }}.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist ExportOptions.plist | xcpretty
+            -archivePath build/AniLiberty.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/ipa | xcpretty
         shell: bash
 
       - name: Upload IPA artifact
@@ -70,4 +66,3 @@ jobs:
         with:
           name: AniLiberty-unsigned
           path: build/ipa/*.ipa
-          if-no-files-found: warn
