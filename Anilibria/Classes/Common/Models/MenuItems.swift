@@ -35,7 +35,7 @@ public final class MenuItemsFactory {
         return [
             MenuItem(type: .feed, icon: .System.news),
             MenuItem(type: .catalog, icon: .System.search),
-            MenuItem(type: .news, icon: .iconYoutube),
+            // MenuItem(type: .news, icon: .iconYoutube),
             MenuItem(type: .collections, icon: .System.book),
             MenuItem(type: .other, icon: .System.dots)
         ]

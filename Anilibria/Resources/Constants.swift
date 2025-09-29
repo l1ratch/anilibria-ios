@@ -14,7 +14,7 @@ struct Sizes {
     static let minSize: CGSize = CGSize(width: 1000, height: 800)
     static let maxSize: CGSize = CGSize(width: CGFloat.greatestFiniteMagnitude,
                                         height: CGFloat.greatestFiniteMagnitude)
-    
+
     static func adapt(_ width: CGFloat) -> CGFloat {
         return width > maxWidth ? maxWidth : width
     }
@@ -62,7 +62,7 @@ struct URLHelper {
         return nil
     }
 
-    
+
     static func searchUrl(text: String) -> URL? {
         let query = text.split(separator: " ")
             .compactMap {
@@ -71,7 +71,7 @@ struct URLHelper {
             .joined(separator: "+")
         return URL(string: "https://www.google.ru/search?q=\(query)")
     }
-    
+
     static func releaseUrl(_ series: Series?) -> URL? {
         if let value = series {
             return URL(string: "https://anilibria.top/anime/releases/release/\(value.alias)/episodes")
