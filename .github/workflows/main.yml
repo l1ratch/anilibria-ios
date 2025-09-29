@@ -1,54 +1,56 @@
-name: Build Unsigned IPA
+name: Build unsigned IPA
 
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  workflow_dispatch:
+  workflow_dispatch:   # ручной запуск
 
 jobs:
   build:
+    name: Build unsigned IPA
     runs-on: macos-latest
-    env:
-      default_scheme: AniLiberty
 
     steps:
+      # 1. Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      # 2. Устанавливаем необходимые Ruby-гемы
+      - name: Install gems
         run: |
           sudo gem install xcpretty cocoapods
-          pod install || echo "No Podfile, skipping"
 
-      - name: Clean and Archive
-        run: |
-          PROJECT=$(ls *.xcodeproj 2>/dev/null || echo "")
-          if [ -n "$PROJECT" ]; then
-            echo "Found project: $PROJECT"
-            xcodebuild clean archive \
-              -project "$PROJECT" \
-              -scheme "$default_scheme" \
-              -archivePath build/AniLiberty.xcarchive \
-              | xcpretty
-          else
-            echo "Error: no project found!"
-            exit 1
-          fi
+      # 3. Создаём папку для сборки
+      - name: Create build directory
+        run: mkdir -p build/ipa
 
-      - name: Export IPA
+      # 4. Архивируем проект через workspace + scheme
+      - name: Archive Xcode project
         run: |
-          mkdir -p build/ipa
+          xcodebuild clean archive \
+            -workspace "Anilibria.xcworkspace" \
+            -scheme "AniLiberty" \
+            -archivePath build/AniLiberty.xcarchive \
+            | xcpretty
+
+      # 5. Экспортируем unsigned IPA
+      - name: Export unsigned IPA
+        run: |
           xcodebuild -exportArchive \
             -archivePath build/AniLiberty.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build/ipa \
             | xcpretty
 
-      - name: Upload IPA artifact
+      # 6. Загружаем артефакт для скачивания
+      - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: AniLiberty-unsigned
           path: build/ipa/*.ipa
           if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
