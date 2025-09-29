@@ -1,4 +1,4 @@
-name: Build iOS Unsigned IPA
+name: Build AniLiberty IPA
 
 on:
   push:
@@ -10,7 +10,6 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-
     env:
       SCHEME: AniLiberty
       EXPORT_OPTIONS_PLIST: ExportOptions.plist
@@ -23,37 +22,13 @@ jobs:
         run: |
           sudo gem install xcpretty cocoapods
 
-      - name: Detect Xcode project or workspace
-        id: detect
-        run: |
-          ws=$(ls *.xcworkspace 2>/dev/null | head -n1)
-          proj=$(ls *.xcodeproj 2>/dev/null | head -n1)
-
-          if [ -n "$ws" ]; then
-            echo "TYPE=workspace" >> $GITHUB_ENV
-            echo "FILE=$ws" >> $GITHUB_ENV
-          elif [ -n "$proj" ]; then
-            echo "TYPE=project" >> $GITHUB_ENV
-            echo "FILE=$proj" >> $GITHUB_ENV
-          else
-            echo "No Xcode project or workspace found!"
-            exit 1
-          fi
-
       - name: Build Archive
         run: |
           mkdir -p build
-          if [ "$TYPE" = "workspace" ]; then
-            xcodebuild clean archive \
-              -workspace "$FILE" \
-              -scheme "$SCHEME" \
-              -archivePath "build/$SCHEME.xcarchive" | xcpretty
-          else
-            xcodebuild clean archive \
-              -project "$FILE" \
-              -scheme "$SCHEME" \
-              -archivePath "build/$SCHEME.xcarchive" | xcpretty
-          fi
+          xcodebuild clean archive \
+            -project "Anilibria.xcodeproj" \
+            -scheme "$SCHEME" \
+            -archivePath "build/$SCHEME.xcarchive" | xcpretty
 
       - name: Export unsigned IPA
         run: |
@@ -69,3 +44,5 @@ jobs:
           name: AniLiberty-unsigned
           path: build/ipa/*.ipa
           if-no-files-found: warn
+          compression-level: 6
+          overwrite: false

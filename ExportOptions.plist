@@ -2,31 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Не компилировать Bitcode -->
     <key>compileBitcode</key>
     <false/>
-    
-    <!-- Метод сборки -->
-    <key>method</key>
-    <string>development</string>
-    
-    <!-- Без подписи -->
-    <key>signingStyle</key>
-    <string>none</string>
-    
-    <!-- Стрипать Swift Symbols -->
-    <key>stripSwiftSymbols</key>
-    <true/>
-    
-    <!-- Путь назначения при экспорте -->
     <key>destination</key>
     <string>export</string>
-    
-    <!-- Team ID не нужен для unsigned сборки, можно оставить пустым или указать любой -->
+    <key>method</key>
+    <string>development</string>
+    <key>signingStyle</key>
+    <string>none</string>
+    <key>stripSwiftSymbols</key>
+    <true/>
     <key>teamID</key>
-    <string></string>
-    
-    <!-- Не использовать Thinning -->
+    <string>XXXXXXXXXX</string>
     <key>thinning</key>
     <string>&lt;none&gt;</string>
 </dict>
