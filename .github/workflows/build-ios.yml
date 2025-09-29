@@ -14,11 +14,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Ruby (для CocoaPods, если нужен)
-      uses: ruby/setup-ruby@v2
-      with:
-        ruby-version: '3.2'
-
     - name: Install CocoaPods dependencies
       run: |
         sudo gem install cocoapods
