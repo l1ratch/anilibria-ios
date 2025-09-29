@@ -14,25 +14,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Ruby (для xcpretty, если нужно)
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.x
-
       - name: Install xcpretty
         run: gem install xcpretty
 
       - name: Create build folder
         run: mkdir -p build
 
-      - name: Build archive (unsigned)
+      - name: Build unsigned archive
         run: |
           xcodebuild -project Anilibria.xcodeproj \
             -scheme AniLiberty \
             -configuration Release \
             -archivePath $PWD/build/AniLiberty.xcarchive \
+            -destination 'generic/platform=iOS' \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
             archive | xcpretty
 
