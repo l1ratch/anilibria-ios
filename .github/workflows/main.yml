@@ -24,7 +24,7 @@ jobs:
       run: gem install xcbeautify
 
     - name: Set up Xcode
-      uses: maxim-lobanov/setup-xcode@v4
+      uses: maxim-lobanov/setup-xcode@v2
       with:
         xcode-version: '16.4'
 
