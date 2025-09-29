@@ -36,21 +36,27 @@ jobs:
 
       - name: Clean and Archive
         run: |
-          # Указываем либо workspace, либо project
-          if [ -f "*.xcworkspace" ]; then
-            WORKSPACE=$(ls *.xcworkspace)
+          # Проверяем workspace
+          WORKSPACE=$(ls *.xcworkspace 2>/dev/null || echo "")
+          PROJECT=$(ls *.xcodeproj 2>/dev/null || echo "")
+
+          if [ -n "$WORKSPACE" ]; then
+            echo "Found workspace: $WORKSPACE"
             xcodebuild clean archive \
               -workspace "$WORKSPACE" \
               -scheme "$default_scheme" \
               -archivePath build/AniLiberty.xcarchive \
               | xcpretty
-          else
-            PROJECT=$(ls *.xcodeproj)
+          elif [ -n "$PROJECT" ]; then
+            echo "Found project: $PROJECT"
             xcodebuild clean archive \
               -project "$PROJECT" \
               -scheme "$default_scheme" \
               -archivePath build/AniLiberty.xcarchive \
               | xcpretty
+          else
+            echo "Error: no workspace or project found!"
+            exit 1
           fi
 
       - name: Check Archive
