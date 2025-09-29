@@ -2,52 +2,30 @@ name: Build Unsigned IPA
 
 on:
   push:
-    branches:
-      - master
+    branches: [ "master" ]
   pull_request:
-    branches:
-      - master
-  workflow_dispatch:  # чтобы запускать вручную
+    branches: [ "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build unsigned IPA
     runs-on: macos-latest
+    env:
+      default_scheme: AniLiberty
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install CocoaPods
+      - name: Install dependencies
         run: |
-          sudo gem install cocoapods
-
-      - name: Install xcpretty
-        run: |
-          sudo gem install xcpretty
-
-      - name: Set default scheme
-        id: scheme
-        run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo "default_scheme=$default" >> $GITHUB_ENV
-          echo "Using default scheme: $default"
+          sudo gem install xcpretty cocoapods
+          pod install || echo "No Podfile, skipping"
 
       - name: Clean and Archive
         run: |
-          # Проверяем workspace
-          WORKSPACE=$(ls *.xcworkspace 2>/dev/null || echo "")
           PROJECT=$(ls *.xcodeproj 2>/dev/null || echo "")
-
-          if [ -n "$WORKSPACE" ]; then
-            echo "Found workspace: $WORKSPACE"
-            xcodebuild clean archive \
-              -workspace "$WORKSPACE" \
-              -scheme "$default_scheme" \
-              -archivePath build/AniLiberty.xcarchive \
-              | xcpretty
-          elif [ -n "$PROJECT" ]; then
+          if [ -n "$PROJECT" ]; then
             echo "Found project: $PROJECT"
             xcodebuild clean archive \
               -project "$PROJECT" \
@@ -55,14 +33,11 @@ jobs:
               -archivePath build/AniLiberty.xcarchive \
               | xcpretty
           else
-            echo "Error: no workspace or project found!"
+            echo "Error: no project found!"
             exit 1
           fi
 
-      - name: Check Archive
-        run: ls -la build/AniLiberty.xcarchive
-
-      - name: Export unsigned IPA
+      - name: Export IPA
         run: |
           mkdir -p build/ipa
           xcodebuild -exportArchive \
@@ -70,7 +45,6 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build/ipa \
             | xcpretty
-          ls -la build/ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
