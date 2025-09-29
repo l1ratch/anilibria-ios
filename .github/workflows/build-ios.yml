@@ -1,48 +1,54 @@
-name: Build iOS Unsigned IPA
+name: Build AniLiberty
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-ios:
+  build:
     runs-on: macos-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install CocoaPods dependencies
+    - name: Set up Ruby (для gem xcbeautify, если нужен)
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2
+
+    - name: Install xcbeautify (optional, для красивого лога сборки)
+      run: gem install xcbeautify
+
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v3
+      with:
+        xcode-version: '16.4'
+
+    - name: Build & Archive
       run: |
-        sudo gem install cocoapods
-        pod install --repo-update
+        PROJECT="Anilibria.xcodeproj"
+        SCHEME="AniLiberty"
+        ARCHIVE_PATH="$PWD/build/AniLiberty.xcarchive"
+        EXPORT_PATH="$PWD/build"
 
-    - name: Build iOS unsigned IPA
-      run: |
-        mkdir -p build
+        # Архивируем проект
+        xcodebuild -project "$PROJECT" \
+                   -scheme "$SCHEME" \
+                   -configuration Release \
+                   -archivePath "$ARCHIVE_PATH" \
+                   archive | xcbeautify
 
-        # Очистка проекта
-        xcodebuild clean -project Anilibria.xcodeproj -scheme AniLiberty -configuration Release
-
-        # Архивация без подписи (unsigned)
-        xcodebuild archive \
-          -project Anilibria.xcodeproj \
-          -scheme AniLiberty \
-          -archivePath $PWD/build/AniLiberty.xcarchive \
-          -destination 'generic/platform=iOS' \
-          CODE_SIGNING_ALLOWED=NO
-
-        # Экспорт IPA без подписи
+        # Экспортируем unsigned IPA
         xcodebuild -exportArchive \
-          -archivePath $PWD/build/AniLiberty.xcarchive \
-          -exportPath $PWD/build \
-          -exportOptionsPlist ExportOptions.plist
+                   -archivePath "$ARCHIVE_PATH" \
+                   -exportPath "$EXPORT_PATH" \
+                   -exportOptionsPlist ExportOptions.plist | xcbeautify
 
-    - name: Upload IPA artifact
+    - name: Upload unsigned IPA
       uses: actions/upload-artifact@v4
       with:
         name: AniLiberty-unsigned
         path: build/*.ipa
-        if-no-files-found: warn
