@@ -2,56 +2,73 @@ name: Build Unsigned IPA
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
   pull_request:
-    branches: [ "master" ]
-  workflow_dispatch:
+    branches:
+      - master
+  workflow_dispatch:  # чтобы запускать вручную
 
 jobs:
   build:
-    name: Build Unsigned IPA
+    name: Build unsigned IPA
     runs-on: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install xcpretty
-        run: sudo gem install xcpretty
-
-      - name: Create output folder
-        run: mkdir -p build/ipa
-
-      - name: Build Archive
+      - name: Install CocoaPods
         run: |
-          # Если есть workspace, использовать его, иначе project
-          if [ -f "AniLiberty.xcworkspace" ]; then
+          sudo gem install cocoapods
+
+      - name: Install xcpretty
+        run: |
+          sudo gem install xcpretty
+
+      - name: Set default scheme
+        id: scheme
+        run: |
+          scheme_list=$(xcodebuild -list -json | tr -d "\n")
+          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo "default_scheme=$default" >> $GITHUB_ENV
+          echo "Using default scheme: $default"
+
+      - name: Clean and Archive
+        run: |
+          # Указываем либо workspace, либо project
+          if [ -f "*.xcworkspace" ]; then
+            WORKSPACE=$(ls *.xcworkspace)
             xcodebuild clean archive \
-              -scheme "AniLiberty" \
-              -workspace "AniLiberty.xcworkspace" \
+              -workspace "$WORKSPACE" \
+              -scheme "$default_scheme" \
               -archivePath build/AniLiberty.xcarchive \
               | xcpretty
           else
+            PROJECT=$(ls *.xcodeproj)
             xcodebuild clean archive \
-              -scheme "AniLiberty" \
-              -project "AniLiberty.xcodeproj" \
+              -project "$PROJECT" \
+              -scheme "$default_scheme" \
               -archivePath build/AniLiberty.xcarchive \
               | xcpretty
           fi
 
-      - name: Export IPA
+      - name: Check Archive
+        run: ls -la build/AniLiberty.xcarchive
+
+      - name: Export unsigned IPA
         run: |
+          mkdir -p build/ipa
           xcodebuild -exportArchive \
             -archivePath build/AniLiberty.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build/ipa \
             | xcpretty
+          ls -la build/ipa
 
-      - name: Upload unsigned IPA
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: AniLiberty-unsigned
           path: build/ipa/*.ipa
           if-no-files-found: warn
-          compression-level: 6
-          overwrite: false
