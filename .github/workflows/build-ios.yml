@@ -1,4 +1,4 @@
-name: Build unsigned iOS IPA
+name: Build iOS Unsigned IPA
 
 on:
   push:
@@ -7,39 +7,47 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-ipa:
+  build-ios:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install xcpretty
-        run: gem install xcpretty
+    - name: Set up Ruby (для CocoaPods, если нужен)
+      uses: ruby/setup-ruby@v2
+      with:
+        ruby-version: '3.2'
 
-      - name: Create build folder
-        run: mkdir -p build
+    - name: Install CocoaPods dependencies
+      run: |
+        sudo gem install cocoapods
+        pod install --repo-update
 
-      - name: Build unsigned archive
-        run: |
-          xcodebuild -project Anilibria.xcodeproj \
-            -scheme AniLiberty \
-            -configuration Release \
-            -archivePath $PWD/build/AniLiberty.xcarchive \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            archive | xcpretty
+    - name: Build iOS unsigned IPA
+      run: |
+        mkdir -p build
 
-      - name: Export unsigned IPA
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/AniLiberty.xcarchive \
-            -exportPath $PWD/build \
-            -exportOptionsPlist ExportOptions.plist | xcpretty
+        # Очистка проекта
+        xcodebuild clean -project Anilibria.xcodeproj -scheme AniLiberty -configuration Release
 
-      - name: Upload IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: AniLiberty-unsigned
-          path: build/*.ipa
+        # Архивация без подписи (unsigned)
+        xcodebuild archive \
+          -project Anilibria.xcodeproj \
+          -scheme AniLiberty \
+          -archivePath $PWD/build/AniLiberty.xcarchive \
+          -destination 'generic/platform=iOS' \
+          CODE_SIGNING_ALLOWED=NO
+
+        # Экспорт IPA без подписи
+        xcodebuild -exportArchive \
+          -archivePath $PWD/build/AniLiberty.xcarchive \
+          -exportPath $PWD/build \
+          -exportOptionsPlist ExportOptions.plist
+
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AniLiberty-unsigned
+        path: build/*.ipa
+        if-no-files-found: warn
