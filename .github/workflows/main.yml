@@ -2,59 +2,72 @@ name: Build unsigned IPA
 
 on:
   push:
-    branches: ["master"]
+    branches: [ "master" ]
   pull_request:
-    branches: ["master"]
+    branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
   build:
+    name: Build and export unsigned IPA
     runs-on: macos-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Install gems
-      run: |
-        sudo gem install xcpretty cocoapods
+      - name: Install Ruby gems
+        run: sudo gem install xcpretty cocoapods
 
-    - name: Determine project/workspace
-      id: detect
-      run: |
-        if [ -f "*.xcworkspace" ]; then
-          echo "type=workspace" >> $GITHUB_OUTPUT
-          echo "file=$(ls *.xcworkspace)" >> $GITHUB_OUTPUT
-        else
-          echo "type=project" >> $GITHUB_OUTPUT
-          echo "file=$(ls *.xcodeproj)" >> $GITHUB_OUTPUT
-        fi
+      - name: Determine project/workspace
+        id: detect
+        run: |
+          ws=$(ls *.xcworkspace 2>/dev/null || true)
+          proj=$(ls *.xcodeproj 2>/dev/null || true)
 
-    - name: Clean & Archive
-      run: |
-        mkdir -p build
-        if [ "${{ steps.detect.outputs.type }}" == "workspace" ]; then
-          xcodebuild clean archive \
-            -workspace "${{ steps.detect.outputs.file }}" \
-            -scheme "AniLiberty" \
-            -archivePath build/AniLiberty.xcarchive | xcpretty
-        else
-          xcodebuild clean archive \
-            -project "${{ steps.detect.outputs.file }}" \
-            -scheme "AniLiberty" \
-            -archivePath build/AniLiberty.xcarchive | xcpretty
-        fi
+          if [ -n "$ws" ]; then
+            echo "type=workspace" >> $GITHUB_OUTPUT
+            echo "file=$ws" >> $GITHUB_OUTPUT
+          elif [ -n "$proj" ]; then
+            echo "type=project" >> $GITHUB_OUTPUT
+            echo "file=$proj" >> $GITHUB_OUTPUT
+          else
+            echo "No Xcode project or workspace found!"
+            exit 1
+        shell: bash
 
-    - name: Export unsigned IPA
-      run: |
-        mkdir -p build/ipa
-        xcodebuild -exportArchive \
-          -archivePath build/AniLiberty.xcarchive \
-          -exportOptionsPlist ExportOptions.plist \
-          -exportPath build/ipa | xcpretty
+      - name: Set scheme
+        id: scheme
+        run: |
+          default_scheme=$(xcodebuild -list -json | tr -d "\n" | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo "scheme=$default_scheme" >> $GITHUB_OUTPUT
 
-    - name: Upload IPA artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: AniLiberty-unsigned
-        path: build/ipa/*.ipa
+      - name: Build archive
+        run: |
+          if [ "${{ steps.detect.outputs.type }}" = "workspace" ]; then
+            xcodebuild clean archive \
+              -workspace "${{ steps.detect.outputs.file }}" \
+              -scheme "${{ steps.scheme.outputs.scheme }}" \
+              -archivePath build/${{ steps.scheme.outputs.scheme }}.xcarchive | xcpretty
+          else
+            xcodebuild clean archive \
+              -project "${{ steps.detect.outputs.file }}" \
+              -scheme "${{ steps.scheme.outputs.scheme }}" \
+              -archivePath build/${{ steps.scheme.outputs.scheme }}.xcarchive | xcpretty
+        shell: bash
+
+      - name: Export unsigned IPA
+        run: |
+          mkdir -p build/ipa
+          xcodebuild -exportArchive \
+            -archivePath build/${{ steps.scheme.outputs.scheme }}.xcarchive \
+            -exportPath build/ipa \
+            -exportOptionsPlist ExportOptions.plist | xcpretty
+        shell: bash
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AniLiberty-unsigned
+          path: build/ipa/*.ipa
+          if-no-files-found: warn
