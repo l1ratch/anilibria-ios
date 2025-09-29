@@ -9,44 +9,49 @@ on:
 
 jobs:
   build:
-    name: Build unsigned IPA
+    name: Build Unsigned IPA
     runs-on: macos-latest
 
     steps:
-      # 1️⃣ Клонирование репозитория
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Установка CocoaPods (если проект их использует)
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods
-
-      # 3️⃣ Установка xcpretty (для красивого вывода xcodebuild)
       - name: Install xcpretty
         run: sudo gem install xcpretty
 
-      # 4️⃣ Сборка и архивирование
+      - name: Create output folder
+        run: mkdir -p build/ipa
+
       - name: Build Archive
         run: |
-          xcodebuild clean archive \
-            -scheme "AniLiberty" \
-            -workspace "AniLiberty.xcworkspace" \ # или -project "AniLiberty.xcodeproj" если нет workspace
-            -archivePath build/AniLiberty.xcarchive \
-            | xcpretty
+          # Если есть workspace, использовать его, иначе project
+          if [ -f "AniLiberty.xcworkspace" ]; then
+            xcodebuild clean archive \
+              -scheme "AniLiberty" \
+              -workspace "AniLiberty.xcworkspace" \
+              -archivePath build/AniLiberty.xcarchive \
+              | xcpretty
+          else
+            xcodebuild clean archive \
+              -scheme "AniLiberty" \
+              -project "AniLiberty.xcodeproj" \
+              -archivePath build/AniLiberty.xcarchive \
+              | xcpretty
+          fi
 
-      # 5️⃣ Экспорт unsigned IPA
       - name: Export IPA
         run: |
-          mkdir -p build/ipa
           xcodebuild -exportArchive \
             -archivePath build/AniLiberty.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build/ipa \
             | xcpretty
 
-      # 6️⃣ Загрузка IPA как артефакта
-      - name: Upload IPA
+      - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: AniLiberty-unsigned
           path: build/ipa/*.ipa
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
