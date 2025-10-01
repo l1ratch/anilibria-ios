@@ -24,8 +24,7 @@ jobs:
       - name: Build Archive (unsigned)
         run: |
           mkdir -p build
-          
-          # Находим workspace или project
+      
           ws=$(find . -maxdepth 1 -name "*.xcworkspace" | head -n1)
           proj=$(find . -maxdepth 1 -name "*.xcodeproj" | head -n1)
 
@@ -33,20 +32,18 @@ jobs:
           echo "Detected project: $proj"
 
           if [ -n "$ws" ]; then
-            echo "📦 Building using workspace: $ws"
-            xcodebuild clean build \
+            xcodebuild clean archive \
               -workspace "$ws" \
               -scheme "$SCHEME" \
-              -configuration Release \
+              -archivePath "build/$SCHEME.xcarchive" \
               CODE_SIGN_IDENTITY="" \
               CODE_SIGNING_REQUIRED=NO \
               CODE_SIGNING_ALLOWED=NO | xcpretty
           elif [ -n "$proj" ]; then
-            echo "📦 Building using project: $proj"
-            xcodebuild clean build \
+            xcodebuild clean archive \
               -project "$proj" \
               -scheme "$SCHEME" \
-              -configuration Release \
+              -archivePath "build/$SCHEME.xcarchive" \
               CODE_SIGN_IDENTITY="" \
               CODE_SIGNING_REQUIRED=NO \
               CODE_SIGNING_ALLOWED=NO | xcpretty
@@ -58,7 +55,7 @@ jobs:
       - name: Package unsigned IPA
         run: |
           mkdir -p build/ipa/Payload
-          cp -r build/Release-iphoneos/$SCHEME.app build/ipa/Payload/
+          cp -r build/$SCHEME.xcarchive/Products/Applications/$SCHEME.app build/ipa/Payload/
           cd build/ipa
           zip -r ../$SCHEME-unsigned.ipa Payload
           cd ../
