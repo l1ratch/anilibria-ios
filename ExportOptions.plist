@@ -3,22 +3,27 @@
 "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Используем безопасный тип экспорта -->
     <key>method</key>
-    <string>ad-hoc</string>
+    <string>release-testing</string>
 
-    <key>compileBitcode</key>
-    <false/>
-
+    <!-- Полностью отключаем подпись -->
     <key>signingStyle</key>
     <string>manual</string>
-
+    
     <key>signingCertificate</key>
     <string></string>
 
+    <!-- Пустой профиль -->
     <key>provisioningProfiles</key>
     <dict/>
-    
+
+    <!-- Просто фиктивный teamID -->
     <key>teamID</key>
-    <string></string>
+    <string>XXXXXXXXXX</string>
+
+    <!-- Отключаем Bitcode -->
+    <key>compileBitcode</key>
+    <false/>
 </dict>
 </plist>
