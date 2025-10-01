@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>development</string>
+    <string>ad-hoc</string>
+
     <key>compileBitcode</key>
     <false/>
-    <key>stripSwiftSymbols</key>
-    <true/>
-    <key>destination</key>
-    <string>export</string>
+
+    <key>signingStyle</key>
+    <string>manual</string>
+
+    <key>signingCertificate</key>
+    <string></string>
+
+    <key>provisioningProfiles</key>
+    <dict/>
+    
     <key>teamID</key>
-    <string>XXXXXXXXXX</string>
-    <key>thinning</key>
-    <string>&lt;none&gt;</string>
+    <string></string>
 </dict>
 </plist>
