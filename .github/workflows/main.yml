@@ -26,21 +26,21 @@ jobs:
         run: |
           mkdir -p build
 
-          ws=$(ls *.xcworkspace 2>/dev/null | head -n1)
-          proj=$(ls *.xcodeproj 2>/dev/null | head -n1)
+          ws=$(find . -maxdepth 1 -name "*.xcworkspace" | head -n1)
+          proj=$(find . -maxdepth 1 -name "*.xcodeproj" | head -n1)
 
           echo "Detected workspace: $ws"
           echo "Detected project: $proj"
 
           if [ -n "$ws" ]; then
-            echo "Building using workspace: $ws"
+            echo "📦 Building using workspace: $ws"
             xcodebuild clean archive \
               -workspace "$ws" \
               -scheme "$SCHEME" \
               -archivePath "build/$SCHEME.xcarchive" \
               CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
           elif [ -n "$proj" ]; then
-            echo "Building using project: $proj"
+            echo "📦 Building using project: $proj"
             xcodebuild clean archive \
               -project "$proj" \
               -scheme "$SCHEME" \
