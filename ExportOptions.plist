@@ -1,38 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Без подписи -->
+    <!-- Метод экспорта: app-store, ad-hoc, enterprise, development -->
+    <key>method</key>
+    <string>development</string>
+
+    <!-- Не подписывать автоматически -->
     <key>signingStyle</key>
     <string>manual</string>
 
-    <!-- Новый метод без подписи -->
-    <key>method</key>
-    <string>debugging</string>
-
-    <!-- Фиктивный Team ID (нужен, но не проверяется) -->
-    <key>teamID</key>
-    <string>XXXXXXXXXX</string>
-
-    <!-- Без provisioning -->
-    <key>provisioningProfiles</key>
-    <dict/>
-
-    <!-- Без сертификатов -->
-    <key>signingCertificate</key>
-    <string></string>
-
-    <!-- Не компилировать Bitcode -->
+    <!-- Игнорировать автоматическую подпись -->
     <key>compileBitcode</key>
     <false/>
 
-    <!-- Не убирать Swift символы -->
+    <!-- Не добавлять автоматически подписи -->
     <key>stripSwiftSymbols</key>
-    <false/>
+    <true/>
 
-    <!-- Указываем директорию экспорта -->
-    <key>destination</key>
-    <string>export</string>
+    <!-- Сохраняем все Swift dylib -->
+    <key>thinning</key>
+    <string>&lt;none&gt;</string>
 </dict>
 </plist>
