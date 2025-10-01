@@ -7,10 +7,11 @@
     <key>signingStyle</key>
     <string>manual</string>
 
+    <!-- Новый метод без подписи -->
     <key>method</key>
-    <string>development</string>
+    <string>debugging</string>
 
-    <!-- Фиктивный teamID -->
+    <!-- Фиктивный Team ID (нужен, но не проверяется) -->
     <key>teamID</key>
     <string>XXXXXXXXXX</string>
 
@@ -22,15 +23,15 @@
     <key>signingCertificate</key>
     <string></string>
 
-    <!-- Отключаем Bitcode -->
+    <!-- Не компилировать Bitcode -->
     <key>compileBitcode</key>
     <false/>
 
-    <!-- Отключаем Swift stripping -->
+    <!-- Не убирать Swift символы -->
     <key>stripSwiftSymbols</key>
     <false/>
 
-    <!-- Экспортируем в build/ipa -->
+    <!-- Указываем директорию экспорта -->
     <key>destination</key>
     <string>export</string>
 </dict>
