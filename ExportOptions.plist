@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Метод экспорта: app-store, ad-hoc, enterprise, development -->
     <key>method</key>
     <string>development</string>
-
-    <!-- Не подписывать автоматически -->
-    <key>signingStyle</key>
-    <string>manual</string>
-
-    <!-- Игнорировать автоматическую подпись -->
     <key>compileBitcode</key>
     <false/>
-
-    <!-- Не добавлять автоматически подписи -->
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>destination</key>
+    <string>export</string>
     <key>stripSwiftSymbols</key>
     <true/>
-
-    <!-- Сохраняем все Swift dylib -->
-    <key>thinning</key>
-    <string>&lt;none&gt;</string>
 </dict>
 </plist>
