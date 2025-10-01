@@ -21,8 +21,10 @@ jobs:
       - name: Install gems
         run: |
           sudo gem install xcpretty cocoapods
+          pod repo update || true
+          pod install || true
 
-      - name: Build Archive
+      - name: Build Archive (iOS)
         run: |
           mkdir -p build
 
@@ -37,15 +39,23 @@ jobs:
             xcodebuild clean archive \
               -workspace "$ws" \
               -scheme "$SCHEME" \
+              -sdk iphoneos \
+              -destination 'generic/platform=iOS' \
               -archivePath "build/$SCHEME.xcarchive" \
-              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO | xcpretty
           elif [ -n "$proj" ]; then
             echo "📦 Building using project: $proj"
             xcodebuild clean archive \
               -project "$proj" \
               -scheme "$SCHEME" \
+              -sdk iphoneos \
+              -destination 'generic/platform=iOS' \
               -archivePath "build/$SCHEME.xcarchive" \
-              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO | xcpretty
           else
             echo "❌ No Xcode project or workspace found!"
             exit 1
@@ -58,11 +68,11 @@ jobs:
             -archivePath "build/$SCHEME.xcarchive" \
             -exportPath "build/ipa" \
             -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO | xcpretty
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO | xcpretty
         env:
           SCHEME: AniLiberty
           EXPORT_OPTIONS_PLIST: ExportOptions.plist
-
 
       - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
