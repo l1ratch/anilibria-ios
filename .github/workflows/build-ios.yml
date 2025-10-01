@@ -1,69 +1,53 @@
-name: Build AniLiberty (v4)
+name: Build iOS IPA
 
 on:
   #push:
-    #branches: ["master"]
+    #branches: [main]
   workflow_dispatch:
 
 jobs:
-  build:
+  build-ios:
     runs-on: macos-latest
+
     env:
       SCHEME: AniLiberty
+      PROJECT: ./Anilibria.xcodeproj
       BUILD_PATH: build
+      EXPORT_OPTIONS_PLIST: ExportOptions.plist
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install xcpretty
-        run: |
-          sudo gem install xcpretty
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v2
+        with:
+          xcode-version: '15.2'  # укажи нужную версию
 
-      - name: Detect Xcode project/workspace
-        id: detect
+      - name: Clean build folder
         run: |
-          ws=$(find . -maxdepth 1 -name "*.xcworkspace" | head -n1)
-          proj=$(find . -maxdepth 1 -name "*.xcodeproj" | head -n1)
-          echo "workspace=$ws" >> $GITHUB_ENV
-          echo "project=$proj" >> $GITHUB_ENV
-
-      - name: Build Archive
-        run: |
+          rm -rf $BUILD_PATH
           mkdir -p $BUILD_PATH
-          if [ -n "$workspace" ]; then
-            echo "Building using workspace: $workspace"
-            xcodebuild clean archive \
-              -workspace "$workspace" \
-              -scheme "$SCHEME" \
-              -configuration Release \
-              -archivePath "$BUILD_PATH/$SCHEME.xcarchive" \
-              CODE_SIGNING_ALLOWED=NO \
-              CODE_SIGNING_REQUIRED=NO | xcpretty
-          elif [ -n "$project" ]; then
-            echo "Building using project: $project"
-            xcodebuild clean archive \
-              -project "$project" \
-              -scheme "$SCHEME" \
-              -configuration Release \
-              -archivePath "$BUILD_PATH/$SCHEME.xcarchive" \
-              CODE_SIGNING_ALLOWED=NO \
-              CODE_SIGNING_REQUIRED=NO | xcpretty
-          else
-            echo "No Xcode project or workspace found!"
-            exit 1
-          fi
 
-      - name: Package unsigned IPA
+      - name: Archive project for Generic iOS Device
         run: |
-          mkdir -p $BUILD_PATH/ipa/Payload
-          cp -R "$BUILD_PATH/$SCHEME.xcarchive/Products/Applications/$SCHEME.app" "$BUILD_PATH/ipa/Payload/"
-          cd $BUILD_PATH/ipa
-          zip -r ../$SCHEME-unsigned.ipa Payload
-          cd ../..
+          xcodebuild archive \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "generic/platform=iOS" \
+            -archivePath "$BUILD_PATH/$SCHEME.xcarchive" \
+            SKIP_INSTALL=NO \
+            BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
 
-      - name: Upload artifact
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$BUILD_PATH/$SCHEME.xcarchive" \
+            -exportPath "$BUILD_PATH/ipa" \
+            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST"
+
+      - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: AniLiberty-unsigned
-          path: $BUILD_PATH/ipa/AniLiberty-unsigned.zip
+          path: $BUILD_PATH/ipa/*.ipa
