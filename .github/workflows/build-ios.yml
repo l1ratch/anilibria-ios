@@ -1,35 +1,33 @@
-name: Build AniLiberty iOS IPA
+name: Build AniLiberty IPA (v3)
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
   workflow_dispatch:
 
+env:
+  SCHEME: AniLiberty
+  BUILD_PATH: build
+
 jobs:
-  build-ios:
+  build_ios:
     runs-on: macos-latest
-    env:
-      SCHEME: AniLiberty
-      EXPORT_OPTIONS_PLIST: ExportOptions.plist
-      BUILD_PATH: build
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install gems
+      - name: Install dependencies
         run: |
           sudo gem install xcpretty cocoapods
+          pod install --repo-update || echo "No Podfile found"
 
-      - name: Install pods
-        run: |
-          pod install || echo "No pods found"
-
-      - name: Build iOS Archive
+      - name: Build archive (unsigned)
         run: |
           mkdir -p $BUILD_PATH
+
           ws=$(find . -maxdepth 1 -name "*.xcworkspace" | head -n1)
           proj=$(find . -maxdepth 1 -name "*.xcodeproj" | head -n1)
 
@@ -40,34 +38,36 @@ jobs:
             xcodebuild clean archive \
               -workspace "$ws" \
               -scheme "$SCHEME" \
-              -destination "generic/platform=iOS" \
               -archivePath "$BUILD_PATH/$SCHEME.xcarchive" \
-              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO | xcpretty
           elif [ -n "$proj" ]; then
             xcodebuild clean archive \
               -project "$proj" \
               -scheme "$SCHEME" \
-              -destination "generic/platform=iOS" \
               -archivePath "$BUILD_PATH/$SCHEME.xcarchive" \
-              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO | xcpretty
           else
             echo "❌ No Xcode project or workspace found!"
             exit 1
           fi
 
-      - name: Export unsigned IPA
+      - name: Package unsigned IPA manually
         run: |
-          mkdir -p $BUILD_PATH/ipa
-          xcodebuild -exportArchive \
-            -archivePath "$BUILD_PATH/$SCHEME.xcarchive" \
-            -exportPath "$BUILD_PATH/ipa" \
-            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
-            CODE_SIGN_IDENTITY="" \
-            SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO | xcpretty
+          mkdir -p $BUILD_PATH/ipa/Payload
+          cp -r $BUILD_PATH/$SCHEME.xcarchive/Products/Applications/$SCHEME.app $BUILD_PATH/ipa/Payload/
+          cd $BUILD_PATH/ipa
+          zip -r ../$SCHEME-unsigned.ipa Payload
+        shell: bash
 
       - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
-          name: AniLiberty-unsigned
-          path: $BUILD_PATH/ipa/*.ipa
+          name: ${{ env.SCHEME }}-unsigned
+          path: ${{ env.BUILD_PATH }}/${{ env.SCHEME }}-unsigned.ipa
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: true
