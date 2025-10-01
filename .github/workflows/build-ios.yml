@@ -1,4 +1,4 @@
-name: Build iOS IPA
+name: Build iOS IPA V4
 
 on:
   #push:
