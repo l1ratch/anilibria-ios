@@ -1,0 +1,68 @@
+name: Build AniLiberty IPA
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    env:
+      SCHEME: AniLiberty
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install gems
+        run: |
+          sudo gem install xcpretty cocoapods
+
+      - name: Build Archive
+        run: |
+          mkdir -p build
+
+          ws=$(find . -maxdepth 1 -name "*.xcworkspace" | head -n1)
+          proj=$(find . -maxdepth 1 -name "*.xcodeproj" | head -n1)
+
+          echo "Detected workspace: $ws"
+          echo "Detected project: $proj"
+
+          if [ -n "$ws" ]; then
+            echo "📦 Building using workspace: $ws"
+            xcodebuild clean archive \
+              -workspace "$ws" \
+              -scheme "$SCHEME" \
+              -archivePath "build/$SCHEME.xcarchive" \
+              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+          elif [ -n "$proj" ]; then
+            echo "📦 Building using project: $proj"
+            xcodebuild clean archive \
+              -project "$proj" \
+              -scheme "$SCHEME" \
+              -archivePath "build/$SCHEME.xcarchive" \
+              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+          else
+            echo "❌ No Xcode project or workspace found!"
+            exit 1
+          fi
+
+      - name: Package unsigned IPA manually
+        run: |
+          mkdir -p build/ipa/Payload
+          cp -R build/$SCHEME.xcarchive/Products/Applications/$SCHEME.app build/ipa/Payload/
+          cd build/ipa
+          zip -r ../$SCHEME-unsigned.ipa Payload
+          cd ../..
+
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: AniLiberty-unsigned
+          path: build/AniLiberty-unsigned.ipa
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
