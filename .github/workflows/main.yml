@@ -25,10 +25,18 @@ jobs:
       - name: Build Archive
         run: |
           mkdir -p build
-          xcodebuild clean archive \
-            -project "Anilibria.xcodeproj" \
-            -scheme "$SCHEME" \
-            -archivePath "build/$SCHEME.xcarchive" | xcpretty
+          ws=$(ls *.xcworkspace 2>/dev/null | head -n1)
+          proj=$(ls *.xcodeproj 2>/dev/null | head -n1)
+      
+          if [ -n "$ws" ]; then
+            xcodebuild clean archive -workspace "$ws" -scheme "$SCHEME" -archivePath "build/$SCHEME.xcarchive" | xcpretty
+          elif [ -n "$proj" ]; then
+            xcodebuild clean archive -project "$proj" -scheme "$SCHEME" -archivePath "build/$SCHEME.xcarchive" | xcpretty
+          else
+            echo "No Xcode project or workspace found!"
+            exit 1
+          fi
+
 
       - name: Export unsigned IPA
         run: |
