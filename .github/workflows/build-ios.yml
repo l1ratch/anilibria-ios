@@ -64,5 +64,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AniLiberty-unsigned
-          path: build/$SCHEME-unsigned.ipa
+          path: build/AniLiberty-unsigned.ipa
           if-no-files-found: warn
