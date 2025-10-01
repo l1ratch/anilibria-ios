@@ -51,14 +51,18 @@ jobs:
             exit 1
           fi
 
-      - name: Export unsigned IPA
+      - name: Export IPA (unsigned)
         run: |
           mkdir -p build/ipa
           xcodebuild -exportArchive \
             -archivePath "build/$SCHEME.xcarchive" \
-            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
             -exportPath "build/ipa" \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO | xcpretty
+        env:
+          SCHEME: AniLiberty
+          EXPORT_OPTIONS_PLIST: ExportOptions.plist
+
 
       - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
