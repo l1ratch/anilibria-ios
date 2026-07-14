@@ -6,6 +6,7 @@ public struct PlayerSettings: Codable {
     var autoPlay: Bool = true
     var playbackRate: Double = 1.0
     var playOnStartup: Bool = false
+    var volume: Float = 1.0
 
     init() {}
 
@@ -16,6 +17,7 @@ public struct PlayerSettings: Codable {
         self.autoPlay = container.decode(.autoPlay) ?? true
         self.playbackRate = container.decode(.playbackRate) ?? 1.0
         self.playOnStartup = container.decode(.playOnStartup) ?? false
+        self.volume = container.decode(.volume) ?? 1.0
     }
 
     static var playbackRateOptions: [Double] {

@@ -18,6 +18,10 @@ final class PlayerViewModel {
     @Published private(set) var orientation = InterfaceOrientation.current
     @Published private(set) var playItem: PlayItem?
     @Published private(set) var playbackRate: Double
+    @Published private(set) var volume: Float
+    @Published private(set) var isMuted: Bool = false
+
+    private var volumeBeforeMute: Float = 1.0
 
     private var changed: Bool = false
     private var currentTimeCode: TimeCodeData?
@@ -32,6 +36,7 @@ final class PlayerViewModel {
     private var playerSettings: PlayerSettings {
         didSet {
             playbackRate = playerSettings.playbackRate
+            volume = playerSettings.volume
         }
     }
 
@@ -48,6 +53,7 @@ final class PlayerViewModel {
         self.sessionService = sessionService
         self.playerSettings = playerService.fetchSettings()
         self.playbackRate = playerSettings.playbackRate
+        self.volume = playerSettings.volume
         skipViewModel.set(mode: playerSettings.skipMode)
     }
 }
@@ -132,6 +138,27 @@ extension PlayerViewModel {
             save()
             seriesEnded()
         }
+    }
+
+    @discardableResult
+    func changeVolume(by delta: Float) -> Float {
+        if isMuted { isMuted = false }
+        let newValue = min(max(playerSettings.volume + delta, 0), 1)
+        playerSettings.volume = newValue
+        playerService.update(settings: playerSettings)
+        return newValue
+    }
+
+    func toggleMute() {
+        if isMuted {
+            isMuted = false
+            playerSettings.volume = volumeBeforeMute
+        } else {
+            volumeBeforeMute = playerSettings.volume
+            isMuted = true
+            playerSettings.volume = 0
+        }
+        playerService.update(settings: playerSettings)
     }
 
     func showSettings() {
