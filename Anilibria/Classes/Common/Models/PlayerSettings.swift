@@ -19,7 +19,7 @@ public struct PlayerSettings: Codable {
     }
 
     static var playbackRateOptions: [Double] {
-        [0.25, 0.5, 1.0, 1.5, 2.0]
+        [0.25, 0.5, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.5, 2.0]
     }
 
     static func nameFor(rate: Double) -> String {
