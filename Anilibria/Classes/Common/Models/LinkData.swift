@@ -7,14 +7,9 @@ public enum LinkType: String, Codable {
     case telegram
     case discord
     case boosty
-    case anilibria
-    case info
-    case rules
-    case person
     case site
-    case unknown
 
-    public var icon: UIImage? {
+    public var icon: UIImage {
         switch self {
         case .vk:
             return .iconVk
@@ -30,13 +25,31 @@ public enum LinkType: String, Codable {
             return .System.web
         case .boosty:
             return .iconBoosty
-        default:
-            return .iconAnilibria
         }
     }
 }
 
-public struct LinkData: Codable {
-    let linkType: LinkType
+public struct LinkData: Codable, Hashable {
+    let linkType: LinkType?
     let url: URL?
+
+    public init(linkType: LinkType?, url: URL?) {
+        self.linkType = linkType
+        self.url = url
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.linkType = container.decode(.linkType)
+        self.url = container.decode(.url)
+    }
+}
+
+extension Optional where Wrapped == LinkType {
+    var icon: UIImage {
+        if let self {
+            return self.icon
+        }
+        return .iconAnilibria
+    }
 }

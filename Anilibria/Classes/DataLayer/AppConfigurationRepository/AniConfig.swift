@@ -2,11 +2,32 @@ import Foundation
 
 struct AniConfig: Codable, Hashable {
     let addresses: [AniAddress]
+    let urls: AniLinks?
+
+    init(
+        addresses: [AniAddress],
+        urls: AniLinks? = nil
+    ) {
+        self.addresses = addresses
+        self.urls = urls
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.addresses = try container.decode(required: .addresses)
+        self.urls = container.decode(.urls)
+    }
 }
 
 struct AniAddress: Codable, Hashable {
     let baseUrl: URL
     let baseImagesUrl: URL
+}
+
+struct AniLinks: Codable, Hashable {
+    let donateUrl: URL
+    let signUpUrl: URL
+    let links: [LinkData]
 }
 
 extension AniConfig {

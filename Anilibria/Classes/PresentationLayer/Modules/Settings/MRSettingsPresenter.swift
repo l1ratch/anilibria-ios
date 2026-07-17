@@ -129,7 +129,7 @@ extension SettingsPresenter: SettingsEventHandler {
 
         self.router.openSheet(with: [ChoiceGroup(items: items)])
     }
-    
+
     func selectLanguage() {
         let languages = Language.allCases
         let items = languages.map {
@@ -143,7 +143,7 @@ extension SettingsPresenter: SettingsEventHandler {
                 }
             )
         }
-        
+
         self.router.openSheet(with: [ChoiceGroup(items: items)])
     }
 
