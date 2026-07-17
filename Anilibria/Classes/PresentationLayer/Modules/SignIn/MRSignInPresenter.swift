@@ -18,10 +18,13 @@ final class SignInPresenter {
     private var activity: ActivityDisposable?
 
     private let sessionService: SessionService
+    private let linksService: LinksService
     private var bag = Set<AnyCancellable>()
 
-    init(sessionService: SessionService) {
+    init(sessionService: SessionService,
+         linksService: LinksService) {
         self.sessionService = sessionService
+        self.linksService = linksService
     }
 }
 
@@ -76,7 +79,15 @@ extension SignInPresenter: SignInEventHandler {
     }
 
     func signUp() {
-        router.open(url: .web(URLS.signUp))
+        self.linksService
+            .fetchDonateLink()
+            .manageActivity(self.view.showLoading(fullscreen: false))
+            .sink(onNext: { [weak self] url in
+                self?.router.open(url: .web(url))
+            }, onError: { [weak self] error in
+                self?.router.show(error: error)
+            })
+            .store(in: &bag)
     }
 
     func resetPassword() {

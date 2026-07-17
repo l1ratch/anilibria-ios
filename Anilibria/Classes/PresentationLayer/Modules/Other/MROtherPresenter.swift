@@ -67,7 +67,15 @@ extension OtherPresenter: OtherEventHandler {
     }
 
     func donate() {
-        self.router.open(url: URLS.donate)
+        self.linksService
+            .fetchDonateLink()
+            .manageActivity(self.view.showLoading(fullscreen: false))
+            .sink(onNext: { [weak self] url in
+                self?.router.open(url: url)
+            }, onError: { [weak self] error in
+                self?.router.show(error: error)
+            })
+            .store(in: &bag)
     }
 
     func settings() {

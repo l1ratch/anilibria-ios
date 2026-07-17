@@ -16,7 +16,7 @@ protocol ConfigRepository {
 }
 
 final class ConfigRepositoryImp: ConfigRepository {
-    private let keyConfig: String = "ANI_CONFIG_INFO_KEY"
+    private let keyConfig: String = "ANI_CONFIG_INFO_KEY_V2"
 
     func set(config: AniConfigInfo) {
         UserDefaults.standard[keyConfig] = config

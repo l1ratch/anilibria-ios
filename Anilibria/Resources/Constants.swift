@@ -25,17 +25,6 @@ struct Keys {
 }
 
 struct URLS {
-    static let donate: URL? = URL(string: "https://anilibria.top/support")
-
-    static let vk: URL? = URL(string: "https://vk.com/anilibria")
-    static let youtube: URL? = URL(string: "https://www.youtube.com/user/anilibriatv")
-    static let patreon: URL? = URL(string: "https://www.patreon.com/anilibria")
-    static let telegram: URL? = URL(string: "https://t.me/anilibria")
-    static let discord: URL? = URL(string: "https://discord.gg/M6yCGeGN9B")
-    static let boosty: URL? = URL(string: "https://boosty.to/anilibriatv")
-
-    static let signUp: URL? = URL(string: "https://anilibria.top/app/auth/registration/newRegistration")
-
     static let config: URL = URL(
         string: "https://gist.githubusercontent.com/Allui/ede8643134477a9ea84eea967b0e18e4/raw/config.json"
     )!
