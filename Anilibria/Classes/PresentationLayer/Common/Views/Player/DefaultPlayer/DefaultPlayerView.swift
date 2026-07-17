@@ -39,6 +39,13 @@ public final class DefaultPlayerView: UIView, Player {
         }
     }
 
+    public var volume: Float = 1 {
+        didSet {
+            volume = min(max(volume, 0), 1)
+            player?.volume = volume
+        }
+    }
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
         try? AVAudioSession.sharedInstance().setCategory(.playback)
@@ -86,6 +93,7 @@ public final class DefaultPlayerView: UIView, Player {
         let asset = AVAsset(url: url)
         let item = AVPlayerItem(asset: asset)
         self.player = AVPlayer(playerItem: item)
+        self.player?.volume = volume
 
         setupStateObserving()
         observeTime()
