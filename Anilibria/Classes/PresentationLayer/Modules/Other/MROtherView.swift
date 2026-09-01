@@ -176,7 +176,7 @@ final class SettingsPlusViewController: BaseViewController, UITableViewDelegate,
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -184,33 +184,69 @@ final class SettingsPlusViewController: BaseViewController, UITableViewDelegate,
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "НАВИГАЦИЯ И ИНТЕРФЕЙС"
+        if section == 0 {
+            return "НАВИГАЦИЯ И ИНТЕРФЕЙС"
+        } else {
+            return "ГЛАВНЫЙ ЭКРАН"
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .value1, reuseIdentifier: "PlusCell")
-        cell.backgroundColor = .Surfaces.content
-        cell.accessoryType = .disclosureIndicator
-        
-        let count = MenuSettingsManager.shared.getActiveTabs().count
-        cell.textLabel?.text = "Настройка навигации"
-        cell.textLabel?.textColor = .Text.main
-        cell.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
-        
-        cell.detailTextLabel?.text = "\(count) вкл."
-        cell.detailTextLabel?.textColor = .Text.secondary
-        cell.detailTextLabel?.font = .systemFont(ofSize: 14, weight: .regular)
-        
-        cell.imageView?.image = UIImage(systemName: "slider.horizontal.3")
-        cell.imageView?.tintColor = .Tint.active
-        return cell
+        if indexPath.section == 0 {
+            let cell = UITableViewCell(style: .value1, reuseIdentifier: "PlusCell")
+            cell.backgroundColor = .Surfaces.content
+            cell.accessoryType = .disclosureIndicator
+            
+            let count = MenuSettingsManager.shared.getActiveTabs().count
+            cell.textLabel?.text = "Настройка навигации"
+            cell.textLabel?.textColor = .Text.main
+            cell.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+            
+            cell.detailTextLabel?.text = "\(count) вкл."
+            cell.detailTextLabel?.textColor = .Text.secondary
+            cell.detailTextLabel?.font = .systemFont(ofSize: 14, weight: .regular)
+            
+            cell.imageView?.image = UIImage(systemName: "slider.horizontal.3")
+            cell.imageView?.tintColor = .Tint.active
+            return cell
+        } else {
+            let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "SwitchCell")
+            cell.backgroundColor = .Surfaces.content
+            cell.selectionStyle = .none
+            
+            cell.textLabel?.text = "Скрывать промо-баннер"
+            cell.textLabel?.textColor = .Text.main
+            cell.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+            
+            cell.detailTextLabel?.text = "Скрыть блок новостей/промо в ленте"
+            cell.detailTextLabel?.textColor = .Text.secondary
+            cell.detailTextLabel?.font = .systemFont(ofSize: 12, weight: .regular)
+            
+            cell.imageView?.image = UIImage(systemName: "rectangle.badge.xmark")
+            cell.imageView?.tintColor = .Tint.active
+            
+            let switchView = UISwitch()
+            switchView.isOn = UserDefaults.standard.bool(forKey: "AniLiberty.HideFeedPromo")
+            switchView.onTintColor = .Tint.active
+            switchView.addTarget(self, action: #selector(toggleFeedPromo(_:)), for: .valueChanged)
+            cell.accessoryView = switchView
+            return cell
+        }
+    }
+    
+    @objc private func toggleFeedPromo(_ sender: UISwitch) {
+        triggerHaptic(style: .light)
+        UserDefaults.standard.set(sender.isOn, forKey: "AniLiberty.HideFeedPromo")
+        NotificationCenter.default.post(name: NSNotification.Name("FeedSettingsDidChange"), object: nil)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        triggerHaptic(style: .light)
-        let vc = TabSettingsViewController()
-        self.navigationController?.pushViewController(vc, animated: true)
+        if indexPath.section == 0 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            triggerHaptic(style: .light)
+            let vc = TabSettingsViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
 }
 

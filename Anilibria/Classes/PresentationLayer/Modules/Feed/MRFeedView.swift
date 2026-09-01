@@ -19,6 +19,7 @@ final class FeedViewController: BaseCollectionViewController {
     #endif
 
     var bag: Any?
+    private var lastRawItems: [any Hashable] = []
 
     // MARK: - Life cycle
 
@@ -29,6 +30,12 @@ final class FeedViewController: BaseCollectionViewController {
         self.handler.didLoad()
         self.collectionView.contentInset.top = 10
         self.collectionView.contentInset.bottom = 16
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(feedSettingsChanged), name: NSNotification.Name("FeedSettingsDidChange"), object: nil)
+    }
+
+    @objc private func feedSettingsChanged() {
+        self.set(items: self.lastRawItems)
     }
 
     override func setupStrings() {
@@ -57,6 +64,9 @@ final class FeedViewController: BaseCollectionViewController {
     private func map(item: any Hashable) -> (any SectionAdapterProtocol)? {
         switch item {
         case let model as PromoViewModel:
+            if UserDefaults.standard.bool(forKey: "AniLiberty.HideFeedPromo") {
+                return nil
+            }
             return SectionAdapter([PromoCellAdapter(viewModel: model)])
         case let model as SoonViewModel:
             return SoonSectionsAdapter(model)
@@ -72,6 +82,7 @@ final class FeedViewController: BaseCollectionViewController {
 
 extension FeedViewController: FeedViewBehavior {
     func set(items: [any Hashable]) {
+        self.lastRawItems = items
         set(sections: items.compactMap(map))
     }
 }

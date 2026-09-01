@@ -11,6 +11,7 @@ final class MainContainerViewController: BaseViewController {
     var handler: MainContainerEventHandler!
     private var pages: [MenuControllerData] = []
     private var glassBlurView: UIVisualEffectView?
+    private var dockWidthConstraint: NSLayoutConstraint?
 
     // MARK: - Life cycle
 
@@ -39,9 +40,29 @@ final class MainContainerViewController: BaseViewController {
         }
     }
     
+    private func updateDockWidth(for itemCount: Int) {
+        let buttonWidth: CGFloat = 64
+        let padding: CGFloat = 16
+        let calculatedWidth = min(view.bounds.width - 24, CGFloat(itemCount) * buttonWidth + padding)
+        
+        if let existing = dockWidthConstraint {
+            existing.constant = calculatedWidth
+        } else {
+            dockWidthConstraint = shadowView.widthAnchor.constraint(equalToConstant: calculatedWidth)
+            dockWidthConstraint?.priority = UILayoutPriority(1000)
+            dockWidthConstraint?.isActive = true
+        }
+        
+        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: [], animations: {
+            self.view.layoutIfNeeded()
+        })
+    }
+    
     @objc private func reloadTabs() {
         let newItems = MenuItemsFactory.create()
         let currentType = self.pages[safe: self.pagerView.currentIndex]?.type ?? .other
+        
+        updateDockWidth(for: newItems.count)
         
         // Update menuTabBar items
         self.menuTabBar.set(newItems) { [weak self] type in
@@ -143,6 +164,8 @@ extension MainContainerViewController: MainContainerViewBehavior {
         self.pages.forEach { page in
             page.controller.additionalSafeAreaInsets.bottom = 75
         }
+        
+        self.updateDockWidth(for: items.count)
         
         self.menuTabBar.set(items) { [weak self] type in
             self?.handler.select(item: type)

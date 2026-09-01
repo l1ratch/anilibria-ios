@@ -59,8 +59,8 @@ final class ActionSheetViewController: BaseCollectionViewController {
             type: SectionBackgroundCollectionViewCompositionalLayout.self,
             configuration: conf
         ) { layout in
-            layout.backgroundColor = UIColor.white.withAlphaComponent(0.1)
-            layout.cornerRadius = 4
+            layout.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
+            layout.cornerRadius = 12
             layout.backgroundInsets = .init(top: 0, left: 8, bottom: 0, right: 8)
         }
     }

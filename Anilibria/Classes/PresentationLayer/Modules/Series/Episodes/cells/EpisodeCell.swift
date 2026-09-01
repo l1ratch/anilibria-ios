@@ -24,9 +24,6 @@ final class EpisodeCell: RippleViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         timeLabel.superview?.smoothCorners(with: 6)
-        imageView.smoothCorners(with: 8)
-        progressView.progressTintColor = .Tint.active
-        progressView.trackTintColor = .Surfaces.base
         progressView.transform = .init(scaleX: 1, y: 2)
     }
 

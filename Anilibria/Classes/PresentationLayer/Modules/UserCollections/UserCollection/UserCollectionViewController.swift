@@ -22,6 +22,7 @@ protocol UserCollectionViewModelProtocol: SeriesViewModelProtocol {
 
 final class UserCollectionViewController: BaseCollectionViewController {
     @IBOutlet var searchView: SearchView!
+    @IBOutlet var searchToggleButton: UIButton!
     @IBOutlet var filterButton: UIButton!
     @IBOutlet var refreshButton: UIButton!
 
@@ -68,6 +69,17 @@ final class UserCollectionViewController: BaseCollectionViewController {
                 self?.viewModel.search(query: text)
             })
             .store(in: &subscribers)
+
+        searchToggleButton?.publisher(for: .touchUpInside).sink { [weak self] in
+            guard let self else { return }
+            self.triggerHaptic(style: .light)
+            let isOpening = self.searchView.isHidden
+            UIView.animate(withDuration: 0.25) {
+                self.searchView.isHidden = !isOpening
+                self.searchToggleButton.tintColor = isOpening ? .Tint.active : .Tint.main
+                self.view.layoutIfNeeded()
+            }
+        }.store(in: &subscribers)
 
         filterButton.publisher(for: .touchUpInside).sink { [weak self] in
             self?.viewModel.openFilter()

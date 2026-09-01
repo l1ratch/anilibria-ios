@@ -63,10 +63,10 @@
                                         <constraint firstAttribute="height" priority="751" constant="400" id="0NC-wK-Lml"/>
                                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="10" id="ho6-Jm-uci"/>
                                     </constraints>
-                                    <blurEffect style="light"/>
+                                    <blurEffect style="systemMaterialDark"/>
                                     <userDefinedRuntimeAttributes>
                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                            <integer key="value" value="5"/>
+                                            <integer key="value" value="18"/>
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                 </visualEffectView>
@@ -74,16 +74,16 @@
                                     <rect key="frame" x="0.0" y="404" width="382" height="0.0"/>
                                 </stackView>
                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iGx-1Q-4rj" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="408" width="382" height="40"/>
+                                    <rect key="frame" x="0.0" y="408" width="382" height="48"/>
                                     <subviews>
                                         <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lzj-dl-O3g">
-                                            <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="382" height="48"/>
                                             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="QCt-4q-80e">
-                                                <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="382" height="48"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Apj-zN-056">
-                                                        <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="382" height="48"/>
                                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                                                         <state key="normal">
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -100,12 +100,12 @@
                                                     <constraint firstItem="Apj-zN-056" firstAttribute="leading" secondItem="QCt-4q-80e" secondAttribute="leading" id="cC1-Af-Rho"/>
                                                 </constraints>
                                             </view>
-                                            <blurEffect style="light"/>
+                                            <blurEffect style="systemMaterialDark"/>
                                         </visualEffectView>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="40" id="4FN-wK-di5"/>
+                                        <constraint firstAttribute="height" constant="48" id="4FN-wK-di5"/>
                                         <constraint firstAttribute="trailing" secondItem="lzj-dl-O3g" secondAttribute="trailing" id="HUd-j1-WYt"/>
                                         <constraint firstAttribute="bottom" secondItem="lzj-dl-O3g" secondAttribute="bottom" id="ICH-SK-QCT"/>
                                         <constraint firstItem="lzj-dl-O3g" firstAttribute="top" secondItem="iGx-1Q-4rj" secondAttribute="top" id="dGg-XW-eGS"/>
@@ -113,7 +113,7 @@
                                     </constraints>
                                     <userDefinedRuntimeAttributes>
                                         <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                            <real key="value" value="5"/>
+                                            <real key="value" value="14"/>
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                 </view>
