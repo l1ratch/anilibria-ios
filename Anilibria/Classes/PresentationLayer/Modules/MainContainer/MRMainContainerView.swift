@@ -16,40 +16,70 @@ final class MainContainerViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupNativeTabBar()
+        setupFloatingLiquidGlassDock()
         setupPager()
         handler.didLoad()
         view.backgroundColor = .Surfaces.background
+        
+        self.additionalSafeAreaInsets.bottom = 85
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTabs), name: NSNotification.Name("TabsSettingsDidChange"), object: nil)
+    }
+    
+    @objc private func reloadTabs() {
+        let newItems = MenuItemsFactory.create()
+        self.set(items: newItems)
+        if let first = newItems.first {
+            self.set(selected: first.type)
+        }
     }
 
-    private func setupNativeTabBar() {
+    private func setupFloatingLiquidGlassDock() {
+        // Spatial drop shadow for depth
         shadowView.backgroundColor = .clear
-        shadowView.shadowOpacity = 0
+        shadowView.shadowOpacity = 0.6
+        shadowView.shadowRadius = 25
+        shadowView.shadowOffset = CGSize(width: 0, height: 12)
+        shadowView.shadowColor = UIColor.black.cgColor
 
         tabBarContainer.backgroundColor = .clear
         glassBlurView?.removeFromSuperview()
 
+        // Liquid glass backdrop
         let blur = UIBlurEffect(style: .systemUltraThinMaterialDark)
         let blurView = UIVisualEffectView(effect: blur)
         blurView.translatesAutoresizingMaskIntoConstraints = false
-
-        let topBorder = UIView()
-        topBorder.backgroundColor = UIColor.white.withAlphaComponent(0.12)
-        topBorder.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add subtle vibrancy tint
+        let tintView = UIView()
+        tintView.backgroundColor = UIColor(white: 1.0, alpha: 0.05)
+        tintView.translatesAutoresizingMaskIntoConstraints = false
+        blurView.contentView.addSubview(tintView)
 
         tabBarContainer.insertSubview(blurView, at: 0)
-        tabBarContainer.addSubview(topBorder)
+
+        // Continuous pill rounding (Height is 68, radius = 34)
+        tabBarContainer.layer.cornerCurve = .continuous
+        tabBarContainer.layer.cornerRadius = 34
+        tabBarContainer.layer.masksToBounds = true
+        blurView.layer.cornerCurve = .continuous
+        blurView.layer.cornerRadius = 34
+        blurView.layer.masksToBounds = true
+        
+        // Specular inner glass border
+        tabBarContainer.layer.borderWidth = 0.75
+        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
 
         NSLayoutConstraint.activate([
             blurView.topAnchor.constraint(equalTo: tabBarContainer.topAnchor),
             blurView.bottomAnchor.constraint(equalTo: tabBarContainer.bottomAnchor),
             blurView.leadingAnchor.constraint(equalTo: tabBarContainer.leadingAnchor),
             blurView.trailingAnchor.constraint(equalTo: tabBarContainer.trailingAnchor),
-
-            topBorder.topAnchor.constraint(equalTo: tabBarContainer.topAnchor),
-            topBorder.leadingAnchor.constraint(equalTo: tabBarContainer.leadingAnchor),
-            topBorder.trailingAnchor.constraint(equalTo: tabBarContainer.trailingAnchor),
-            topBorder.heightAnchor.constraint(equalToConstant: 0.5)
+            
+            tintView.topAnchor.constraint(equalTo: blurView.contentView.topAnchor),
+            tintView.bottomAnchor.constraint(equalTo: blurView.contentView.bottomAnchor),
+            tintView.leadingAnchor.constraint(equalTo: blurView.contentView.leadingAnchor),
+            tintView.trailingAnchor.constraint(equalTo: blurView.contentView.trailingAnchor)
         ])
 
         self.glassBlurView = blurView

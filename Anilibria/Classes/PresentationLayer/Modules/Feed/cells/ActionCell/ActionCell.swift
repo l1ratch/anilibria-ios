@@ -9,12 +9,20 @@ public final class ActionCell: RippleViewCell {
 
     public override func awakeFromNib() {
         super.awakeFromNib()
-        rippleContainerView?.smoothCorners(with: 12)
-        rippleContainerView?.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
-        rippleContainerView?.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        rippleContainerView?.layer.cornerCurve = .continuous
+        rippleContainerView?.smoothCorners(with: 25)
+        rippleContainerView?.backgroundColor = UIColor(white: 1.0, alpha: 0.1)
+        rippleContainerView?.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
         rippleContainerView?.layer.borderWidth = 0.5
+        
+        // Deep shadow for floating pill effect
+        rippleContainerView?.layer.shadowColor = UIColor.black.cgColor
+        rippleContainerView?.layer.shadowOpacity = 0.4
+        rippleContainerView?.layer.shadowRadius = 12
+        rippleContainerView?.layer.shadowOffset = CGSize(width: 0, height: 6)
+        
         titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
-        titleLabel.textColor = .Text.main
+        titleLabel.textColor = .white
     }
 
     func configure(_ item: ActionItem) {
@@ -35,7 +43,7 @@ public final class ActionCell: RippleViewCell {
             let attString = NSMutableAttributedString(attachment: attachment)
             attString.append(NSAttributedString(string: "  " + item.localizedTitle(), attributes: [
                 .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
-                .foregroundColor: UIColor.Text.main
+                .foregroundColor: UIColor.white
             ]))
             self.titleLabel.attributedText = attString
         } else {

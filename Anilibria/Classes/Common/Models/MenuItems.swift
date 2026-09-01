@@ -41,3 +41,36 @@ public final class MenuItemsFactory {
         ]
     }
 }
+
+public final class MenuSettingsManager {
+    public static let shared = MenuSettingsManager()
+    
+    private let activeTabsKey = "AniLiberty.ActiveTabs"
+    private let inactiveTabsKey = "AniLiberty.InactiveTabs"
+    
+    private let defaultActive: [MenuItemType] = [.feed, .catalog, .news, .collections, .other]
+    private let defaultInactive: [MenuItemType] = []
+    
+    public init() {}
+    
+    public func getActiveTabs() -> [MenuItemType] {
+        if let saved = UserDefaults.standard.stringArray(forKey: activeTabsKey) {
+            return saved.compactMap { MenuItemType(rawValue: $0) }
+        }
+        return defaultActive
+    }
+    
+    public func getInactiveTabs() -> [MenuItemType] {
+        if let saved = UserDefaults.standard.stringArray(forKey: inactiveTabsKey) {
+            return saved.compactMap { MenuItemType(rawValue: $0) }
+        }
+        return defaultInactive
+    }
+    
+    public func save(active: [MenuItemType], inactive: [MenuItemType]) {
+        let activeStrings = active.map { $0.rawValue }
+        let inactiveStrings = inactive.map { $0.rawValue }
+        UserDefaults.standard.set(activeStrings, forKey: activeTabsKey)
+        UserDefaults.standard.set(inactiveStrings, forKey: inactiveTabsKey)
+    }
+}
