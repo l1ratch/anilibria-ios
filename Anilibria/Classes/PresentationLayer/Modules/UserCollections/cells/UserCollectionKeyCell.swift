@@ -1,9 +1,6 @@
 //
 //  UserCollectionKeyCell.swift
-//  Anilibria
-//
-//  Created by Ivan Morozov on 09.05.2025.
-//  Copyright © 2025 Иван Морозов. All rights reserved.
+//  AniLiberty
 //
 
 import UIKit
@@ -18,7 +15,13 @@ public final class UserCollectionKeyCell: RippleViewCell {
 
     public override func awakeFromNib() {
         super.awakeFromNib()
-        titleLabel.font = UIFont.font(ofSize: 15, weight: .regular)
+        titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        backView.layer.cornerCurve = .continuous
+        backView.smoothCorners(with: backView.bounds.height / 2)
+    }
+
+    public override func layoutSubviews() {
+        super.layoutSubviews()
         backView.smoothCorners(with: backView.bounds.height / 2)
     }
 
@@ -34,20 +37,34 @@ public final class UserCollectionKeyCell: RippleViewCell {
     func set(selected: Bool, animated: Bool) {
         func apply() {
             if selected {
-                backView.backgroundColor = .Buttons.selected
-                titleLabel.textColor = .Text.monoLight
-                iconView.tintColor = .Text.monoLight
+                backView.backgroundColor = .Tint.active
+                backView.layer.borderColor = UIColor.white.withAlphaComponent(0.3).cgColor
+                backView.layer.borderWidth = 0.75
+                backView.layer.shadowColor = UIColor.Tint.active.cgColor
+                backView.layer.shadowRadius = 8
+                backView.layer.shadowOpacity = 0.5
+                backView.layer.shadowOffset = .zero
+                titleLabel.textColor = .white
+                iconView.tintColor = .white
             } else {
-                backView.backgroundColor = .Buttons.unselected
-                titleLabel.textColor = .Text.main
-                iconView.tintColor = .Text.main
+                backView.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
+                backView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+                backView.layer.borderWidth = 0.5
+                backView.layer.shadowOpacity = 0
+                titleLabel.textColor = .Text.secondary
+                iconView.tintColor = .Text.secondary
             }
         }
 
         if animated {
-            UIView.animate(withDuration: 0.3) {
-                apply()
-            }
+            UIView.animate(
+                withDuration: 0.25,
+                delay: 0,
+                usingSpringWithDamping: 0.75,
+                initialSpringVelocity: 0.5,
+                options: [.allowUserInteraction, .beginFromCurrentState],
+                animations: apply
+            )
         } else {
             apply()
         }

@@ -16,6 +16,7 @@ final class MainContainerViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.additionalSafeAreaInsets.bottom = 50
         setupFloatingDock()
         setupPager()
         handler.didLoad()
@@ -29,14 +30,16 @@ final class MainContainerViewController: BaseViewController {
 
     private func setupFloatingDock() {
         shadowView.backgroundColor = .clear
-        shadowView.shadowColor = UIColor.black.withAlphaComponent(0.4)
-        shadowView.shadowY = 6
-        shadowView.shadowRadius = 18
+        shadowView.shadowColor = UIColor.black
+        shadowView.shadowOpacity = 0.55
+        shadowView.shadowY = 8
+        shadowView.shadowRadius = 20
 
         tabBarContainer.backgroundColor = .clear
         tabBarContainer.layer.cornerCurve = .continuous
         tabBarContainer.layer.borderWidth = 0.75
-        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+        tabBarContainer.clipsToBounds = true
 
         // Remove old subviews from background
         glassBlurView?.removeFromSuperview()
@@ -48,7 +51,7 @@ final class MainContainerViewController: BaseViewController {
         blurView.clipsToBounds = true
 
         let tintOverlay = UIView()
-        tintOverlay.backgroundColor = UIColor(white: 1.0, alpha: 0.03)
+        tintOverlay.backgroundColor = UIColor(white: 1.0, alpha: 0.04)
         tintOverlay.translatesAutoresizingMaskIntoConstraints = false
         tintOverlay.layer.cornerCurve = .continuous
 
@@ -71,12 +74,12 @@ final class MainContainerViewController: BaseViewController {
     }
 
     private func updateDockCorners() {
-        // Subtle capsule rounding on the top/all edges of the dock
-        let radius: CGFloat = 20
-        tabBarContainer.layer.cornerRadius = radius
-        glassBlurView?.layer.cornerRadius = radius
+        let capsuleRadius: CGFloat = tabBarContainer.bounds.height > 0 ? (tabBarContainer.bounds.height / 2) : 31
+        tabBarContainer.layer.cornerRadius = capsuleRadius
+        glassBlurView?.layer.cornerRadius = capsuleRadius
+        shadowView.layer.cornerRadius = capsuleRadius
         if let tintOverlay = tabBarContainer.subviews.first(where: { $0 !== glassBlurView && $0 !== menuTabBar }) {
-            tintOverlay.layer.cornerRadius = radius
+            tintOverlay.layer.cornerRadius = capsuleRadius
         }
     }
 

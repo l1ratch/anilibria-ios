@@ -9,7 +9,7 @@ class BaseViewController: UIViewController, WaitingBehavior, Loggable {
     public private(set) var refreshControl: RefreshIndicator?
     private weak var refreshActivity: ActivityDisposable?
 
-    public var statusBarStyle: UIStatusBarStyle = .default
+    public var statusBarStyle: UIStatusBarStyle = .lightContent
 
     deinit {
         log(.info, "[D] \(self) destroyed")
@@ -30,7 +30,7 @@ class BaseViewController: UIViewController, WaitingBehavior, Loggable {
         super.viewDidLoad()
         self.setupBackButton()
         self.setupStrings()
-        view.backgroundColor = .Surfaces.base
+        view.backgroundColor = .Surfaces.background
     }
 
     public override func viewWillLayoutSubviews() {

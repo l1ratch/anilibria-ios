@@ -2,10 +2,12 @@ import UIKit
 
 public final class ActionItem: NSObject {
     let localizedTitle: () -> String
+    let icon: UIImage?
     private let action: ActionFunc
 
-    init(_ title: @escaping @autoclosure () -> String, action: @escaping ActionFunc) {
+    init(_ title: @escaping @autoclosure () -> String, icon: UIImage? = nil, action: @escaping ActionFunc) {
         self.localizedTitle = title
+        self.icon = icon
         self.action = action
     }
 

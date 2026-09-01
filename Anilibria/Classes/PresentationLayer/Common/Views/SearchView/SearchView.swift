@@ -33,6 +33,20 @@ public final class SearchView: LoadableView {
         }
     }
 
+    public override func awakeFromNib() {
+        super.awakeFromNib()
+        setupStyle()
+    }
+
+    private func setupStyle() {
+        if let bordered = subviews.first(where: { $0 is BorderedView }) as? BorderedView {
+            bordered.smoothCorners(with: 20)
+            bordered.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
+            bordered.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+            bordered.layer.borderWidth = 0.5
+        }
+    }
+
     private func setupSearchField() {
         self.searchField.placeholder = L10n.Common.Search.byName
         self.searchField.textPublisher.map { $0 ?? "" }
@@ -47,7 +61,6 @@ public final class SearchView: LoadableView {
         }
         .store(in: &bag)
     }
-
 
     func querySequence() -> AnyPublisher<String, Never> {
         return self.queryRelay.removeDuplicates().eraseToAnyPublisher()

@@ -24,11 +24,17 @@ final class FeedPresenter {
     private var lastRefreshDate: Date?
     private let refreshInterval: TimeInterval = 3600
 
-    private lazy var randomSeries = ActionItem(L10n.Screen.Feed.randomRelease) { [weak self] in
+    private lazy var randomSeries = ActionItem(
+        L10n.Screen.Feed.randomRelease,
+        icon: UIImage(systemName: "dice.fill") ?? UIImage(systemName: "shuffle")
+    ) { [weak self] in
         self?.selectRandom()
     }
 
-    private lazy var history = ActionItem(L10n.Screen.Feed.history) { [weak self] in
+    private lazy var history = ActionItem(
+        L10n.Screen.Feed.history,
+        icon: UIImage(systemName: "clock.arrow.circlepath") ?? UIImage(systemName: "clock.fill")
+    ) { [weak self] in
         self?.selectHistory()
     }
 

@@ -3,7 +3,14 @@ import UIKit
 final class ScheduleSeriesCell: RippleViewCell {
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var releaseIndicatorView: [UIView]!
-    
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        imageView.smoothCorners(with: 16)
+        imageView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        imageView.layer.borderWidth = 0.5
+        rippleContainerView?.smoothCorners(with: 16)
+    }
 
     func configure(_ schedule: ScheduleItem) {
 

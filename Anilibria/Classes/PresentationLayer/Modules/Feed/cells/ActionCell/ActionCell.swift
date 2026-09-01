@@ -5,11 +5,41 @@ public final class ActionCell: RippleViewCell {
     @IBOutlet var titleLabel: UILabel!
     
     private var langSubscriber: AnyCancellable?
+    private var currentItem: ActionItem?
+
+    public override func awakeFromNib() {
+        super.awakeFromNib()
+        rippleContainerView?.smoothCorners(with: 22)
+        rippleContainerView?.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
+        rippleContainerView?.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+        rippleContainerView?.layer.borderWidth = 0.75
+        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        titleLabel.textColor = .Text.main
+    }
 
     func configure(_ item: ActionItem) {
-        self.titleLabel.text = item.localizedTitle()
+        self.currentItem = item
+        renderText(item)
+
         langSubscriber = Language.languageChanged.sink { [weak self] in
-            self?.titleLabel.text = item.localizedTitle()
+            guard let self, let item = self.currentItem else { return }
+            self.renderText(item)
+        }
+    }
+
+    private func renderText(_ item: ActionItem) {
+        if let icon = item.icon {
+            let attachment = NSTextAttachment()
+            attachment.image = icon.withTintColor(.Tint.active, renderingMode: .alwaysOriginal)
+            attachment.bounds = CGRect(x: 0, y: -3, width: 18, height: 18)
+            let attString = NSMutableAttributedString(attachment: attachment)
+            attString.append(NSAttributedString(string: "  " + item.localizedTitle(), attributes: [
+                .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+                .foregroundColor: UIColor.Text.main
+            ]))
+            self.titleLabel.attributedText = attString
+        } else {
+            self.titleLabel.text = item.localizedTitle()
         }
     }
 

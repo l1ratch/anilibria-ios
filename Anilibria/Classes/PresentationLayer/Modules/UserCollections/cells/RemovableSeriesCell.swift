@@ -17,8 +17,13 @@ public final class RemovableSeriesCell: DraggableRippleCell {
     public override func awakeFromNib() {
         super.awakeFromNib()
         draggableView.swipeOffset = 100
-        containerView.smoothCorners(with: 4)
-        containerView.backgroundColor = .Surfaces.content
+        titleLabel.font = .font(ofSize: 16, weight: .bold)
+        titleLabel.textColor = .Text.main
+        imageView.smoothCorners(with: 12)
+        containerView.smoothCorners(with: 16)
+        containerView.backgroundColor = UIColor.Surfaces.content.withAlphaComponent(0.65)
+        containerView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        containerView.layer.borderWidth = 0.6
     }
 
     func configure(_ item: Series) {
