@@ -62,10 +62,10 @@ jobs:
             -configuration Release \
             -derivedDataPath ./Build \
             ARCHS="arm64" \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_ALLOWED=YES \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGN_ENTITLEMENTS="" \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM="" \
             ONLY_ACTIVE_ARCH=NO > build.log 2>&1
           STATUS=$?
