@@ -25,9 +25,8 @@ public struct MainTheme: AppTheme {
         navbar.prefersLargeTitles = false
 
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
-        appearance.backgroundColor = UIColor.Surfaces.background.withAlphaComponent(0.65)
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .Surfaces.background
         appearance.titleTextAttributes = [
             .foregroundColor: UIColor.Text.main,
             .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
@@ -36,7 +35,7 @@ public struct MainTheme: AppTheme {
             .foregroundColor: UIColor.Text.main,
             .font: UIFont.systemFont(ofSize: 32, weight: .bold)
         ]
-        appearance.shadowColor = UIColor.white.withAlphaComponent(0.06)
+        appearance.shadowColor = .clear
 
         navbar.standardAppearance = appearance
         navbar.scrollEdgeAppearance = appearance

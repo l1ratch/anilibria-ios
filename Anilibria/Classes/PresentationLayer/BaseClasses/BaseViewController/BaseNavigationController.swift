@@ -51,6 +51,12 @@ extension BaseNavigationController: UINavigationControllerDelegate {
         let isRoot = self.viewControllers.first == viewController
         NotificationCenter.default.post(name: NSNotification.Name("ToggleMainTabBarVisibility"), object: isRoot)
     }
+
+    public func navigationController(_ navigationController: UINavigationController,
+                                     didShow viewController: UIViewController, animated: Bool) {
+        let isRoot = self.viewControllers.first == viewController
+        NotificationCenter.default.post(name: NSNotification.Name("ToggleMainTabBarVisibility"), object: isRoot)
+    }
 }
 
 extension BaseNavigationController: UIGestureRecognizerDelegate {

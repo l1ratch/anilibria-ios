@@ -63,30 +63,30 @@ final class MainContainerViewController: BaseViewController {
         }
         self.pages = updatedPages
         
-        // Keep current selection intact
+        // Keep current selection intact (do NOT call scrollTo unless the active page was deleted!)
         let targetType = updatedPages.contains(where: { $0.type == currentType }) ? currentType : (updatedPages.first?.type ?? .other)
         self.menuTabBar.set(selected: targetType)
-        if let newIndex = updatedPages.firstIndex(where: { $0.type == targetType }) {
+        if !updatedPages.contains(where: { $0.type == currentType }), let newIndex = updatedPages.firstIndex(where: { $0.type == targetType }) {
             self.pagerView.scrollTo(index: newIndex, animated: false)
         }
     }
 
     private func setupFloatingLiquidGlassDock() {
         shadowView.backgroundColor = .clear
-        shadowView.shadowOpacity = 0.35
-        shadowView.shadowRadius = 16
-        shadowView.shadowY = 6
+        shadowView.shadowOpacity = 0.5
+        shadowView.shadowRadius = 20
+        shadowView.shadowY = 8
         shadowView.shadowColor = .black
 
         tabBarContainer.backgroundColor = .clear
         glassBlurView?.removeFromSuperview()
 
-        let blur = UIBlurEffect(style: .systemUltraThinMaterialDark)
+        let blur = UIBlurEffect(style: .systemMaterialDark)
         let blurView = UIVisualEffectView(effect: blur)
         blurView.translatesAutoresizingMaskIntoConstraints = false
         
         let tintView = UIView()
-        tintView.backgroundColor = UIColor(white: 1.0, alpha: 0.04)
+        tintView.backgroundColor = UIColor(white: 0.1, alpha: 0.65)
         tintView.translatesAutoresizingMaskIntoConstraints = false
         blurView.contentView.addSubview(tintView)
 
@@ -102,7 +102,7 @@ final class MainContainerViewController: BaseViewController {
         
         // Specular highlight border
         tabBarContainer.layer.borderWidth = 0.5
-        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
 
         NSLayoutConstraint.activate([
             blurView.topAnchor.constraint(equalTo: tabBarContainer.topAnchor),

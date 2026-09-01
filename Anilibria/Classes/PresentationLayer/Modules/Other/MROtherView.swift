@@ -98,7 +98,7 @@ final class OtherViewController: BaseViewController {
 
     @IBAction func customSettingsAction(_ sender: Any) {
         triggerHaptic(style: .light)
-        let vc = TabSettingsViewController()
+        let vc = SettingsPlusViewController()
         self.navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -140,6 +140,82 @@ extension OtherViewController: OtherViewBehavior {
     }
 }
 
+// MARK: - Settings Plus Hub Screen
+
+final class SettingsPlusViewController: BaseViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    private let tableView = UITableView(frame: .zero, style: .insetGrouped)
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = "Настройки +"
+        view.backgroundColor = .Surfaces.background
+        
+        setupTableView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
+    private func setupTableView() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.backgroundColor = .clear
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "PlusCell")
+        
+        view.addSubview(tableView)
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "НАВИГАЦИЯ И ИНТЕРФЕЙС"
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: .value1, reuseIdentifier: "PlusCell")
+        cell.backgroundColor = .Surfaces.content
+        cell.accessoryType = .disclosureIndicator
+        
+        let count = MenuSettingsManager.shared.getActiveTabs().count
+        cell.textLabel?.text = "Настройка навигации"
+        cell.textLabel?.textColor = .Text.main
+        cell.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+        
+        cell.detailTextLabel?.text = "\(count) вкл."
+        cell.detailTextLabel?.textColor = .Text.secondary
+        cell.detailTextLabel?.font = .systemFont(ofSize: 14, weight: .regular)
+        
+        cell.imageView?.image = UIImage(systemName: "slider.horizontal.3")
+        cell.imageView?.tintColor = .Tint.active
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        triggerHaptic(style: .light)
+        let vc = TabSettingsViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+}
+
+// MARK: - Tab Settings Screen
+
 final class TabSettingsViewController: BaseViewController, UITableViewDelegate, UITableViewDataSource {
     
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -148,18 +224,13 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Настройки +"
+        title = "Настройка навигации"
         view.backgroundColor = .Surfaces.background
         
         activeTabs = MenuSettingsManager.shared.getActiveTabs()
         inactiveTabs = MenuSettingsManager.shared.getInactiveTabs()
         
         setupTableView()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        persistChanges()
     }
     
     private func persistChanges() {
@@ -206,13 +277,14 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
         
         switch type {
         case .feed: title = "Главная"; icon = .System.feed
-        case .catalog: title = "Каталог"; icon = .System.catalog
+        case .catalog: title = "Релизы"; icon = .System.catalog
         case .news: title = "Новости"; icon = .System.media
-        case .collections: title = "Избранное"; icon = .System.collections
+        case .collections: title = "Коллекции"; icon = .System.collections
         case .other: title = "Другое"; icon = .System.more
         }
         
         cell.textLabel?.text = title
+        cell.textLabel?.textColor = .Text.main
         cell.imageView?.image = icon
         cell.imageView?.tintColor = .Tint.active
         cell.backgroundColor = .Surfaces.content

@@ -70,9 +70,7 @@ final class SeriesViewController: BaseViewController {
         super.viewDidLoad()
         self.setupNavigationButtons()
         addRefreshControl(scrollView: scrollView)
-        seriesImageView.smoothCorners(with: 18)
-        seriesImageView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
-        seriesImageView.layer.borderWidth = 0.5
+        seriesImageView.smoothCorners(with: 12)
         updateEpisodesUI()
 
         let action: Action<URL> = { [weak self] url in
@@ -96,19 +94,17 @@ final class SeriesViewController: BaseViewController {
         infoTextView.textContainerInset = .zero
         infoTextView.font = .font(ofSize: 16, weight: .regular)
         infoTextView.textColor = .Text.main
-        supportLabelContainer.cornerRadius = 10
+        supportLabelContainer.cornerRadius = 6
 
-        playButtonContainer.smoothCorners(with: 20)
-        playButtonContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
-        playButtonContainer.layer.borderWidth = 0.5
+        playButtonContainer.smoothCorners(with: 12)
 
-        relatedShimmerView.smoothCorners(with: 16)
+        relatedShimmerView.smoothCorners(with: 8)
         relatedShimmerView.backgroundColor = .Tint.shimmer
         relatedShimmerView.shimmerColor = .Surfaces.base
         relatedShimmerView.run()
 
         contentShimmerViews.forEach {
-            $0.smoothCorners(with: 16)
+            $0.smoothCorners(with: 8)
             $0.backgroundColor = .Tint.shimmer
             $0.shimmerColor = .Surfaces.base
             $0.run()

@@ -34,7 +34,7 @@ final class CatalogViewController: BaseCollectionViewController {
 
     override func setupStrings() {
         super.setupStrings()
-        self.navigationItem.title = L10n.Screen.Catalog.title
+        self.navigationItem.title = "Релизы"
     }
 
     override func refresh() {

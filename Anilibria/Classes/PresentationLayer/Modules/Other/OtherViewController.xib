@@ -32,7 +32,7 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tXR-Br-u8V" customClass="ShadowView" customModule="Anilibria" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="156" width="414" height="740"/>
                     <subviews>
-                        <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DpG-Aa-mCd" customClass="TouchesScrollView" customModule="Anilibria" customModuleProvider="target">
+                        <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DpG-Aa-mCd" customClass="TouchesScrollView" customModule="Anilibria" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="414" height="740"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="R3G-kp-Dbk">
@@ -356,6 +356,7 @@
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="CkN-AS-WRB" secondAttribute="bottom" id="OPd-AE-qLq"/>
                                                 <constraint firstItem="CkN-AS-WRB" firstAttribute="leading" secondItem="BGu-GH-ieP" secondAttribute="leading" id="fD1-ho-7Fn"/>
                                                 <constraint firstAttribute="trailing" secondItem="CkN-AS-WRB" secondAttribute="trailing" id="hFg-xo-7G1"/>
                                                 <constraint firstItem="CkN-AS-WRB" firstAttribute="top" secondItem="BGu-GH-ieP" secondAttribute="top" id="p4o-Ce-2rV"/>
