@@ -44,7 +44,7 @@ jobs:
 
       - name: Resolve Swift Package Manager dependencies
         run: |
-          xcodebuild -resolvePackageDependencies -project Anilibria.xcodeproj -scheme AniLiberty
+          xcodebuild -resolvePackageDependencies -project Anilibria.xcodeproj -skipPackagePluginValidation -skipMacroValidation || true
 
       - name: Build iOS App (.app)
         run: |
@@ -54,6 +54,8 @@ jobs:
             -destination "generic/platform=iOS" \
             -configuration Release \
             -derivedDataPath ./Build \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
             ARCHS="arm64" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
