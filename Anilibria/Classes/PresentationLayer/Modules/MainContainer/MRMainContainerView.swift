@@ -21,8 +21,6 @@ final class MainContainerViewController: BaseViewController {
         handler.didLoad()
         view.backgroundColor = .Surfaces.background
         
-        self.additionalSafeAreaInsets.bottom = 85
-        
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTabs), name: NSNotification.Name("TabsSettingsDidChange"), object: nil)
     }
     
@@ -35,40 +33,37 @@ final class MainContainerViewController: BaseViewController {
     }
 
     private func setupFloatingLiquidGlassDock() {
-        // Spatial drop shadow for depth
         shadowView.backgroundColor = .clear
-        shadowView.shadowOpacity = 0.6
-        shadowView.shadowRadius = 25
-        shadowView.shadowY = 12
+        shadowView.shadowOpacity = 0.35
+        shadowView.shadowRadius = 16
+        shadowView.shadowY = 6
         shadowView.shadowColor = .black
 
         tabBarContainer.backgroundColor = .clear
         glassBlurView?.removeFromSuperview()
 
-        // Liquid glass backdrop
         let blur = UIBlurEffect(style: .systemUltraThinMaterialDark)
         let blurView = UIVisualEffectView(effect: blur)
         blurView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Add subtle vibrancy tint
         let tintView = UIView()
-        tintView.backgroundColor = UIColor(white: 1.0, alpha: 0.05)
+        tintView.backgroundColor = UIColor(white: 1.0, alpha: 0.04)
         tintView.translatesAutoresizingMaskIntoConstraints = false
         blurView.contentView.addSubview(tintView)
 
         tabBarContainer.insertSubview(blurView, at: 0)
 
-        // Continuous pill rounding (Height is 68, radius = 34)
+        // Continuous capsule corners (height is 62pt, radius is 31pt)
         tabBarContainer.layer.cornerCurve = .continuous
-        tabBarContainer.layer.cornerRadius = 34
+        tabBarContainer.layer.cornerRadius = 31
         tabBarContainer.layer.masksToBounds = true
         blurView.layer.cornerCurve = .continuous
-        blurView.layer.cornerRadius = 34
+        blurView.layer.cornerRadius = 31
         blurView.layer.masksToBounds = true
         
-        // Specular inner glass border
-        tabBarContainer.layer.borderWidth = 0.75
-        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+        // Specular highlight border
+        tabBarContainer.layer.borderWidth = 0.5
+        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
 
         NSLayoutConstraint.activate([
             blurView.topAnchor.constraint(equalTo: tabBarContainer.topAnchor),
@@ -104,6 +99,12 @@ extension MainContainerViewController: PagerViewDelegate {
 extension MainContainerViewController: MainContainerViewBehavior {
     func set(items: [MenuItem]) {
         self.pages = MenuItemsControllersFactory.create(for: items)
+        
+        // Propagate safe area scroll insets ONLY to the child pages
+        self.pages.forEach { page in
+            page.controller.additionalSafeAreaInsets.bottom = 75
+        }
+        
         self.menuTabBar.set(items) { [weak self] type in
             self?.handler.select(item: type)
         }

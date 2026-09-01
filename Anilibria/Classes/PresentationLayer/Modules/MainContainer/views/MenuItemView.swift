@@ -5,7 +5,7 @@ final class MenuItemView: LoadableView {
     private(set) var type: MenuItemType?
 
     private var tapHandler: Action<MenuItemType>?
-    private let pillGlowView = UIView()
+    private let pillCapsuleView = UIView()
 
     public var isSelected: Bool = false {
         didSet {
@@ -17,57 +17,46 @@ final class MenuItemView: LoadableView {
         super.awakeFromNib()
         backgroundColor = .clear
         iconView.contentMode = .center
-        setupPillGlow()
+        setupPillCapsule()
     }
 
-    private func setupPillGlow() {
-        // Subtle spatial glow pill
-        pillGlowView.backgroundColor = UIColor.Tint.active.withAlphaComponent(0.15)
-        pillGlowView.layer.cornerCurve = .continuous
-        pillGlowView.layer.cornerRadius = 22
-        pillGlowView.translatesAutoresizingMaskIntoConstraints = false
-        pillGlowView.alpha = 0
-        pillGlowView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+    private func setupPillCapsule() {
+        pillCapsuleView.layer.cornerCurve = .continuous
+        pillCapsuleView.layer.cornerRadius = 18
+        pillCapsuleView.layer.masksToBounds = true
+        pillCapsuleView.translatesAutoresizingMaskIntoConstraints = false
+        pillCapsuleView.isUserInteractionEnabled = false
 
-        insertSubview(pillGlowView, belowSubview: iconView)
+        insertSubview(pillCapsuleView, belowSubview: iconView)
 
         NSLayoutConstraint.activate([
-            pillGlowView.centerXAnchor.constraint(equalTo: iconView.centerXAnchor),
-            pillGlowView.centerYAnchor.constraint(equalTo: iconView.centerYAnchor),
-            pillGlowView.widthAnchor.constraint(equalToConstant: 44),
-            pillGlowView.heightAnchor.constraint(equalToConstant: 44)
+            pillCapsuleView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            pillCapsuleView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            pillCapsuleView.widthAnchor.constraint(equalToConstant: 48),
+            pillCapsuleView.heightAnchor.constraint(equalToConstant: 36)
         ])
     }
 
     private func updateSelectionState(animated: Bool) {
-        let targetColor: UIColor = isSelected ? .Tint.active : UIColor.white.withAlphaComponent(0.4)
-        let targetScale: CGFloat = isSelected ? 1.08 : 1.0
-        
-        let glowAlpha: CGFloat = isSelected ? 1.0 : 0.0
-        let glowScale: CGFloat = isSelected ? 1.0 : 0.5
+        let targetIconColor: UIColor = isSelected ? .Tint.active : UIColor.white.withAlphaComponent(0.45)
+        let targetBgColor: UIColor = isSelected ? UIColor.white.withAlphaComponent(0.12) : .clear
+        let targetBorderColor: UIColor = isSelected ? UIColor.white.withAlphaComponent(0.2) : .clear
+        let targetScale: CGFloat = isSelected ? 1.05 : 1.0
 
         let changes = {
-            self.iconView.tintColor = targetColor
+            self.iconView.tintColor = targetIconColor
             self.iconView.transform = CGAffineTransform(scaleX: targetScale, y: targetScale)
-            self.pillGlowView.alpha = glowAlpha
-            self.pillGlowView.transform = CGAffineTransform(scaleX: glowScale, y: glowScale)
-            
-            if self.isSelected {
-                self.iconView.layer.shadowColor = UIColor.Tint.active.cgColor
-                self.iconView.layer.shadowRadius = 8
-                self.iconView.layer.shadowOpacity = 0.5
-                self.iconView.layer.shadowOffset = .zero
-            } else {
-                self.iconView.layer.shadowOpacity = 0
-            }
+            self.pillCapsuleView.backgroundColor = targetBgColor
+            self.pillCapsuleView.layer.borderColor = targetBorderColor.cgColor
+            self.pillCapsuleView.layer.borderWidth = self.isSelected ? 0.5 : 0.0
         }
 
         if animated {
             UIView.animate(
-                withDuration: 0.4,
+                withDuration: 0.35,
                 delay: 0,
-                usingSpringWithDamping: 0.65,
-                initialSpringVelocity: 0.6,
+                usingSpringWithDamping: 0.7,
+                initialSpringVelocity: 0.5,
                 options: [.allowUserInteraction, .beginFromCurrentState],
                 animations: changes
             )
@@ -89,6 +78,16 @@ final class MenuItemView: LoadableView {
     @IBAction func tapAction(_ sender: Any) {
         if let type = self.type {
             triggerHaptic(style: .light)
+            
+            // Micro bounce feedback
+            UIView.animate(withDuration: 0.12, animations: {
+                self.transform = CGAffineTransform(scaleX: 0.92, y: 0.92)
+            }) { _ in
+                UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: [], animations: {
+                    self.transform = .identity
+                })
+            }
+            
             self.tapHandler?(type)
         }
     }

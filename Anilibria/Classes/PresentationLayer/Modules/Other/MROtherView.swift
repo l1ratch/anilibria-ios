@@ -24,7 +24,6 @@ final class OtherViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLiquidGlassStyle()
-        setupTabSettingsButton()
 
         if UIDevice.current.userInterfaceIdiom == .pad {
             historyView.isHidden = true
@@ -58,30 +57,6 @@ final class OtherViewController: BaseViewController {
             bordered.layer.borderWidth = 0.75
         }
         view.subviews.forEach { applyGlassRecursively($0) }
-    }
-    
-    private func setupTabSettingsButton() {
-        let tabSettingsBtn = UIButton(type: .system)
-        tabSettingsBtn.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)
-        tabSettingsBtn.tintColor = .white
-        tabSettingsBtn.backgroundColor = UIColor.white.withAlphaComponent(0.1)
-        tabSettingsBtn.layer.cornerRadius = 22
-        tabSettingsBtn.translatesAutoresizingMaskIntoConstraints = false
-        tabSettingsBtn.addTarget(self, action: #selector(openTabSettings), for: .touchUpInside)
-        
-        view.addSubview(tabSettingsBtn)
-        NSLayoutConstraint.activate([
-            tabSettingsBtn.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            tabSettingsBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            tabSettingsBtn.widthAnchor.constraint(equalToConstant: 44),
-            tabSettingsBtn.heightAnchor.constraint(equalToConstant: 44)
-        ])
-    }
-    
-    @objc private func openTabSettings() {
-        triggerHaptic(style: .medium)
-        let vc = TabSettingsViewController()
-        self.navigationController?.pushViewController(vc, animated: true)
     }
 
     override func setupStrings() {

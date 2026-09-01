@@ -31,13 +31,13 @@
                     </connections>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gi0-Ok-EvC" customClass="ShadowView" customModule="Anilibria" customModuleProvider="target">
-                    <rect key="frame" x="20" y="786" width="374" height="68"/>
+                    <rect key="frame" x="16" y="796" width="382" height="62"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hlb-eq-Zu7">
-                            <rect key="frame" x="0.0" y="0.0" width="374" height="68"/>
+                            <rect key="frame" x="0.0" y="0.0" width="382" height="62"/>
                             <subviews>
-                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="lbm-cD-8Dy" customClass="MenuTabController" customModule="Anilibria" customModuleProvider="target">
-                                    <rect key="frame" x="4" y="4" width="366" height="60"/>
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="lbm-cD-8Dy" customClass="MenuTabController" customModule="Anilibria" customModuleProvider="target">
+                                    <rect key="frame" x="6" y="4" width="370" height="54"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </stackView>
                             </subviews>
@@ -45,14 +45,14 @@
                             <constraints>
                                 <constraint firstItem="lbm-cD-8Dy" firstAttribute="top" secondItem="hlb-eq-Zu7" secondAttribute="top" constant="4" id="Rte-Zj-iwO"/>
                                 <constraint firstAttribute="bottom" secondItem="lbm-cD-8Dy" secondAttribute="bottom" constant="4" id="ivm-Rn-Xfy"/>
-                                <constraint firstAttribute="trailing" secondItem="lbm-cD-8Dy" secondAttribute="trailing" constant="4" id="hla-Qr-8vg"/>
-                                <constraint firstItem="lbm-cD-8Dy" firstAttribute="leading" secondItem="hlb-eq-Zu7" secondAttribute="leading" constant="4" id="uWx-US-xAH"/>
+                                <constraint firstAttribute="trailing" secondItem="lbm-cD-8Dy" secondAttribute="trailing" constant="6" id="hla-Qr-8vg"/>
+                                <constraint firstItem="lbm-cD-8Dy" firstAttribute="leading" secondItem="hlb-eq-Zu7" secondAttribute="leading" constant="6" id="uWx-US-xAH"/>
                             </constraints>
                         </view>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="68" id="U2b-Oa-t3K"/>
+                        <constraint firstAttribute="height" constant="62" id="U2b-Oa-t3K"/>
                         <constraint firstAttribute="width" relation="lessThanOrEqual" constant="440" id="UeN-x0-L3D"/>
                         <constraint firstItem="hlb-eq-Zu7" firstAttribute="leading" secondItem="gi0-Ok-EvC" secondAttribute="leading" id="5Zj-ZO-jbA"/>
                         <constraint firstItem="hlb-eq-Zu7" firstAttribute="top" secondItem="gi0-Ok-EvC" secondAttribute="top" id="PQ4-K1-K4N"/>
@@ -68,10 +68,10 @@
                 <constraint firstItem="Hng-aB-oz2" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="S9n-Dh-thr"/>
                 <constraint firstAttribute="bottom" secondItem="Hng-aB-oz2" secondAttribute="bottom" id="iRG-nT-oYn"/>
                 <constraint firstItem="Hng-aB-oz2" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="wAY-ao-deN"/>
-                <constraint firstItem="gi0-Ok-EvC" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" priority="999" constant="20" id="JMd-bh-dJ4"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="gi0-Ok-EvC" secondAttribute="trailing" priority="999" constant="20" id="b5N-Zd-YUr"/>
+                <constraint firstItem="gi0-Ok-EvC" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" priority="999" constant="16" id="JMd-bh-dJ4"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="gi0-Ok-EvC" secondAttribute="trailing" priority="999" constant="16" id="b5N-Zd-YUr"/>
                 <constraint firstItem="gi0-Ok-EvC" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="eno-eW-SLk"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="gi0-Ok-EvC" secondAttribute="bottom" constant="8" id="g1k-VF-Qcu"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="gi0-Ok-EvC" secondAttribute="bottom" constant="4" id="g1k-VF-Qcu"/>
             </constraints>
             <point key="canvasLocation" x="47.826086956521742" y="35.491071428571423"/>
         </view>
