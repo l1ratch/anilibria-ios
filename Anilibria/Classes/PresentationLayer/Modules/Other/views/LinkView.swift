@@ -17,9 +17,10 @@ public final class LinkView: UIView {
     }
 
     private func setup() {
-        self.smoothCorners(with: 14)
-        self.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
-        self.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        self.layer.cornerCurve = .continuous
+        self.smoothCorners(with: 20)
+        self.backgroundColor = .Surfaces.content
+        self.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
         self.layer.borderWidth = 0.5
     }
 
@@ -36,6 +37,15 @@ public final class LinkView: UIView {
 
     @IBAction func tapAction(_ sender: Any) {
         triggerHaptic(style: .light)
+        
+        UIView.animate(withDuration: 0.1, animations: {
+            self.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        }) { _ in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: [], animations: {
+                self.transform = .identity
+            })
+        }
+        
         if let value = data {
             self.handler?(value)
         }

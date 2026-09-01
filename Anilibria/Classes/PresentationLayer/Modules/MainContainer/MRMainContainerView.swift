@@ -41,9 +41,33 @@ final class MainContainerViewController: BaseViewController {
     
     @objc private func reloadTabs() {
         let newItems = MenuItemsFactory.create()
-        self.set(items: newItems)
-        if let first = newItems.first {
-            self.set(selected: first.type)
+        let currentType = self.pages[safe: self.pagerView.currentIndex]?.type ?? .other
+        
+        // Update menuTabBar items
+        self.menuTabBar.set(newItems) { [weak self] type in
+            self?.handler.select(item: type)
+        }
+        
+        // Update pages, reusing existing controllers to prevent deallocation / crash of active screens
+        var updatedPages: [MenuControllerData] = []
+        for item in newItems {
+            if let existing = self.pages.first(where: { $0.type == item.type }) {
+                updatedPages.append(existing)
+            } else {
+                let newPage = MenuItemsControllersFactory.create(for: [item])
+                if let created = newPage.first {
+                    created.controller.additionalSafeAreaInsets.bottom = 75
+                    updatedPages.append(created)
+                }
+            }
+        }
+        self.pages = updatedPages
+        
+        // Keep current selection intact
+        let targetType = updatedPages.contains(where: { $0.type == currentType }) ? currentType : (updatedPages.first?.type ?? .other)
+        self.menuTabBar.set(selected: targetType)
+        if let newIndex = updatedPages.firstIndex(where: { $0.type == targetType }) {
+            self.pagerView.scrollTo(index: newIndex, animated: false)
         }
     }
 

@@ -22,7 +22,7 @@
                         <constraint firstAttribute="height" constant="20" id="DxC-9H-USR"/>
                     </constraints>
                 </imageView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K01-az-pkK" customClass="RippleButton" customModule="Anilibria" customModuleProvider="target">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K01-az-pkK">
                     <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
                     <connections>
                         <action selector="tapAction:" destination="d2s-r9-fKe" eventType="touchUpInside" id="4Q7-DC-oo4"/>

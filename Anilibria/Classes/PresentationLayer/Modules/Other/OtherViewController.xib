@@ -339,7 +339,7 @@
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </view>
-                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BGu-GH-ieP" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
+                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BGu-GH-ieP">
                                             <rect key="frame" x="16" y="248" width="382" height="50"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="CkN-AS-WRB">
@@ -348,7 +348,7 @@
                                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ZrU-yx-N20">
                                                             <rect key="frame" x="51" y="0.0" width="280" height="50"/>
                                                             <constraints>
-                                                                <constraint firstAttribute="height" priority="1" id="xb6-GB-I4J"/>
+                                                                <constraint firstAttribute="height" constant="50" id="Uuh-rA-WvV"/>
                                                             </constraints>
                                                         </stackView>
                                                     </subviews>
@@ -356,16 +356,10 @@
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="CkN-AS-WRB" secondAttribute="bottom" id="OPd-AE-qLq"/>
                                                 <constraint firstItem="CkN-AS-WRB" firstAttribute="leading" secondItem="BGu-GH-ieP" secondAttribute="leading" id="fD1-ho-7Fn"/>
                                                 <constraint firstAttribute="trailing" secondItem="CkN-AS-WRB" secondAttribute="trailing" id="hFg-xo-7G1"/>
                                                 <constraint firstItem="CkN-AS-WRB" firstAttribute="top" secondItem="BGu-GH-ieP" secondAttribute="top" id="p4o-Ce-2rV"/>
                                             </constraints>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                    <real key="value" value="5"/>
-                                                </userDefinedRuntimeAttribute>
-                                            </userDefinedRuntimeAttributes>
                                         </view>
                                     </subviews>
                                     <constraints>
@@ -375,6 +369,8 @@
                                         <constraint firstItem="UBz-cX-sMs" firstAttribute="leading" secondItem="R3G-kp-Dbk" secondAttribute="leading" constant="16" id="hlV-Hs-8Mg"/>
                                         <constraint firstItem="BGu-GH-ieP" firstAttribute="leading" secondItem="R3G-kp-Dbk" secondAttribute="leading" constant="16" id="jpb-Oq-KBe"/>
                                         <constraint firstAttribute="trailing" secondItem="onC-Uw-SN6" secondAttribute="trailing" constant="16" id="uQ7-sF-ayc"/>
+                                        <constraint firstItem="cs-card-01" firstAttribute="leading" secondItem="R3G-kp-Dbk" secondAttribute="leading" constant="16" id="cs-lead-01"/>
+                                        <constraint firstAttribute="trailing" secondItem="cs-card-01" secondAttribute="trailing" constant="16" id="cs-trail-01"/>
                                     </constraints>
                                 </stackView>
                             </subviews>
