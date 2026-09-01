@@ -48,6 +48,7 @@ jobs:
 
       - name: Archive iOS App
         run: |
+          set +e
           xcodebuild archive \
             -project Anilibria.xcodeproj \
             -scheme AniLiberty \
@@ -60,7 +61,17 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
-            ONLY_ACTIVE_ARCH=NO
+            ONLY_ACTIVE_ARCH=NO > build.log 2>&1
+          STATUS=$?
+          cat build.log
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::xcodebuild archive failed with code $STATUS"
+            echo "### XcodeBuild Error Log" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 100 build.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit $STATUS
+          fi
 
       - name: Package into IPA
         run: |
