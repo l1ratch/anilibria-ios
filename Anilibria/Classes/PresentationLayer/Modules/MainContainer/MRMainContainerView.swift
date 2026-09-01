@@ -39,8 +39,8 @@ final class MainContainerViewController: BaseViewController {
         shadowView.backgroundColor = .clear
         shadowView.shadowOpacity = 0.6
         shadowView.shadowRadius = 25
-        shadowView.shadowOffset = CGSize(width: 0, height: 12)
-        shadowView.shadowColor = UIColor.black.cgColor
+        shadowView.shadowY = 12
+        shadowView.shadowColor = .black
 
         tabBarContainer.backgroundColor = .clear
         glassBlurView?.removeFromSuperview()

@@ -227,11 +227,9 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
         case .other: title = "Другое"; icon = .System.more
         }
         
-        var content = cell.defaultContentConfiguration()
-        content.text = title
-        content.image = icon
-        content.imageProperties.tintColor = .Tint.active
-        cell.contentConfiguration = content
+        cell.textLabel?.text = title
+        cell.imageView?.image = icon
+        cell.imageView?.tintColor = .Tint.active
         cell.backgroundColor = .Surfaces.content
         return cell
     }
