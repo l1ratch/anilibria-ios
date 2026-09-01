@@ -56,7 +56,7 @@ final class BackendRepositoryImp: BackendRepository, Loggable {
 
     private func runWithModifier(
         request: any BackendAPIRequest,
-        retrier: LoadRetrier?,
+        retrier: LoadRetrier?
     ) -> AnyPublisher<NetworkResponse, Error> {
         return Deferred<Future<any BackendAPIRequest, Error>> {
             Future<any BackendAPIRequest, Error> { [weak self] promise in
