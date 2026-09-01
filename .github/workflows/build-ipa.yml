@@ -72,18 +72,22 @@ jobs:
 
       - name: Package into IPA
         run: |
-          APP_PATH="./Build/Build/Products/Release-iphoneos/AniLiberty.app"
-          if [ ! -d "$APP_PATH" ]; then
-            echo "Error: $APP_PATH not found!"
+          APP_PATH=$(find ./Build -name "AniLiberty.app" -type d | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: AniLiberty.app not found in ./Build!"
+            find ./Build -type d -maxdepth 4
             exit 1
           fi
+          echo "Found app at: $APP_PATH"
 
           mkdir -p Payload
           cp -r "$APP_PATH" Payload/
           zip -vr AniLiberty.ipa Payload
 
-          if [ -d "./Build/Build/Products/Release-iphoneos/AniLiberty.app.dSYM" ]; then
-            zip -vr AniLiberty.app.dSYM.zip ./Build/Build/Products/Release-iphoneos/AniLiberty.app.dSYM
+          DSYM_PATH=$(find ./Build -name "AniLiberty.app.dSYM" -type d | head -n 1)
+          if [ -n "$DSYM_PATH" ]; then
+            echo "Found dSYM at: $DSYM_PATH"
+            zip -vr AniLiberty.app.dSYM.zip "$DSYM_PATH"
           fi
 
       - name: Upload IPA Artifact
