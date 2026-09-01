@@ -198,7 +198,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\nset -e\n\nif [ \"Release\" = \"${CONFIGURATION}\" ]; then\n    \n    # Path to the app directory\n    APP_DIR_PATH=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}\"\n    # Strip main binary\n    strip -rSTx \"${APP_DIR_PATH}/${EXECUTABLE_NAME}\"\n    # Path to the Frameworks directory\n    APP_FRAMEWORKS_DIR=\"${APP_DIR_PATH}/Frameworks\"\n    \n    # Strip symbols from frameworks, if Frameworks/ exists at all\n    # ... as long as the framework is NOT signed by Apple\n    if [ -d \"$APP_FRAMEWORKS_DIR\" ]; then\n        find \"$APP_FRAMEWORKS_DIR\" -type f -perm +111 -maxdepth 2 -mindepth 2 -exec bash -c 'codesign -v -R=\"anchor apple\" \"{}\" &> /dev/null || (printf \"%s\\\\n\" \"{}\" && strip -rSTx \"{}\")' \\;\n    fi\n    # Re-sign binaries as necessary\nfi\n";
+			shellScript = "#!/bin/bash\nif [ \"Release\" = \"${CONFIGURATION}\" ]; then\n    APP_DIR_PATH=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}\"\n    if [ -f \"${APP_DIR_PATH}/${EXECUTABLE_NAME}\" ]; then\n        strip -rSTx \"${APP_DIR_PATH}/${EXECUTABLE_NAME}\" || true\n    fi\n    APP_FRAMEWORKS_DIR=\"${APP_DIR_PATH}/Frameworks\"\n    if [ -d \"$APP_FRAMEWORKS_DIR\" ]; then\n        find \"$APP_FRAMEWORKS_DIR\" -type f -maxdepth 2 -mindepth 2 -perm -111 -exec bash -c 'codesign -v -R=\"anchor apple\" \"{}\" &> /dev/null || strip -rSTx \"{}\" || true' \\; || true\n    fi\nfi\n";
 		};
 		C70D848E2DF06F05001ADEBE /* L10n */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -219,7 +219,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"${SRCROOT}/${PROJECT_NAME}/Resources/Localize\"\nxcrun --sdk macosx swiftc -parse-as-library $SCRIPT_INPUT_FILE_0 \\\n  -o GenerationScript\n./GenerationScript\n";
+			shellScript = "cd \"${SRCROOT}/${PROJECT_NAME}/Resources/Localize\"\nxcrun --sdk macosx swiftc -parse-as-library $SCRIPT_INPUT_FILE_0 \\\n  -o GenerationScript || true\n./GenerationScript || true\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

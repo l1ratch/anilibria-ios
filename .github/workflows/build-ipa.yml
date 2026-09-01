@@ -52,15 +52,15 @@ jobs:
         run: |
           xcodebuild -resolvePackageDependencies -project Anilibria.xcodeproj || true
 
-      - name: Archive iOS App
+      - name: Build iOS App (.app)
         run: |
           set +e
-          xcodebuild archive \
+          xcodebuild build \
             -project Anilibria.xcodeproj \
             -scheme AniLiberty \
             -destination "generic/platform=iOS" \
             -configuration Release \
-            -archivePath ./Build/AniLiberty.xcarchive \
+            -derivedDataPath ./Build \
             ARCHS="arm64" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
@@ -71,7 +71,7 @@ jobs:
           STATUS=$?
           cat build.log
           if [ $STATUS -ne 0 ]; then
-            echo "::error::xcodebuild archive failed with code $STATUS"
+            echo "::error::xcodebuild failed with code $STATUS"
             echo "### XcodeBuild Error Log" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 100 build.log >> $GITHUB_STEP_SUMMARY
@@ -91,20 +91,20 @@ jobs:
       - name: Package into IPA
         run: |
           mkdir -p Payload
-          APP_PATH=$(find ./Build/AniLiberty.xcarchive/Products/Applications -name "*.app" -type d | head -n 1)
+          APP_PATH=$(find ./Build -name "AniLiberty.app" -type d | head -n 1)
           if [ -z "$APP_PATH" ]; then
-            echo "Error: .app not found in archive!"
-            find ./Build -type d
+            echo "Error: AniLiberty.app not found in ./Build!"
+            find ./Build -type d -maxdepth 4
             exit 1
           fi
-          echo "Found app in archive: $APP_PATH"
+          echo "Found app at: $APP_PATH"
           cp -r "$APP_PATH" Payload/
           zip -vr AniLiberty.ipa Payload
 
-          if [ -d "./Build/AniLiberty.xcarchive/dSYMs" ]; then
-            cd ./Build/AniLiberty.xcarchive/dSYMs
-            zip -vr ../../../AniLiberty.app.dSYM.zip . || true
-            cd -
+          DSYM_PATH=$(find ./Build -name "AniLiberty.app.dSYM" -type d | head -n 1)
+          if [ -n "$DSYM_PATH" ]; then
+            echo "Found dSYM at: $DSYM_PATH"
+            zip -vr AniLiberty.app.dSYM.zip "$DSYM_PATH"
           fi
 
       - name: Upload IPA Artifact
