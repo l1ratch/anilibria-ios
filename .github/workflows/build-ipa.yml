@@ -46,48 +46,39 @@ jobs:
         run: |
           xcodebuild -resolvePackageDependencies -project Anilibria.xcodeproj || true
 
-      - name: Build iOS App (.app)
+      - name: Archive iOS App
         run: |
-          xcodebuild clean build \
+          xcodebuild archive \
             -project Anilibria.xcodeproj \
             -scheme AniLiberty \
             -destination "generic/platform=iOS" \
             -configuration Release \
-            -derivedDataPath ./Build \
+            -archivePath ./Build/AniLiberty.xcarchive \
             ARCHS="arm64" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
-            ONLY_ACTIVE_ARCH=NO | tee build.log
-
-      - name: Upload Build Log on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: XcodeBuild-Log
-          path: build.log
-          retention-days: 7
+            ONLY_ACTIVE_ARCH=NO
 
       - name: Package into IPA
         run: |
-          APP_PATH=$(find ./Build -name "AniLiberty.app" -type d | head -n 1)
+          mkdir -p Payload
+          APP_PATH=$(find ./Build/AniLiberty.xcarchive/Products/Applications -name "*.app" -type d | head -n 1)
           if [ -z "$APP_PATH" ]; then
-            echo "Error: AniLiberty.app not found in ./Build!"
-            find ./Build -type d -maxdepth 4
+            echo "Error: .app not found in archive!"
+            find ./Build -type d
             exit 1
           fi
-          echo "Found app at: $APP_PATH"
-
-          mkdir -p Payload
+          echo "Found app in archive: $APP_PATH"
           cp -r "$APP_PATH" Payload/
           zip -vr AniLiberty.ipa Payload
 
-          DSYM_PATH=$(find ./Build -name "AniLiberty.app.dSYM" -type d | head -n 1)
-          if [ -n "$DSYM_PATH" ]; then
-            echo "Found dSYM at: $DSYM_PATH"
-            zip -vr AniLiberty.app.dSYM.zip "$DSYM_PATH"
+          if [ -d "./Build/AniLiberty.xcarchive/dSYMs" ]; then
+            cd ./Build/AniLiberty.xcarchive/dSYMs
+            zip -vr ../../../AniLiberty.app.dSYM.zip . || true
+            cd -
           fi
 
       - name: Upload IPA Artifact
