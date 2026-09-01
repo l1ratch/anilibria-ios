@@ -6,6 +6,12 @@ public final class TitleCell: UICollectionViewCell {
     
     private var langSubscriber: AnyCancellable?
 
+    public override func awakeFromNib() {
+        super.awakeFromNib()
+        titleLabel.font = .font(ofSize: 22, weight: .bold)
+        titleLabel.textColor = .Text.main
+    }
+
     func configure(_ item: TitleItem) {
         self.titleLabel.text = item.localizedTitle()
         langSubscriber = Language.languageChanged.sink { [weak self] in

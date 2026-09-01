@@ -1,9 +1,6 @@
 //
 //  Images.swift
-//  Anilibria
-//
-//  Created by Ivan Morozov on 05.06.2025.
-//  Copyright © 2025 Иван Морозов. All rights reserved.
+//  AniLiberty
 //
 
 import UIKit
@@ -14,6 +11,22 @@ extension UIImage {
             UIImage(systemName: system) ?? UIImage()
         }
 
+        static var feed: UIImage {
+            UIImage(systemName: "sparkles.tv") ?? UIImage(systemName: "play.tv.fill") ?? create(system: "newspaper")
+        }
+        static var catalog: UIImage {
+            UIImage(systemName: "square.grid.2x2.fill") ?? create(system: "magnifyingglass")
+        }
+        static var media: UIImage {
+            UIImage(systemName: "play.rectangle.fill") ?? UIImage(systemName: "tv.fill") ?? create(system: "play.fill")
+        }
+        static var collections: UIImage {
+            UIImage(systemName: "bookmark.fill") ?? create(system: "book")
+        }
+        static var more: UIImage {
+            UIImage(systemName: "ellipsis.circle.fill") ?? UIImage(systemName: "gearshape.fill") ?? create(system: "ellipsis")
+        }
+
         static var book: UIImage { create(system: "book") }
         static var play: UIImage { create(system: "play.fill") }
         static var pause: UIImage { create(system: "pause.fill") }
@@ -21,7 +34,7 @@ extension UIImage {
         static var search: UIImage { create(system: "magnifyingglass") }
         static var news: UIImage { create(system: "newspaper") }
         static var history: UIImage { create(system: "memories") }
-        static var star: UIImage { create(system: "star") }
+        static var star: UIImage { create(system: "star.fill") }
         static var calendar: UIImage { create(system: "calendar") }
         static var xmark: UIImage { create(system: "xmark") }
         static var checkmark: UIImage { create(system: "checkmark") }
@@ -32,12 +45,12 @@ extension UIImage {
 
         static var pencil: UIImage {
             create(system: "pencil")
-                .applyingSymbolConfiguration(.init(weight: .black)) ?? UIImage()
+                .applyingSymbolConfiguration(.init(weight: .semibold)) ?? UIImage()
         }
 
         static var dots: UIImage {
             create(system: "ellipsis")
-                .applyingSymbolConfiguration(.init(weight: .black)) ?? UIImage()
+                .applyingSymbolConfiguration(.init(weight: .bold)) ?? UIImage()
         }
 
         static var web: UIImage {

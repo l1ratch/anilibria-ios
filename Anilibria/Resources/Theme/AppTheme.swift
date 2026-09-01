@@ -21,27 +21,36 @@ public struct MainTheme: AppTheme {
 
     func configureNavBar() {
         let navbar = UINavigationBar.appearance()
-        navbar.tintColor = .Tint.main
+        navbar.tintColor = .Tint.active
+        navbar.prefersLargeTitles = false
+
         let appearance = UINavigationBarAppearance()
-        appearance.backgroundColor = .Surfaces.background
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
+        appearance.backgroundColor = UIColor.Surfaces.background.withAlphaComponent(0.65)
         appearance.titleTextAttributes = [
             .foregroundColor: UIColor.Text.main,
-            .font: UIFont.font(ofSize: 17, weight: .medium)
+            .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
         ]
-        appearance.shadowColor = .clear
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.Text.main,
+            .font: UIFont.systemFont(ofSize: 32, weight: .bold)
+        ]
+        appearance.shadowColor = UIColor.white.withAlphaComponent(0.06)
 
         navbar.standardAppearance = appearance
         navbar.scrollEdgeAppearance = appearance
+        navbar.compactAppearance = appearance
     }
 
     func configureTextView() {
-        UITextView.appearance().tintColor = .Tint.main
-        UITextField.appearance().tintColor = .Tint.main
+        UITextView.appearance().tintColor = .Tint.active
+        UITextField.appearance().tintColor = .Tint.active
         UICollectionView.appearance().backgroundColor = .clear
     }
 
     func configureCollectionView() {
-        UICollectionView.appearance().isPrefetchingEnabled = false
+        UICollectionView.appearance().isPrefetchingEnabled = true
     }
 
     // MARK: - Font

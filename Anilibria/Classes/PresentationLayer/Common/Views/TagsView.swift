@@ -1,9 +1,6 @@
 //
 //  TagsView.swift
-//  Anilibria
-//
-//  Created by Ivan Morozov on 06.06.2025.
-//  Copyright © 2025 Иван Морозов. All rights reserved.
+//  AniLiberty
 //
 
 import UIKit
@@ -71,29 +68,32 @@ extension TagsView {
             super.init(frame: .zero)
             translatesAutoresizingMaskIntoConstraints = false
 
+            backgroundColor = UIColor(white: 1.0, alpha: 0.06)
+            layer.cornerCurve = .continuous
+            layer.borderWidth = 0.5
+            layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+
             let stackView = UIStackView()
             stackView.axis = .horizontal
-            stackView.spacing = 4
+            stackView.spacing = 5
             stackView.alignment = .center
             self.addSubview(stackView)
-            stackView.constraintEdgesToSuperview(.init(top: 4, left: 6, bottom: 4, right: 6))
+            stackView.constraintEdgesToSuperview(.init(top: 5, left: 8, bottom: 5, right: 8))
 
             iconView.image = tag.icon
             iconView.translatesAutoresizingMaskIntoConstraints = false
             iconView.widthAnchor.constraint(equalToConstant: 12).isActive = true
             iconView.heightAnchor.constraint(equalToConstant: 12).isActive = true
             iconView.contentMode = .scaleAspectFit
-            iconView.tintColor = .Text.main
+            iconView.tintColor = .Tint.active
             stackView.addArrangedSubview(iconView)
 
             titleLabel.text = tag.title
-            titleLabel.font = UIFont.font(ofSize: 12, weight: .regular)
-            titleLabel.textColor = .Text.secondary
+            titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+            titleLabel.textColor = .Text.main
             stackView.addArrangedSubview(titleLabel)
-
-            self.layer.borderWidth = 1
         }
-        
+
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
@@ -105,7 +105,7 @@ extension TagsView {
 
         override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
             super.traitCollectionDidChange(previousTraitCollection)
-            self.layer.borderColor = UIColor.Tint.separator.cgColor
+            self.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
         }
     }
 }

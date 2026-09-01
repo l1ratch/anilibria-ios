@@ -10,17 +10,74 @@ final class MainContainerViewController: BaseViewController {
 
     var handler: MainContainerEventHandler!
     private var pages: [MenuControllerData] = []
+    private var glassBlurView: UIVisualEffectView?
 
     // MARK: - Life cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        shadowView.shadowX = 10
-        shadowView.shadowRadius = 10
-        tabBarContainer.backgroundColor = .Surfaces.background
+        setupFloatingDock()
         setupPager()
         handler.didLoad()
         view.backgroundColor = .Surfaces.background
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateDockCorners()
+    }
+
+    private func setupFloatingDock() {
+        shadowView.backgroundColor = .clear
+        shadowView.shadowColor = UIColor.black.withAlphaComponent(0.4)
+        shadowView.shadowY = 6
+        shadowView.shadowRadius = 18
+
+        tabBarContainer.backgroundColor = .clear
+        tabBarContainer.layer.cornerCurve = .continuous
+        tabBarContainer.layer.borderWidth = 0.75
+        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+
+        // Remove old subviews from background
+        glassBlurView?.removeFromSuperview()
+
+        let blur = UIBlurEffect(style: .systemUltraThinMaterialDark)
+        let blurView = UIVisualEffectView(effect: blur)
+        blurView.layer.cornerCurve = .continuous
+        blurView.translatesAutoresizingMaskIntoConstraints = false
+        blurView.clipsToBounds = true
+
+        let tintOverlay = UIView()
+        tintOverlay.backgroundColor = UIColor(white: 1.0, alpha: 0.03)
+        tintOverlay.translatesAutoresizingMaskIntoConstraints = false
+        tintOverlay.layer.cornerCurve = .continuous
+
+        tabBarContainer.insertSubview(blurView, at: 0)
+        tabBarContainer.insertSubview(tintOverlay, at: 1)
+
+        NSLayoutConstraint.activate([
+            blurView.topAnchor.constraint(equalTo: tabBarContainer.topAnchor),
+            blurView.bottomAnchor.constraint(equalTo: tabBarContainer.bottomAnchor),
+            blurView.leadingAnchor.constraint(equalTo: tabBarContainer.leadingAnchor),
+            blurView.trailingAnchor.constraint(equalTo: tabBarContainer.trailingAnchor),
+
+            tintOverlay.topAnchor.constraint(equalTo: tabBarContainer.topAnchor),
+            tintOverlay.bottomAnchor.constraint(equalTo: tabBarContainer.bottomAnchor),
+            tintOverlay.leadingAnchor.constraint(equalTo: tabBarContainer.leadingAnchor),
+            tintOverlay.trailingAnchor.constraint(equalTo: tabBarContainer.trailingAnchor)
+        ])
+
+        self.glassBlurView = blurView
+    }
+
+    private func updateDockCorners() {
+        // Subtle capsule rounding on the top/all edges of the dock
+        let radius: CGFloat = 20
+        tabBarContainer.layer.cornerRadius = radius
+        glassBlurView?.layer.cornerRadius = radius
+        if let tintOverlay = tabBarContainer.subviews.first(where: { $0 !== glassBlurView && $0 !== menuTabBar }) {
+            tintOverlay.layer.cornerRadius = radius
+        }
     }
 
     func setupPager() {

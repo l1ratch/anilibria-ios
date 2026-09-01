@@ -46,6 +46,7 @@ public class BorderedView: UIView {
     }
 
     open func setupNib() {
+        self.layer.cornerCurve = .continuous
         self.border.lineDashPattern = [4, 0]
         self.border.fillColor = UIColor.clear.cgColor
         self.layer.addSublayer(self.border)

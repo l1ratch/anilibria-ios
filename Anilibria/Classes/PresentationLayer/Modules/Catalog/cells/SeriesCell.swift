@@ -15,8 +15,10 @@ public final class SeriesCell: RippleViewCell {
         super.awakeFromNib()
         titleLabel.font = .font(ofSize: 16, weight: .bold)
         titleLabel.textColor = .Text.main
-        containerView.smoothCorners(with: 4)
-        containerView.backgroundColor = .Surfaces.content
+        containerView.smoothCorners(with: 16)
+        containerView.backgroundColor = UIColor.Surfaces.content.withAlphaComponent(0.65)
+        containerView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        containerView.layer.borderWidth = 0.6
     }
     
     public override func prepareForReuse() {

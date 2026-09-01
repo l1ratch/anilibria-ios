@@ -10,12 +10,19 @@ final class SoonCell: RippleViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         titleLabel.text = L10n.Screen.Feed.schedule
-        rippleContainerView?.smoothCorners(with: 8)
+        titleLabel.font = .font(ofSize: 22, weight: .bold)
+        rippleContainerView?.smoothCorners(with: 16)
+        segmentControl.selectedSegmentTintColor = .Tint.active
+        segmentControl.layer.cornerCurve = .continuous
+        segmentControl.layer.cornerRadius = 12
+        segmentControl.backgroundColor = UIColor(white: 1.0, alpha: 0.07)
         segmentControl.setTitleTextAttributes([
-            .foregroundColor: UIColor.Text.monoLight,
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 13, weight: .semibold)
         ], for: .selected)
         segmentControl.setTitleTextAttributes([
-            .foregroundColor: UIColor.Text.main,
+            .foregroundColor: UIColor.Text.secondary,
+            .font: UIFont.systemFont(ofSize: 13, weight: .medium)
         ], for: .normal)
     }
     

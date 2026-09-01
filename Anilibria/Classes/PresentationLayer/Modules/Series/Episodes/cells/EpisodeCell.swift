@@ -23,8 +23,15 @@ final class EpisodeCell: RippleViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        timeLabel.superview?.smoothCorners(with: 6)
-        progressView.transform = .init(scaleX: 1, y: 2)
+        timeLabel.superview?.smoothCorners(with: 8)
+        timeLabel.superview?.backgroundColor = UIColor.black.withAlphaComponent(0.65)
+        imageView.smoothCorners(with: 14)
+        imageView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        imageView.layer.borderWidth = 0.5
+        progressView.progressTintColor = .Tint.active
+        progressView.trackTintColor = UIColor.white.withAlphaComponent(0.15)
+        progressView.transform = .init(scaleX: 1, y: 2.5)
+        rippleContainerView?.smoothCorners(with: 16)
     }
 
     func configure(_ episode: EpisodeViewModel) {
