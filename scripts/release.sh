@@ -25,20 +25,22 @@ makeIPA () {
     fi
 
     xcodebuild \
+        -project Anilibria.xcodeproj \
         -scheme $APP_NAME \
         -destination "generic/platform=iOS" \
         -configuration Release \
         -derivedDataPath ./Build \
         ARCHS="arm64" \
-        IPHONEOS_DEPLOYMENT_TARGET=$TARGET
+        IPHONEOS_DEPLOYMENT_TARGET=$TARGET \
+        CODE_SIGNING_ALLOWED=NO \
+        CODE_SIGNING_REQUIRED=NO \
+        CODE_SIGN_IDENTITY="" \
+        CODE_SIGN_ENTITLEMENTS="" \
+        DEVELOPMENT_TEAM="" \
+        ONLY_ACTIVE_ARCH=NO
 
     if [ ! -d $IOS_APP ]; then
         echo "iOS: $APP_NAME.app is not found"
-        exit 1
-    fi
-
-    if [ ! -d $IOS_DSYM ]; then
-        echo "iOS: dSYM is not found"
         exit 1
     fi
 
@@ -47,10 +49,11 @@ makeIPA () {
     fi
 
     mkdir Payload
-    mv $IOS_APP ./Payload/$APP_NAME.app
-    mv $IOS_DSYM ./$APP_NAME.app.dSYM
-    zip -r ${APP_NAME}_iOS.ipa ./Payload/$APP_NAME.app
-    zip -r ${APP_NAME}.dSYM.zip ./$APP_NAME.app.dSYM
+    cp -r $IOS_APP ./Payload/
+    if [ -d "$IOS_DSYM" ]; then
+        zip -r ${APP_NAME}.dSYM.zip $IOS_DSYM
+    fi
+    zip -r ${APP_NAME}_iOS.ipa Payload
 
     if [ -d Payload ]; then
         rm -rf Payload

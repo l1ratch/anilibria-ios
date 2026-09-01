@@ -1,0 +1,108 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+    inputs:
+      upload_release:
+        description: 'Publish as a GitHub Release with IPA'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build IPA (Unsigned / Developer Ready)
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: |
+          if [ -d "/Applications/Xcode_16.0.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.0.app
+          elif [ -d "/Applications/Xcode_15.4.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_15.4.app
+          elif [ -d "/Applications/Xcode.app" ]; then
+            sudo xcode-select -s /Applications/Xcode.app
+          fi
+          echo "Selected Xcode version:"
+          xcodebuild -version
+
+      - name: Resolve Swift Package Manager dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies -project Anilibria.xcodeproj -scheme AniLiberty
+
+      - name: Build iOS App (.app)
+        run: |
+          xcodebuild clean build \
+            -project Anilibria.xcodeproj \
+            -scheme AniLiberty \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            -derivedDataPath ./Build \
+            ARCHS="arm64" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            ONLY_ACTIVE_ARCH=NO
+
+      - name: Package into IPA
+        run: |
+          APP_PATH="./Build/Build/Products/Release-iphoneos/AniLiberty.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Error: $APP_PATH not found!"
+            exit 1
+          fi
+
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -vr AniLiberty.ipa Payload
+
+          if [ -d "./Build/Build/Products/Release-iphoneos/AniLiberty.app.dSYM" ]; then
+            zip -vr AniLiberty.app.dSYM.zip ./Build/Build/Products/Release-iphoneos/AniLiberty.app.dSYM
+          fi
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AniLiberty-IPA
+          path: AniLiberty.ipa
+          retention-days: 14
+
+      - name: Upload dSYM Artifact (Optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AniLiberty-dSYM
+          path: AniLiberty.app.dSYM.zip
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Create Release and Upload Asset
+        if: (startsWith(github.ref, 'refs/tags/v') || github.event.inputs.upload_release == 'true') && success()
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            AniLiberty.ipa
+            AniLiberty.app.dSYM.zip
+          tag_name: ${{ github.ref_name || format('v2.7.0-{0}', github.run_number) }}
+          name: AniLiberty ${{ github.ref_name || format('v2.7.0 (Build {0})', github.run_number) }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
