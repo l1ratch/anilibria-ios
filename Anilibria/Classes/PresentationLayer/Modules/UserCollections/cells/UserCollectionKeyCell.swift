@@ -15,7 +15,7 @@ public final class UserCollectionKeyCell: RippleViewCell {
 
     public override func awakeFromNib() {
         super.awakeFromNib()
-        titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        titleLabel.font = UIFont.systemFont(ofSize: 13.5, weight: .semibold)
         backView.layer.cornerCurve = .continuous
         backView.smoothCorners(with: backView.bounds.height / 2)
     }
@@ -38,19 +38,14 @@ public final class UserCollectionKeyCell: RippleViewCell {
         func apply() {
             if selected {
                 backView.backgroundColor = .Tint.active
-                backView.layer.borderColor = UIColor.white.withAlphaComponent(0.3).cgColor
-                backView.layer.borderWidth = 0.75
-                backView.layer.shadowColor = UIColor.Tint.active.cgColor
-                backView.layer.shadowRadius = 8
-                backView.layer.shadowOpacity = 0.5
-                backView.layer.shadowOffset = .zero
+                backView.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+                backView.layer.borderWidth = 0.5
                 titleLabel.textColor = .white
                 iconView.tintColor = .white
             } else {
                 backView.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
-                backView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+                backView.layer.borderColor = UIColor.white.withAlphaComponent(0.1).cgColor
                 backView.layer.borderWidth = 0.5
-                backView.layer.shadowOpacity = 0
                 titleLabel.textColor = .Text.secondary
                 iconView.tintColor = .Text.secondary
             }

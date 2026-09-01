@@ -24,27 +24,29 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hng-aB-oz2" customClass="PagerView" customModule="Anilibria" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="813"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <connections>
                         <outlet property="rootController" destination="-1" id="Pp1-Gj-x8L"/>
                     </connections>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gi0-Ok-EvC" customClass="ShadowView" customModule="Anilibria" customModuleProvider="target">
-                    <rect key="frame" x="20" y="792" width="374" height="62"/>
+                    <rect key="frame" x="0.0" y="813" width="414" height="83"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hlb-eq-Zu7">
-                            <rect key="frame" x="0.0" y="0.0" width="374" height="62"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="83"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="lbm-cD-8Dy" customClass="MenuTabController" customModule="Anilibria" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="374" height="62"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="49"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="49" id="K9d-ab-123"/>
+                                    </constraints>
                                 </stackView>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstItem="lbm-cD-8Dy" firstAttribute="top" secondItem="hlb-eq-Zu7" secondAttribute="top" id="Rte-Zj-iwO"/>
-                                <constraint firstItem="lbm-cD-8Dy" firstAttribute="bottom" secondItem="hlb-eq-Zu7" secondAttribute="bottom" id="ivm-Rn-Xfy"/>
                                 <constraint firstAttribute="trailing" secondItem="lbm-cD-8Dy" secondAttribute="trailing" id="hla-Qr-8vg"/>
                                 <constraint firstItem="lbm-cD-8Dy" firstAttribute="leading" secondItem="hlb-eq-Zu7" secondAttribute="leading" id="uWx-US-xAH"/>
                             </constraints>
@@ -52,8 +54,6 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="62" id="U2b-Oa-t3K"/>
-                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="440" id="UeN-x0-L3D"/>
                         <constraint firstItem="hlb-eq-Zu7" firstAttribute="leading" secondItem="gi0-Ok-EvC" secondAttribute="leading" id="5Zj-ZO-jbA"/>
                         <constraint firstItem="hlb-eq-Zu7" firstAttribute="top" secondItem="gi0-Ok-EvC" secondAttribute="top" id="PQ4-K1-K4N"/>
                         <constraint firstAttribute="bottom" secondItem="hlb-eq-Zu7" secondAttribute="bottom" id="Sr8-xP-lh1"/>
@@ -66,12 +66,12 @@
             <constraints>
                 <constraint firstItem="Hng-aB-oz2" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="K7d-0v-tuQ"/>
                 <constraint firstItem="Hng-aB-oz2" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="S9n-Dh-thr"/>
-                <constraint firstAttribute="bottom" secondItem="Hng-aB-oz2" secondAttribute="bottom" id="iRG-nT-oYn"/>
                 <constraint firstItem="Hng-aB-oz2" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="wAY-ao-deN"/>
-                <constraint firstItem="gi0-Ok-EvC" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" priority="999" constant="20" id="JMd-bh-dJ4"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="gi0-Ok-EvC" secondAttribute="trailing" priority="999" constant="20" id="b5N-Zd-YUr"/>
-                <constraint firstItem="gi0-Ok-EvC" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="eno-eW-SLk"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="gi0-Ok-EvC" secondAttribute="bottom" constant="8" id="g1k-VF-Qcu"/>
+                <constraint firstItem="gi0-Ok-EvC" firstAttribute="top" secondItem="Hng-aB-oz2" secondAttribute="bottom" id="iRG-nT-oYn"/>
+                <constraint firstItem="gi0-Ok-EvC" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="bottom" constant="-49" id="tabbar-top-safe"/>
+                <constraint firstItem="gi0-Ok-EvC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="JMd-bh-dJ4"/>
+                <constraint firstItem="gi0-Ok-EvC" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="b5N-Zd-YUr"/>
+                <constraint firstAttribute="bottom" secondItem="gi0-Ok-EvC" secondAttribute="bottom" id="g1k-VF-Qcu"/>
             </constraints>
             <point key="canvasLocation" x="47.826086956521742" y="35.491071428571423"/>
         </view>

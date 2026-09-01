@@ -9,10 +9,10 @@ public final class ActionCell: RippleViewCell {
 
     public override func awakeFromNib() {
         super.awakeFromNib()
-        rippleContainerView?.smoothCorners(with: 22)
+        rippleContainerView?.smoothCorners(with: 12)
         rippleContainerView?.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
-        rippleContainerView?.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
-        rippleContainerView?.layer.borderWidth = 0.75
+        rippleContainerView?.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        rippleContainerView?.layer.borderWidth = 0.5
         titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
         titleLabel.textColor = .Text.main
     }
@@ -31,7 +31,7 @@ public final class ActionCell: RippleViewCell {
         if let icon = item.icon {
             let attachment = NSTextAttachment()
             attachment.image = icon.withTintColor(.Tint.active, renderingMode: .alwaysOriginal)
-            attachment.bounds = CGRect(x: 0, y: -3, width: 18, height: 18)
+            attachment.bounds = CGRect(x: 0, y: -3, width: 17, height: 17)
             let attString = NSMutableAttributedString(attachment: attachment)
             attString.append(NSAttributedString(string: "  " + item.localizedTitle(), attributes: [
                 .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
