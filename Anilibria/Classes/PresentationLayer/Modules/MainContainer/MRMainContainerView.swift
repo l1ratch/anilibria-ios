@@ -22,6 +22,21 @@ final class MainContainerViewController: BaseViewController {
         view.backgroundColor = .Surfaces.background
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTabs), name: NSNotification.Name("TabsSettingsDidChange"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(toggleTabBarVisibility(_:)), name: NSNotification.Name("ToggleMainTabBarVisibility"), object: nil)
+    }
+    
+    @objc private func toggleTabBarVisibility(_ notification: Notification) {
+        guard let isVisible = notification.object as? Bool else { return }
+        UIView.animate(
+            withDuration: 0.35,
+            delay: 0,
+            usingSpringWithDamping: 0.85,
+            initialSpringVelocity: 0.5,
+            options: [.beginFromCurrentState, .allowUserInteraction]
+        ) {
+            self.shadowView.alpha = isVisible ? 1.0 : 0.0
+            self.shadowView.transform = isVisible ? .identity : CGAffineTransform(translationX: 0, y: 80)
+        }
     }
     
     @objc private func reloadTabs() {

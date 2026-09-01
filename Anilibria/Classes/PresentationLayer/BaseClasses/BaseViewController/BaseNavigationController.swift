@@ -43,8 +43,13 @@ extension BaseNavigationController: UINavigationControllerDelegate {
         topViewController?.transitionCoordinator?.notifyWhenInteractionChanges {  _ in
             let isVisible = self.topViewController?.isNavigationBarVisible == true
             self.setNavigationBarHidden(!isVisible, animated: true)
+            
+            let isCurrentRoot = self.viewControllers.first == self.topViewController
+            NotificationCenter.default.post(name: NSNotification.Name("ToggleMainTabBarVisibility"), object: isCurrentRoot)
         }
 
+        let isRoot = self.viewControllers.first == viewController
+        NotificationCenter.default.post(name: NSNotification.Name("ToggleMainTabBarVisibility"), object: isRoot)
     }
 }
 

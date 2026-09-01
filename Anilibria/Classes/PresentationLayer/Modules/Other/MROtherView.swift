@@ -23,40 +23,40 @@ final class OtherViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLiquidGlassStyle()
+        setupAppleHIGStyle()
 
         if UIDevice.current.userInterfaceIdiom == .pad {
             historyView.isHidden = true
         }
     }
 
-    private func setupLiquidGlassStyle() {
+    private func setupAppleHIGStyle() {
         view.backgroundColor = .Surfaces.background
         userNameLabel.font = .systemFont(ofSize: 22, weight: .bold)
         userNameLabel.textColor = .Text.main
 
-        authButton.smoothCorners(with: 16)
-        authButton.backgroundColor = UIColor.Tint.active.withAlphaComponent(0.15)
-        authButton.layer.borderColor = UIColor.Tint.active.withAlphaComponent(0.4).cgColor
-        authButton.layer.borderWidth = 0.75
+        authButton.smoothCorners(with: 14)
+        authButton.backgroundColor = UIColor.Tint.active.withAlphaComponent(0.12)
+        authButton.layer.borderColor = UIColor.Tint.active.withAlphaComponent(0.3).cgColor
+        authButton.layer.borderWidth = 0.5
         authButton.setTitleColor(.Tint.active, for: .normal)
         authButton.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
         authButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: 14, bottom: 6, right: 14)
 
-        // Style all BorderedView containers as grouped glass cards
+        // Style all BorderedView containers as clean iOS Inset Grouped cards
         view.subviews.forEach { sub in
-            applyGlassRecursively(sub)
+            applyGroupedCardStyle(sub)
         }
     }
 
-    private func applyGlassRecursively(_ view: UIView) {
+    private func applyGroupedCardStyle(_ view: UIView) {
         if let bordered = view as? BorderedView {
-            bordered.smoothCorners(with: 20)
-            bordered.backgroundColor = UIColor.Surfaces.content.withAlphaComponent(0.65)
-            bordered.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
-            bordered.layer.borderWidth = 0.75
+            bordered.smoothCorners(with: 14)
+            bordered.backgroundColor = .Surfaces.content
+            bordered.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+            bordered.layer.borderWidth = 0.5
         }
-        view.subviews.forEach { applyGlassRecursively($0) }
+        view.subviews.forEach { applyGroupedCardStyle($0) }
     }
 
     override func setupStrings() {
@@ -94,6 +94,12 @@ final class OtherViewController: BaseViewController {
     @IBAction func settingsAction(_ sender: Any) {
         triggerHaptic(style: .light)
         self.handler.settings()
+    }
+
+    @IBAction func customSettingsAction(_ sender: Any) {
+        triggerHaptic(style: .light)
+        let vc = TabSettingsViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 
     @IBAction func linkDeviceAction(_ sender: Any) {
@@ -142,7 +148,7 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Настройка вкладок"
+        title = "Настройки +"
         view.backgroundColor = .Surfaces.background
         
         activeTabs = MenuSettingsManager.shared.getActiveTabs()
@@ -153,6 +159,10 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        persistChanges()
+    }
+    
+    private func persistChanges() {
         MenuSettingsManager.shared.save(active: activeTabs, inactive: inactiveTabs)
         NotificationCenter.default.post(name: NSNotification.Name("TabsSettingsDidChange"), object: nil)
     }
@@ -184,7 +194,7 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return section == 0 ? "Активные вкладки" : "Скрытые вкладки"
+        return section == 0 ? "АКТИВНЫЕ ВКЛАДКИ ДОКА" : "СКРЫТЫЕ ВКЛАДКИ"
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -227,6 +237,9 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
             activeTabs.append(item)
             tableView.moveRow(at: indexPath, to: IndexPath(row: activeTabs.count - 1, section: 0))
         }
+        
+        persistChanges()
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             tableView.reloadData()
         }
@@ -246,5 +259,6 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let movedObject = activeTabs.remove(at: sourceIndexPath.row)
         activeTabs.insert(movedObject, at: destinationIndexPath.row)
+        persistChanges()
     }
 }

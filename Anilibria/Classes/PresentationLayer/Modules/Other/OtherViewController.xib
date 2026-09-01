@@ -279,6 +279,66 @@
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </view>
+                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cs-card-01" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
+                                            <rect key="frame" x="16" y="240" width="382" height="40"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="cs-stack-01">
+                                                    <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                                    <subviews>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cs-view-01">
+                                                            <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                                            <subviews>
+                                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="slider.horizontal.3" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="cs-icon-01">
+                                                                    <rect key="frame" x="16" y="10" width="20" height="20"/>
+                                                                    <color key="tintColor" name="text/secondary"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="20" id="cs-w-01"/>
+                                                                        <constraint firstAttribute="height" constant="20" id="cs-h-01"/>
+                                                                    </constraints>
+                                                                </imageView>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Настройки +" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cs-lbl-01">
+                                                                    <rect key="frame" x="46" y="11.5" width="320" height="17"/>
+                                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
+                                                                    <color key="textColor" name="text/main"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cs-btn-01">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                                                    <connections>
+                                                                        <action selector="customSettingsAction:" destination="-1" eventType="touchUpInside" id="cs-act-01"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="40" id="cs-vh-01"/>
+                                                                <constraint firstItem="cs-btn-01" firstAttribute="leading" secondItem="cs-view-01" secondAttribute="leading" id="cs-bl-01"/>
+                                                                <constraint firstAttribute="trailing" secondItem="cs-lbl-01" secondAttribute="trailing" constant="16" id="cs-lr-01"/>
+                                                                <constraint firstItem="cs-lbl-01" firstAttribute="centerY" secondItem="cs-view-01" secondAttribute="centerY" id="cs-ly-01"/>
+                                                                <constraint firstItem="cs-icon-01" firstAttribute="leading" secondItem="cs-view-01" secondAttribute="leading" constant="16" id="cs-il-01"/>
+                                                                <constraint firstAttribute="bottom" secondItem="cs-btn-01" secondAttribute="bottom" id="cs-bb-01"/>
+                                                                <constraint firstAttribute="trailing" secondItem="cs-btn-01" secondAttribute="trailing" id="cs-br-01"/>
+                                                                <constraint firstItem="cs-lbl-01" firstAttribute="leading" secondItem="cs-icon-01" secondAttribute="trailing" constant="10" id="cs-ll-01"/>
+                                                                <constraint firstItem="cs-icon-01" firstAttribute="centerY" secondItem="cs-view-01" secondAttribute="centerY" id="cs-iy-01"/>
+                                                                <constraint firstItem="cs-btn-01" firstAttribute="top" secondItem="cs-view-01" secondAttribute="top" id="cs-bt-01"/>
+                                                            </constraints>
+                                                        </view>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <color key="backgroundColor" name="surfaces/content"/>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="cs-stack-01" secondAttribute="trailing" id="cs-sr-01"/>
+                                                <constraint firstItem="cs-stack-01" firstAttribute="top" secondItem="cs-card-01" secondAttribute="top" id="cs-st-01"/>
+                                                <constraint firstItem="cs-stack-01" firstAttribute="leading" secondItem="cs-card-01" secondAttribute="leading" id="cs-sl-01"/>
+                                                <constraint firstAttribute="bottom" secondItem="cs-stack-01" secondAttribute="bottom" id="cs-sb-01"/>
+                                            </constraints>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                    <real key="value" value="5"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </view>
                                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BGu-GH-ieP" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
                                             <rect key="frame" x="16" y="248" width="382" height="50"/>
                                             <subviews>

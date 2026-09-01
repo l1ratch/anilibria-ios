@@ -10,18 +10,12 @@ public final class ActionCell: RippleViewCell {
     public override func awakeFromNib() {
         super.awakeFromNib()
         rippleContainerView?.layer.cornerCurve = .continuous
-        rippleContainerView?.smoothCorners(with: 25)
-        rippleContainerView?.backgroundColor = UIColor(white: 1.0, alpha: 0.1)
-        rippleContainerView?.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+        rippleContainerView?.smoothCorners(with: 14)
+        rippleContainerView?.backgroundColor = UIColor.Surfaces.content
+        rippleContainerView?.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
         rippleContainerView?.layer.borderWidth = 0.5
         
-        // Deep shadow for floating pill effect
-        rippleContainerView?.layer.shadowColor = UIColor.black.cgColor
-        rippleContainerView?.layer.shadowOpacity = 0.4
-        rippleContainerView?.layer.shadowRadius = 12
-        rippleContainerView?.layer.shadowOffset = CGSize(width: 0, height: 6)
-        
-        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
         titleLabel.textColor = .white
     }
 
@@ -39,10 +33,10 @@ public final class ActionCell: RippleViewCell {
         if let icon = item.icon {
             let attachment = NSTextAttachment()
             attachment.image = icon.withTintColor(.Tint.active, renderingMode: .alwaysOriginal)
-            attachment.bounds = CGRect(x: 0, y: -3, width: 17, height: 17)
+            attachment.bounds = CGRect(x: 0, y: -2.5, width: 16, height: 16)
             let attString = NSMutableAttributedString(attachment: attachment)
             attString.append(NSAttributedString(string: "  " + item.localizedTitle(), attributes: [
-                .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+                .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
                 .foregroundColor: UIColor.white
             ]))
             self.titleLabel.attributedText = attString

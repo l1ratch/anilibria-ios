@@ -24,7 +24,7 @@
                         <constraint firstAttribute="height" constant="20" id="OhN-mI-OWj"/>
                     </constraints>
                 </imageView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X8a-gB-VtR" customClass="RippleButton" customModule="Anilibria" customModuleProvider="target">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X8a-gB-VtR">
                     <rect key="frame" x="0.0" y="0.0" width="182" height="116"/>
                     <connections>
                         <action selector="tapAction:" destination="-1" eventType="touchUpInside" id="Vxk-IJ-KET"/>

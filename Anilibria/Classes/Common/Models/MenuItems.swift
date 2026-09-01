@@ -32,13 +32,18 @@ public final class MenuListItem: ListItem<[MenuItem]> {}
 
 public final class MenuItemsFactory {
     static func create() -> [MenuItem] {
-        return [
-            MenuItem(type: .feed, icon: .System.feed),
-            MenuItem(type: .catalog, icon: .System.catalog),
-            MenuItem(type: .news, icon: .System.media),
-            MenuItem(type: .collections, icon: .System.collections),
-            MenuItem(type: .other, icon: .System.more)
-        ]
+        let activeTypes = MenuSettingsManager.shared.getActiveTabs()
+        return activeTypes.map { type in
+            let icon: UIImage?
+            switch type {
+            case .feed: icon = .System.feed
+            case .catalog: icon = .System.catalog
+            case .news: icon = .System.media
+            case .collections: icon = .System.collections
+            case .other: icon = .System.more
+            }
+            return MenuItem(type: type, icon: icon)
+        }
     }
 }
 
@@ -55,7 +60,10 @@ public final class MenuSettingsManager {
     
     public func getActiveTabs() -> [MenuItemType] {
         if let saved = UserDefaults.standard.stringArray(forKey: activeTabsKey) {
-            return saved.compactMap { MenuItemType(rawValue: $0) }
+            let list = saved.compactMap { MenuItemType(rawValue: $0) }
+            if !list.isEmpty {
+                return list
+            }
         }
         return defaultActive
     }

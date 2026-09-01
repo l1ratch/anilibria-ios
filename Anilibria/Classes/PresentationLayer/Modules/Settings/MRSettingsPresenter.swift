@@ -61,13 +61,6 @@ extension SettingsPresenter: SettingsEventHandler {
                 action: { [weak self] in self?.selectOrientation($0) }
             )
             items.append(orientation)
-            
-            let navigationTabsItem = SettingsControlItem(
-                title: "Настройка навигации",
-                value: "",
-                action: { [weak self] _ in self?.router.openTabSettings() }
-            )
-            items.append(navigationTabsItem)
         }
 
         let qualityItem = SettingsControlItem(

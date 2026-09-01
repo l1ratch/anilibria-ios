@@ -35,13 +35,12 @@
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="500" id="39I-DI-VU1"/>
                                     <constraint firstItem="bYg-fA-KUG" firstAttribute="centerY" secondItem="W7f-EV-pZc" secondAttribute="centerY" id="NGl-id-IbG"/>
-                                    <constraint firstAttribute="trailing" secondItem="bYg-fA-KUG" secondAttribute="trailing" constant="16" id="WgR-jn-RjS"/>
-                                    <constraint firstAttribute="height" constant="50" id="v1R-ee-D1e"/>
-                                    <constraint firstItem="bYg-fA-KUG" firstAttribute="leading" secondItem="W7f-EV-pZc" secondAttribute="leading" constant="20" id="xIV-rk-3uW"/>
+                                    <constraint firstAttribute="height" constant="42" id="v1R-ee-D1e"/>
+                                    <constraint firstItem="bYg-fA-KUG" firstAttribute="leading" secondItem="W7f-EV-pZc" secondAttribute="leading" constant="16" id="xIV-rk-3uW"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="25"/>
+                                        <real key="value" value="14"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </view>
@@ -52,7 +51,7 @@
                             <constraint firstItem="W7f-EV-pZc" firstAttribute="leading" secondItem="5tY-qs-K6D" secondAttribute="leading" priority="750" constant="16" id="5NB-Sf-9gd"/>
                             <constraint firstItem="W7f-EV-pZc" firstAttribute="top" secondItem="gei-IG-kfO" secondAttribute="top" constant="4" id="FhN-LX-CUM"/>
                             <constraint firstItem="W7f-EV-pZc" firstAttribute="centerX" secondItem="gei-IG-kfO" secondAttribute="centerX" id="l7K-8Z-vlN"/>
-                            <constraint firstAttribute="bottom" secondItem="W7f-EV-pZc" secondAttribute="bottom" priority="999" constant="16" id="rqm-cd-0yc"/>
+                            <constraint firstAttribute="bottom" secondItem="W7f-EV-pZc" secondAttribute="bottom" priority="999" constant="6" id="rqm-cd-0yc"/>
                             <constraint firstItem="5tY-qs-K6D" firstAttribute="trailing" secondItem="W7f-EV-pZc" secondAttribute="trailing" priority="750" constant="16" id="x4S-75-tJG"/>
                         </constraints>
                     </view>
