@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SearchView" customModule="AniLiberty" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SearchView" customModule="Anilibria" customModuleProvider="target">
             <connections>
                 <outlet property="cancelButton" destination="GLr-6Z-yX2" id="spe-0S-aWz"/>
                 <outlet property="searchField" destination="PDU-gw-XAd" id="dcF-2k-4KK"/>
@@ -20,7 +20,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QX1-Vu-xG4" customClass="BorderedView" customModule="AniLiberty" customModuleProvider="target">
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QX1-Vu-xG4" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
                     <rect key="frame" x="10" y="0.0" width="300" height="44"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="BSJ-1I-dL8">
