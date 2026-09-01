@@ -44,7 +44,7 @@ jobs:
 
       - name: Resolve Swift Package Manager dependencies
         run: |
-          xcodebuild -resolvePackageDependencies -project Anilibria.xcodeproj -skipPackagePluginValidation -skipMacroValidation || true
+          xcodebuild -resolvePackageDependencies -project Anilibria.xcodeproj || true
 
       - name: Build iOS App (.app)
         run: |
@@ -54,15 +54,21 @@ jobs:
             -destination "generic/platform=iOS" \
             -configuration Release \
             -derivedDataPath ./Build \
-            -skipPackagePluginValidation \
-            -skipMacroValidation \
             ARCHS="arm64" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
-            ONLY_ACTIVE_ARCH=NO
+            ONLY_ACTIVE_ARCH=NO | tee build.log
+
+      - name: Upload Build Log on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: XcodeBuild-Log
+          path: build.log
+          retention-days: 7
 
       - name: Package into IPA
         run: |
