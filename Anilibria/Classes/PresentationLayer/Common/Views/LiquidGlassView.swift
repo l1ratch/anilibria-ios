@@ -269,3 +269,14 @@ extension UIView {
         generator.impactOccurred()
     }
 }
+
+// MARK: - UIViewController Liquid Glass Extensions
+
+extension UIViewController {
+    /// Triggers physical haptic feedback
+    public func triggerHaptic(style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
+        let generator = UIImpactFeedbackGenerator(style: style)
+        generator.prepare()
+        generator.impactOccurred()
+    }
+}
