@@ -68,9 +68,8 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM="" \
-            ONLY_ACTIVE_ARCH=NO > build.log 2>&1
-          STATUS=$?
-          cat build.log
+            ONLY_ACTIVE_ARCH=NO 2>&1 | tee build.log
+          STATUS=${PIPESTATUS[0]}
           if [ $STATUS -ne 0 ]; then
             echo "::error::xcodebuild failed with code $STATUS"
             echo "### XcodeBuild Error Log" >> $GITHUB_STEP_SUMMARY
