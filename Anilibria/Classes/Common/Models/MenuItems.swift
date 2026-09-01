@@ -7,6 +7,16 @@ public enum MenuItemType: String, CaseIterable {
     var index: Int {
         return MenuItemType.allCases.firstIndex(of: self) ?? 0
     }
+    
+    public var icon: UIImage? {
+        switch self {
+        case .feed: return .System.feed
+        case .catalog: return .System.catalog
+        case .news: return .System.media
+        case .collections: return .System.collections
+        case .other: return .System.more
+        }
+    }
 }
 
 public typealias DoubleImage = (normal: UIImage, selected: UIImage)
@@ -34,15 +44,7 @@ public final class MenuItemsFactory {
     static func create() -> [MenuItem] {
         let activeTypes = MenuSettingsManager.shared.getActiveTabs()
         return activeTypes.map { type in
-            let icon: UIImage?
-            switch type {
-            case .feed: icon = .System.feed
-            case .catalog: icon = .System.catalog
-            case .news: icon = .System.media
-            case .collections: icon = .System.collections
-            case .other: icon = .System.more
-            }
-            return MenuItem(type: type, icon: icon)
+            return MenuItem(type: type, icon: type.icon)
         }
     }
 }
