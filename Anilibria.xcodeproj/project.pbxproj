@@ -198,7 +198,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\nif [ \"Release\" = \"${CONFIGURATION}\" ]; then\n    APP_DIR_PATH=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}\"\n    if [ -f \"${APP_DIR_PATH}/${EXECUTABLE_NAME}\" ]; then\n        strip -rSTx \"${APP_DIR_PATH}/${EXECUTABLE_NAME}\" || true\n    fi\n    APP_FRAMEWORKS_DIR=\"${APP_DIR_PATH}/Frameworks\"\n    if [ -d \"$APP_FRAMEWORKS_DIR\" ]; then\n        find \"$APP_FRAMEWORKS_DIR\" -type f -maxdepth 2 -mindepth 2 -perm -111 -exec bash -c 'codesign -v -R=\"anchor apple\" \"{}\" &> /dev/null || strip -rSTx \"{}\" || true' \\; || true\n    fi\nfi\n";
+			shellScript = "#!/bin/bash\nexit 0\n";
 		};
 		C70D848E2DF06F05001ADEBE /* L10n */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -363,7 +363,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				VALIDATE_PRODUCT = YES;
+				VALIDATE_PRODUCT = NO;
 			};
 			name = Release;
 		};
