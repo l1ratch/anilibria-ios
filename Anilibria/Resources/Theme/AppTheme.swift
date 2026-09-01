@@ -15,6 +15,7 @@ public struct MainTheme: AppTheme {
 
     public func apply() {
         self.configureNavBar()
+        self.configureTabBar()
         self.configureTextView()
         self.configureCollectionView()
     }
@@ -40,6 +41,37 @@ public struct MainTheme: AppTheme {
         navbar.standardAppearance = appearance
         navbar.scrollEdgeAppearance = appearance
         navbar.compactAppearance = appearance
+    }
+
+    func configureTabBar() {
+        let tabBar = UITabBar.appearance()
+        tabBar.tintColor = .Tint.active
+
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundEffect = UIBlurEffect(style: .systemMaterialDark)
+        appearance.backgroundColor = UIColor(white: 0.08, alpha: 0.8)
+
+        let itemAppearance = UITabBarItemAppearance()
+        itemAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.55)
+        itemAppearance.normal.titleTextAttributes = [
+            .foregroundColor: UIColor.white.withAlphaComponent(0.55),
+            .font: UIFont.systemFont(ofSize: 10, weight: .medium)
+        ]
+        itemAppearance.selected.iconColor = .Tint.active
+        itemAppearance.selected.titleTextAttributes = [
+            .foregroundColor: UIColor.Tint.active,
+            .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
+        ]
+
+        appearance.stackedLayoutAppearance = itemAppearance
+        appearance.inlineLayoutAppearance = itemAppearance
+        appearance.compactInlineLayoutAppearance = itemAppearance
+
+        tabBar.standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            tabBar.scrollEdgeAppearance = appearance
+        }
     }
 
     func configureTextView() {

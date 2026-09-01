@@ -1,141 +1,342 @@
 import UIKit
 
-// MARK: - View Controller
+// MARK: - View Controller (Native Inset Grouped TableView)
 
-final class OtherViewController: BaseViewController {
-    @IBOutlet var userNameLabel: UILabel!
-    @IBOutlet var authButton: UIButton!
-    @IBOutlet var linksStackView: UIStackView!
-
-    @IBOutlet var linkDeviceLabel: UILabel!
-    @IBOutlet var linkDeviceView: UIView!
-    @IBOutlet var historyTitleLabel: UILabel!
-    @IBOutlet var historyView: UIView!
-    @IBOutlet var teamTitleLabel: UILabel!
-    @IBOutlet var donateTitleLabel: UILabel!
-    @IBOutlet var settingsTitleLabel: UILabel!
-
+final class OtherViewController: BaseViewController, UITableViewDelegate, UITableViewDataSource {
     var handler: OtherEventHandler!
 
-    override var isNavigationBarVisible: Bool { false }
+    private let tableView = UITableView(frame: .zero, style: .insetGrouped)
+    private var currentUser: User?
+    private var links: [LinkData] = []
+    private var isLoadingUser: Bool = false
+
+    override var isNavigationBarVisible: Bool { true }
 
     // MARK: - Life cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupAppleHIGStyle()
-
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            historyView.isHidden = true
-        }
-    }
-
-    private func setupAppleHIGStyle() {
+        title = "Профиль"
         view.backgroundColor = .Surfaces.background
-        userNameLabel.font = .systemFont(ofSize: 22, weight: .bold)
-        userNameLabel.textColor = .Text.main
-
-        authButton.smoothCorners(with: 14)
-        authButton.backgroundColor = UIColor.Tint.active.withAlphaComponent(0.12)
-        authButton.layer.borderColor = UIColor.Tint.active.withAlphaComponent(0.3).cgColor
-        authButton.layer.borderWidth = 0.5
-        authButton.setTitleColor(.Tint.active, for: .normal)
-        authButton.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
-        authButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: 14, bottom: 6, right: 14)
-
-        // Style all BorderedView containers as clean iOS Inset Grouped cards
-        view.subviews.forEach { sub in
-            applyGroupedCardStyle(sub)
-        }
-    }
-
-    private func applyGroupedCardStyle(_ view: UIView) {
-        if let bordered = view as? BorderedView {
-            bordered.smoothCorners(with: 14)
-            bordered.backgroundColor = .Surfaces.content
-            bordered.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
-            bordered.layer.borderWidth = 0.5
-        }
-        view.subviews.forEach { applyGroupedCardStyle($0) }
-    }
-
-    override func setupStrings() {
-        super.setupStrings()
+        
+        setupTableView()
         handler.didLoad()
-        linkDeviceLabel.text = L10n.Screen.LinkDevice.title
-        historyTitleLabel.text = L10n.Screen.Feed.history
-        teamTitleLabel.text = L10n.Screen.Other.team
-        donateTitleLabel.text = L10n.Screen.Other.donate
-        settingsTitleLabel.text = L10n.Screen.Settings.title
     }
 
-    // MARK: - Actions
-
-    @IBAction func loginLogOutAction(_ sender: Any) {
-        triggerHaptic(style: .light)
-        self.handler.loginOrLogout()
+    private func setupTableView() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.backgroundColor = .clear
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "StandardCell")
+        tableView.register(ProfileTableCell.self, forCellReuseIdentifier: "ProfileCell")
+        tableView.register(SocialLinksTableCell.self, forCellReuseIdentifier: "SocialCell")
+        
+        view.addSubview(tableView)
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
 
-    @IBAction func historyAction(_ sender: Any) {
-        triggerHaptic(style: .light)
-        self.handler.history()
+    // MARK: - TableView DataSource & Delegate
+
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 4
     }
 
-    @IBAction func teamAction(_ sender: Any) {
-        triggerHaptic(style: .light)
-        self.handler.team()
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch section {
+        case 0:
+            return 1
+        case 1:
+            // Link Device (if user), History, Team, Donate
+            return (currentUser != nil ? 1 : 0) + 3
+        case 2:
+            // Settings, Settings +
+            return 2
+        case 3:
+            return links.isEmpty ? 0 : 1
+        default:
+            return 0
+        }
     }
 
-    @IBAction func donateAction(_ sender: Any) {
-        triggerHaptic(style: .light)
-        self.handler.donate()
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch section {
+        case 1: return "РАЗДЕЛЫ"
+        case 2: return "НАСТРОЙКИ"
+        case 3: return "СООБЩЕСТВО"
+        default: return nil
+        }
     }
 
-    @IBAction func settingsAction(_ sender: Any) {
-        triggerHaptic(style: .light)
-        self.handler.settings()
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+        case 0:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "ProfileCell", for: indexPath) as? ProfileTableCell else {
+                return UITableViewCell()
+            }
+            cell.configure(user: currentUser, loading: isLoadingUser) { [weak self] in
+                self?.triggerHaptic(style: .light)
+                self?.handler.loginOrLogout()
+            }
+            return cell
+
+        case 1:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "StandardCell", for: indexPath)
+            cell.backgroundColor = .Surfaces.content
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.textColor = .Text.main
+            cell.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+
+            var rowOffset = indexPath.row
+            if currentUser != nil {
+                if rowOffset == 0 {
+                    cell.textLabel?.text = L10n.Screen.LinkDevice.title
+                    cell.imageView?.image = UIImage(systemName: "link")
+                    cell.imageView?.tintColor = .Tint.active
+                    return cell
+                }
+                rowOffset -= 1
+            }
+
+            switch rowOffset {
+            case 0:
+                cell.textLabel?.text = L10n.Screen.Feed.history
+                cell.imageView?.image = UIImage(systemName: "clock.arrow.circlepath")
+                cell.imageView?.tintColor = .Tint.active
+            case 1:
+                cell.textLabel?.text = L10n.Screen.Other.team
+                cell.imageView?.image = UIImage(systemName: "person.3.fill")
+                cell.imageView?.tintColor = .Tint.active
+            case 2:
+                cell.textLabel?.text = L10n.Screen.Other.donate
+                cell.imageView?.image = UIImage(systemName: "heart.fill")
+                cell.imageView?.tintColor = .Tint.active
+            default:
+                break
+            }
+            return cell
+
+        case 2:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "StandardCell", for: indexPath)
+            cell.backgroundColor = .Surfaces.content
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.textColor = .Text.main
+            cell.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+
+            if indexPath.row == 0 {
+                cell.textLabel?.text = L10n.Screen.Settings.title
+                cell.imageView?.image = UIImage(systemName: "gearshape.fill")
+                cell.imageView?.tintColor = .Tint.active
+            } else {
+                cell.textLabel?.text = "Настройки +"
+                cell.imageView?.image = UIImage(systemName: "slider.horizontal.3")
+                cell.imageView?.tintColor = .Tint.active
+            }
+            return cell
+
+        case 3:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "SocialCell", for: indexPath) as? SocialLinksTableCell else {
+                return UITableViewCell()
+            }
+            cell.configure(links: self.links) { [weak self] link in
+                self?.triggerHaptic(style: .light)
+                self?.handler.tap(link: link)
+            }
+            return cell
+
+        default:
+            return UITableViewCell()
+        }
     }
 
-    @IBAction func customSettingsAction(_ sender: Any) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         triggerHaptic(style: .light)
-        let vc = SettingsPlusViewController()
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
 
-    @IBAction func linkDeviceAction(_ sender: Any) {
-        triggerHaptic(style: .light)
-        self.handler.linkDevice()
+        switch indexPath.section {
+        case 0:
+            handler.loginOrLogout()
+
+        case 1:
+            var rowOffset = indexPath.row
+            if currentUser != nil {
+                if rowOffset == 0 {
+                    handler.linkDevice()
+                    return
+                }
+                rowOffset -= 1
+            }
+
+            switch rowOffset {
+            case 0: handler.history()
+            case 1: handler.team()
+            case 2: handler.donate()
+            default: break
+            }
+
+        case 2:
+            if indexPath.row == 0 {
+                handler.settings()
+            } else {
+                let vc = SettingsPlusViewController()
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+
+        default:
+            break
+        }
     }
 }
 
 extension OtherViewController: OtherViewBehavior {
     func set(user: User?, loading: Bool) {
-        self.userNameLabel.isHidden = loading
-        self.authButton.isHidden = loading
-        self.userNameLabel.text = user?.name ?? L10n.Common.guest
-        if user == nil {
-            self.authButton.setTitle(L10n.Buttons.signIn, for: .normal)
-            self.linkDeviceView.isHidden = true
-        } else {
-            self.authButton.setTitle(L10n.Buttons.signOut, for: .normal)
-            self.linkDeviceView.isHidden = false
-        }
+        self.currentUser = user
+        self.isLoadingUser = loading
+        self.tableView.reloadData()
     }
 
     func set(links: [LinkData]) {
-        let views = links.lazy.compactMap { item -> LinkView? in
-            let view = LinkView.fromNib()
-            view?.configure(item)
-            view?.setTap { [weak self] in
-                self?.handler.tap(link: $0)
-            }
-            return view
-        }
-        self.linksStackView.arrangedSubviews.forEach {
+        self.links = links
+        self.tableView.reloadData()
+    }
+}
+
+// MARK: - Profile Table Cell
+
+final class ProfileTableCell: UITableViewCell {
+    private let avatarImageView = UIImageView()
+    private let nameLabel = UILabel()
+    private let authButton = UIButton(type: .system)
+    private var authAction: (() -> Void)?
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    private func setup() {
+        backgroundColor = .Surfaces.content
+        selectionStyle = .none
+
+        avatarImageView.image = UIImage(systemName: "person.crop.circle.fill")
+        avatarImageView.tintColor = .Tint.active
+        avatarImageView.contentMode = .scaleAspectFit
+        avatarImageView.translatesAutoresizingMaskIntoConstraints = false
+
+        nameLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        nameLabel.textColor = .Text.main
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        authButton.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+        authButton.layer.cornerRadius = 14
+        authButton.layer.cornerCurve = .continuous
+        authButton.backgroundColor = UIColor.Tint.active.withAlphaComponent(0.12)
+        authButton.setTitleColor(.Tint.active, for: .normal)
+        authButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: 14, bottom: 6, right: 14)
+        authButton.translatesAutoresizingMaskIntoConstraints = false
+        authButton.addTarget(self, action: #selector(didTapAuth), for: .touchUpInside)
+
+        contentView.addSubview(avatarImageView)
+        contentView.addSubview(nameLabel)
+        contentView.addSubview(authButton)
+
+        NSLayoutConstraint.activate([
+            avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            avatarImageView.widthAnchor.constraint(equalToConstant: 44),
+            avatarImageView.heightAnchor.constraint(equalToConstant: 44),
+
+            nameLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 14),
+            nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            nameLabel.trailingAnchor.constraint(lessThanOrEqualTo: authButton.leadingAnchor, constant: -12),
+
+            authButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            authButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            authButton.heightAnchor.constraint(equalToConstant: 32),
+
+            contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 64)
+        ])
+    }
+
+    @objc private func didTapAuth() {
+        authAction?()
+    }
+
+    func configure(user: User?, loading: Bool, onAuthTap: @escaping () -> Void) {
+        self.authAction = onAuthTap
+        self.nameLabel.text = loading ? "Загрузка..." : (user?.name ?? L10n.Common.guest)
+        let buttonTitle = user == nil ? L10n.Buttons.signIn : L10n.Buttons.signOut
+        self.authButton.setTitle(buttonTitle, for: .normal)
+    }
+}
+
+// MARK: - Social Links Table Cell
+
+final class SocialLinksTableCell: UITableViewCell {
+    private let stackView = UIStackView()
+    private var onLinkTap: ((LinkData) -> Void)?
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    private func setup() {
+        backgroundColor = .Surfaces.content
+        selectionStyle = .none
+
+        stackView.axis = .horizontal
+        stackView.distribution = .equalSpacing
+        stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        contentView.addSubview(stackView)
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
+        ])
+    }
+
+    func configure(links: [LinkData], onLinkTap: @escaping (LinkData) -> Void) {
+        self.onLinkTap = onLinkTap
+        stackView.arrangedSubviews.forEach {
+            stackView.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
-        for view in views {
-            self.linksStackView.addArrangedSubview(view)
+
+        for link in links {
+            let button = UIButton(type: .system)
+            button.setImage(link.linkType.icon?.withRenderingMode(.alwaysTemplate), for: .normal)
+            button.tintColor = .Tint.active
+            button.backgroundColor = UIColor(white: 1.0, alpha: 0.06)
+            button.layer.cornerRadius = 20
+            button.layer.cornerCurve = .continuous
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.widthAnchor.constraint(equalToConstant: 40).isActive = true
+            button.heightAnchor.constraint(equalToConstant: 40).isActive = true
+            
+            button.addAction(UIAction(handler: { [weak self] _ in
+                self?.onLinkTap?(link)
+            }), for: .touchUpInside)
+
+            stackView.addArrangedSubview(button)
         }
     }
 }
@@ -168,7 +369,7 @@ final class SettingsPlusViewController: BaseViewController, UITableViewDelegate,
         
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -285,7 +486,7 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
         
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -309,19 +510,19 @@ final class TabSettingsViewController: BaseViewController, UITableViewDelegate, 
         let type = indexPath.section == 0 ? activeTabs[indexPath.row] : inactiveTabs[indexPath.row]
         
         let title: String
-        let icon: UIImage?
+        let iconName: String
         
         switch type {
-        case .feed: title = "Главная"; icon = .System.feed
-        case .catalog: title = "Релизы"; icon = .System.catalog
-        case .news: title = "Новости"; icon = .System.media
-        case .collections: title = "Коллекции"; icon = .System.collections
-        case .other: title = "Другое"; icon = .System.more
+        case .feed: title = "Главная"; iconName = "house.fill"
+        case .catalog: title = "Релизы"; iconName = "play.rectangle.on.rectangle.fill"
+        case .news: title = "Новости"; iconName = "newspaper.fill"
+        case .collections: title = "Коллекции"; iconName = "square.stack.3d.up.fill"
+        case .other: title = "Другое"; iconName = "ellipsis.circle.fill"
         }
         
         cell.textLabel?.text = title
         cell.textLabel?.textColor = .Text.main
-        cell.imageView?.image = icon
+        cell.imageView?.image = UIImage(systemName: iconName) ?? type.icon
         cell.imageView?.tintColor = .Tint.active
         cell.backgroundColor = .Surfaces.content
         return cell

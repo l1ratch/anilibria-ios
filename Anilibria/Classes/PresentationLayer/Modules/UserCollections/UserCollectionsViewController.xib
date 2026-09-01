@@ -44,7 +44,7 @@
                 </collectionView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <color key="backgroundColor" name="surfaces/background"/>
             <constraints>
                 <constraint firstItem="Q3f-DG-xbO" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="60H-Nv-CTU"/>
                 <constraint firstAttribute="bottom" secondItem="X6P-sz-Wdv" secondAttribute="bottom" id="CZl-dX-dOn"/>
