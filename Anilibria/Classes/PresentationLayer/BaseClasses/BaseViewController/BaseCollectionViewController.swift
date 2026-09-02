@@ -15,7 +15,7 @@ class BaseCollectionViewController: BaseViewController {
 
     // MARK: - Properties
 
-    var defaultBottomInset: CGFloat = 40
+    var defaultBottomInset: CGFloat = 84
 
     public lazy var adapter = CollectionViewAdapter(collectionView: collectionView)
 

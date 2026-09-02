@@ -68,7 +68,7 @@
                 <constraint firstItem="jti-vB-QTd" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="caz-fI-jvr"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="jti-vB-QTd" secondAttribute="trailing" id="em3-0X-REW"/>
                 <constraint firstItem="shx-OZ-8Ha" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="fQG-Hn-8li"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="jti-vB-QTd" secondAttribute="bottom" id="ibd-xh-aNo"/>
+                <constraint firstAttribute="bottom" secondItem="jti-vB-QTd" secondAttribute="bottom" id="ibd-xh-aNo"/>
                 <constraint firstItem="shx-OZ-8Ha" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="pYB-64-39S"/>
             </constraints>
             <point key="canvasLocation" x="141" y="131"/>
