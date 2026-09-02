@@ -18,7 +18,7 @@ final class PlayItemFilterView: LoadableView {
 
     override func setupNib() {
         super.setupNib()
-        smoothCorners(with: 5)
+        smoothCorners(with: 10)
         textField.placeholder = L10n.Common.Search.byName
         textField.placeHolderColor = UIColor.white.withAlphaComponent(0.5)
         textField.tintColor = .Text.monoLight
