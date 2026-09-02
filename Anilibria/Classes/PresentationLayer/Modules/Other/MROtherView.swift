@@ -24,9 +24,18 @@ final class OtherViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-		if UIDevice.current.userInterfaceIdiom == .pad {
-			historyView.isHidden = true
-		}
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            historyView.isHidden = true
+        }
+        setupCards()
+    }
+
+    private func setupCards() {
+        for card in [linkDeviceView?.superview?.superview, teamTitleLabel?.superview?.superview?.superview] {
+            card?.smoothCorners(with: 16)
+            card?.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+            card?.layer.borderWidth = 1
+        }
     }
     
     override func setupStrings() {

@@ -15,6 +15,19 @@ final class SettingsViewController: BaseViewController {
 
     // MARK: - Life cycle
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupCards()
+    }
+
+    private func setupCards() {
+        for card in [commonStackView?.superview?.superview, appNameLabel?.superview?.superview?.superview] {
+            card?.smoothCorners(with: 16)
+            card?.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+            card?.layer.borderWidth = 1
+        }
+    }
+
     override func setupStrings() {
         super.setupStrings()
         self.handler.didLoad()

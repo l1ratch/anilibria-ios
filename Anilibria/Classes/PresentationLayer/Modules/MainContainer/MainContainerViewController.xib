@@ -68,7 +68,7 @@
                 <constraint firstAttribute="bottom" secondItem="Hng-aB-oz2" secondAttribute="bottom" id="iRG-nT-oYn"/>
                 <constraint firstItem="gi0-Ok-EvC" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="JMd-bh-dJ4"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="gi0-Ok-EvC" secondAttribute="trailing" constant="16" id="b5N-Zd-YUr"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="gi0-Ok-EvC" secondAttribute="bottom" constant="10" id="g1k-VF-Qcu"/>
+                <constraint firstAttribute="bottom" secondItem="gi0-Ok-EvC" secondAttribute="bottom" constant="20" id="g1k-VF-Qcu"/>
             </constraints>
             <point key="canvasLocation" x="47.826086956521742" y="35.491071428571423"/>
         </view>
