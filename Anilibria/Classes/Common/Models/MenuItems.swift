@@ -17,9 +17,9 @@ public enum MenuItemType: String, CaseIterable {
         case .news:
             return "YouTube"
         case .collections:
-            return L10n.Screen.UserCollections.title
+            return "Коллекции"
         case .other:
-            return L10n.Screen.Other.title
+            return "Другое"
         }
     }
 

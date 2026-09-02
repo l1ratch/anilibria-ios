@@ -7,6 +7,17 @@
 
 import UIKit
 
+final class DockCell: UITableViewCell {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .Surfaces.content
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+}
+
 final class DockEditorViewController: BaseViewController {
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
 
@@ -53,7 +64,7 @@ final class DockEditorViewController: BaseViewController {
         tableView.isEditing = true
         tableView.allowsSelectionDuringEditing = false
         tableView.backgroundColor = .Surfaces.background
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "DockCell")
+        tableView.register(DockCell.self, forCellReuseIdentifier: "DockCell")
     }
 
     private func loadData() {
@@ -114,32 +125,35 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DockCell", for: indexPath)
         cell.backgroundColor = .Surfaces.content
+        cell.selectionStyle = .none
 
-        var content = cell.defaultContentConfiguration()
         let item: MenuItemType
 
         if indexPath.section == 0 {
             item = activeItems[indexPath.row]
-            content.text = item.title
-            content.image = item.icon
-            content.imageProperties.tintColor = .Tint.active
-            content.textProperties.color = .Text.main
-            content.textProperties.font = .systemFont(ofSize: 16, weight: .medium)
+            cell.textLabel?.text = item.title
+            cell.textLabel?.textColor = .Text.main
+            cell.textLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+            cell.imageView?.image = item.icon
+            cell.imageView?.tintColor = .Tint.active
+
             if item == .other {
-                content.secondaryText = "Обязательная"
-                content.secondaryTextProperties.color = .Text.secondary
-                content.secondaryTextProperties.font = .systemFont(ofSize: 13, weight: .regular)
+                cell.detailTextLabel?.text = "Обязательная"
+                cell.detailTextLabel?.textColor = .Text.secondary
+                cell.detailTextLabel?.font = .systemFont(ofSize: 13, weight: .regular)
+            } else {
+                cell.detailTextLabel?.text = nil
             }
         } else {
             item = hiddenItems[indexPath.row]
-            content.text = item.title
-            content.image = item.icon
-            content.imageProperties.tintColor = .Text.secondary
-            content.textProperties.color = .Text.secondary
-            content.textProperties.font = .systemFont(ofSize: 16, weight: .medium)
+            cell.textLabel?.text = item.title
+            cell.textLabel?.textColor = .Text.secondary
+            cell.textLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+            cell.imageView?.image = item.icon
+            cell.imageView?.tintColor = .Text.secondary
+            cell.detailTextLabel?.text = nil
         }
 
-        cell.contentConfiguration = content
         return cell
     }
 
