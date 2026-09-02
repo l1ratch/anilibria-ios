@@ -56,6 +56,20 @@ final class MainContainerViewController: UITabBarController, UITabBarControllerD
     }
 }
 
+extension MainContainerViewController: WaitingBehavior {
+    var isLoading: Bool {
+        return MRLoaderManager.isLoading()
+    }
+
+    func showLoading(fullscreen: Bool) -> ActivityDisposable? {
+        var target: UIViewController?
+        if !fullscreen {
+            target = self
+        }
+        return MRLoaderManager.show(with: target)
+    }
+}
+
 extension MainContainerViewController: MainContainerViewBehavior {
     func set(items: [MenuItem]) {
         let currentType = menuData[safe: selectedIndex]?.type ?? .feed

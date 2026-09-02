@@ -54,7 +54,6 @@ jobs:
 
       - name: Build iOS App (.app)
         run: |
-          set +e
           xcodebuild build \
             -project Anilibria.xcodeproj \
             -scheme AniLiberty \
@@ -68,26 +67,7 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM="" \
-            ONLY_ACTIVE_ARCH=NO > build.log 2>&1
-          STATUS=$?
-          cat build.log
-          if [ $STATUS -ne 0 ]; then
-            echo "::error::xcodebuild failed with code $STATUS"
-            echo "### XcodeBuild Error Log" >> $GITHUB_STEP_SUMMARY
-            echo '```text' >> $GITHUB_STEP_SUMMARY
-            tail -n 100 build.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            exit $STATUS
-          fi
-
-      - name: Upload Build Log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Build-Log
-          path: build.log
-          retention-days: 7
-          if-no-files-found: ignore
+            ONLY_ACTIVE_ARCH=NO
 
       - name: Package into IPA
         run: |
