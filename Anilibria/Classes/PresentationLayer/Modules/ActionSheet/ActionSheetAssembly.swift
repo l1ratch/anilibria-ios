@@ -34,8 +34,8 @@ extension ActionSheetRoute where Self: RouterProtocol {
                       from: nil,
                       use: BlurPresentationController.self,
                       configure: {
-                          $0.isBlured = true
-                          $0.transformation = MoveUpTransformation()
+                          $0.isBlured = false
+                          $0.transformation = ScaleTransformation()
         }).move()
     }
 
