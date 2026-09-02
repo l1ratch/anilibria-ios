@@ -11,9 +11,9 @@ public enum MenuItemType: String, CaseIterable {
     public var title: String {
         switch self {
         case .feed:
-            return L10n.Screen.Feed.title
+            return "Главная (резерв)"
         case .feedV2:
-            return "Главная (v2)"
+            return "Главная"
         case .catalog:
             return L10n.Screen.Catalog.title
         case .news:
@@ -29,9 +29,9 @@ public enum MenuItemType: String, CaseIterable {
         let config = UIImage.SymbolConfiguration(pointSize: 17, weight: .semibold)
         switch self {
         case .feed:
-            return UIImage(systemName: "house.fill", withConfiguration: config) ?? .System.news
+            return UIImage(systemName: "clock.arrow.circlepath", withConfiguration: config) ?? .System.news
         case .feedV2:
-            return UIImage(systemName: "sparkles", withConfiguration: config) ?? .System.news
+            return UIImage(systemName: "house.fill", withConfiguration: config) ?? .System.news
         case .catalog:
             return UIImage(systemName: "square.grid.2x2.fill", withConfiguration: config) ?? .System.search
         case .news:
@@ -66,21 +66,24 @@ public final class MenuItem: NSObject {
 public final class MenuListItem: ListItem<[MenuItem]> {}
 
 public final class MenuItemsFactory {
-    public static let defaultActiveTypes: [MenuItemType] = [.feed, .feedV2, .catalog, .news, .collections, .other]
+    public static let defaultActiveTypes: [MenuItemType] = [.feedV2, .catalog, .news, .collections, .other]
     private static let dockItemsKey = "dock_active_item_types"
 
     public static func getActiveTypes() -> [MenuItemType] {
         if let rawArray = UserDefaults.standard.stringArray(forKey: dockItemsKey) {
             var result = rawArray.compactMap { MenuItemType(rawValue: $0) }
+            if result.contains(.feed) && result.contains(.feedV2) {
+                result.removeAll(where: { $0 == .feed })
+            } else if result.contains(.feed) && !result.contains(.feedV2) {
+                if let idx = result.firstIndex(of: .feed) {
+                    result[idx] = .feedV2
+                }
+            }
+            if !result.contains(.feedV2) && !result.contains(.feed) {
+                result.insert(.feedV2, at: 0)
+            }
             if !result.contains(.other) {
                 result.append(.other)
-            }
-            if !result.contains(.feedV2) && !rawArray.contains("feedV2") {
-                if let feedIndex = result.firstIndex(of: .feed) {
-                    result.insert(.feedV2, at: feedIndex + 1)
-                } else {
-                    result.insert(.feedV2, at: 0)
-                }
             }
             return result
         }

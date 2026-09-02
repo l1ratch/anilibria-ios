@@ -77,14 +77,14 @@ final class FeedV2ViewController: BaseViewController {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceVertical = false
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 96, right: 0)
+        scrollView.contentInset = UIEdgeInsets(top: 4, left: 0, bottom: 84, right: 0)
 
         self.addRefreshControl(scrollView: scrollView)
 
         scrollView.addSubview(contentStackView)
         contentStackView.translatesAutoresizingMaskIntoConstraints = false
         contentStackView.axis = .vertical
-        contentStackView.spacing = 20
+        contentStackView.spacing = 12
         contentStackView.alignment = .fill
 
         NSLayoutConstraint.activate([
@@ -107,7 +107,7 @@ final class FeedV2ViewController: BaseViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        layout.itemSize = CGSize(width: screenWidth - 32, height: 230)
+        layout.itemSize = CGSize(width: screenWidth - 32, height: 220)
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
@@ -124,13 +124,14 @@ final class FeedV2ViewController: BaseViewController {
         let heroContainer = UIStackView()
         heroContainer.translatesAutoresizingMaskIntoConstraints = false
         heroContainer.axis = .vertical
-        heroContainer.spacing = 10
+        heroContainer.spacing = 4
         heroContainer.alignment = .fill
 
         pageControl.currentPageIndicatorTintColor = UIColor(named: "buttons/selected") ?? .systemRed
         pageControl.pageIndicatorTintColor = UIColor.white.withAlphaComponent(0.25)
         pageControl.hidesForSinglePage = true
         pageControl.isUserInteractionEnabled = false
+        pageControl.translatesAutoresizingMaskIntoConstraints = false
 
         heroContainer.addArrangedSubview(heroCollectionView)
         heroContainer.addArrangedSubview(pageControl)
@@ -138,7 +139,8 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(heroContainer)
 
         NSLayoutConstraint.activate([
-            heroCollectionView.heightAnchor.constraint(equalToConstant: 230)
+            heroCollectionView.heightAnchor.constraint(equalToConstant: 220),
+            pageControl.heightAnchor.constraint(equalToConstant: 16)
         ])
     }
 
@@ -198,7 +200,7 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(scheduleHeaderContainer)
 
         NSLayoutConstraint.activate([
-            scheduleHeaderContainer.heightAnchor.constraint(equalToConstant: 32),
+            scheduleHeaderContainer.heightAnchor.constraint(equalToConstant: 28),
 
             scheduleTitleLabel.leadingAnchor.constraint(equalTo: scheduleHeaderContainer.leadingAnchor, constant: 16),
             scheduleTitleLabel.centerYAnchor.constraint(equalTo: scheduleHeaderContainer.centerYAnchor),
@@ -209,7 +211,7 @@ final class FeedV2ViewController: BaseViewController {
 
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 120, height: 220)
+        layout.itemSize = CGSize(width: 114, height: 206)
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
@@ -224,7 +226,7 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(scheduleCollectionView)
 
         NSLayoutConstraint.activate([
-            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 220)
+            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 206)
         ])
     }
 

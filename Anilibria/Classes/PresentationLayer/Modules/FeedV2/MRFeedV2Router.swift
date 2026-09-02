@@ -15,6 +15,14 @@ protocol FeedV2Routable: BaseRoutable,
     SearchRoute,
     SeriesRoute,
     HistoryRoute,
-    CatalogRoute {}
+    CatalogRoute {
+    func show(title: String, message: String)
+}
 
-final class FeedV2Router: BaseRouter, FeedV2Routable {}
+final class FeedV2Router: BaseRouter, FeedV2Routable {
+    func show(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Понятно", style: .default))
+        controller.present(alert, animated: true)
+    }
+}

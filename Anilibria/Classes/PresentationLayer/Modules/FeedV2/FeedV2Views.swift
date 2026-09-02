@@ -21,6 +21,9 @@ final class FeedV2HeroCell: UICollectionViewCell {
     private let subtitleLabel = UILabel()
     private let actionButton = UIButton(type: .system)
 
+    private var subtitleTrailingToButton: NSLayoutConstraint!
+    private var subtitleTrailingToContent: NSLayoutConstraint!
+
     var onActionTap: (() -> Void)?
 
     override init(frame: CGRect) {
@@ -57,10 +60,10 @@ final class FeedV2HeroCell: UICollectionViewCell {
 
         gradientLayer.colors = [
             UIColor.clear.cgColor,
-            UIColor.black.withAlphaComponent(0.5).cgColor,
-            UIColor.black.withAlphaComponent(0.92).cgColor
+            UIColor.black.withAlphaComponent(0.55).cgColor,
+            UIColor.black.withAlphaComponent(0.94).cgColor
         ]
-        gradientLayer.locations = [0.0, 0.45, 1.0]
+        gradientLayer.locations = [0.0, 0.35, 1.0]
         gradientView.layer.addSublayer(gradientLayer)
 
         badgeContainer.clipsToBounds = true
@@ -76,15 +79,15 @@ final class FeedV2HeroCell: UICollectionViewCell {
         badgeLabel.translatesAutoresizingMaskIntoConstraints = false
         badgeContainer.contentView.addSubview(badgeLabel)
 
-        titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
         titleLabel.textColor = .white
         titleLabel.numberOfLines = 2
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(titleLabel)
 
-        subtitleLabel.font = .systemFont(ofSize: 13, weight: .medium)
-        subtitleLabel.textColor = UIColor.white.withAlphaComponent(0.75)
-        subtitleLabel.numberOfLines = 1
+        subtitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        subtitleLabel.textColor = UIColor.white.withAlphaComponent(0.88)
+        subtitleLabel.numberOfLines = 4
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(subtitleLabel)
 
@@ -99,6 +102,9 @@ final class FeedV2HeroCell: UICollectionViewCell {
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         actionButton.addTarget(self, action: #selector(didTapAction), for: .touchUpInside)
         contentView.addSubview(actionButton)
+
+        subtitleTrailingToButton = subtitleLabel.trailingAnchor.constraint(equalTo: actionButton.leadingAnchor, constant: -10)
+        subtitleTrailingToContent = subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -14)
 
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -126,8 +132,8 @@ final class FeedV2HeroCell: UICollectionViewCell {
             actionButton.widthAnchor.constraint(equalToConstant: 110),
 
             subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 14),
-            subtitleLabel.trailingAnchor.constraint(equalTo: actionButton.leadingAnchor, constant: -10),
             subtitleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),
+            subtitleTrailingToButton,
 
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 14),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -14),
@@ -146,26 +152,61 @@ final class FeedV2HeroCell: UICollectionViewCell {
         case .release(let series):
             badgeLabel.text = "🔥 В ТРЕНДЕ"
             titleLabel.text = series.name?.main ?? series.alias
+            titleLabel.numberOfLines = 2
             let genres = series.genres.prefix(2).map { $0.name }.joined(separator: " • ")
             subtitleLabel.text = genres.isEmpty ? (series.season?.description ?? "Аниме") : genres
+            subtitleLabel.numberOfLines = 1
             actionButton.isHidden = false
+            actionButton.setTitle("  Смотреть", for: .normal)
+            actionButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            subtitleTrailingToContent.isActive = false
+            subtitleTrailingToButton.isActive = true
+
         case .ad(let ad):
             badgeLabel.text = "РЕКЛАМА"
             titleLabel.text = ad.title
+            titleLabel.numberOfLines = 2
             subtitleLabel.text = ad.info
+            subtitleLabel.numberOfLines = 2
             actionButton.isHidden = false
             actionButton.setTitle("  Перейти", for: .normal)
             actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
+            subtitleTrailingToContent.isActive = false
+            subtitleTrailingToButton.isActive = true
+
         case .promo(let promo):
-            badgeLabel.text = "✨ АНОНС"
-            titleLabel.text = promo.title ?? item.info
+            badgeLabel.text = "📢 АНОНС"
+            let title = promo.title?.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let title = title, !title.isEmpty {
+                titleLabel.text = title
+            } else {
+                titleLabel.text = "Анонс"
+            }
+            titleLabel.numberOfLines = 2
             subtitleLabel.text = item.info
-            actionButton.isHidden = promo.url == nil
+            subtitleLabel.numberOfLines = 4
+
+            if promo.url != nil {
+                actionButton.isHidden = false
+                actionButton.setTitle("  Подробнее", for: .normal)
+                actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
+                subtitleTrailingToContent.isActive = false
+                subtitleTrailingToButton.isActive = true
+            } else {
+                actionButton.isHidden = true
+                subtitleTrailingToButton.isActive = false
+                subtitleTrailingToContent.isActive = true
+            }
+
         case nil:
-            badgeLabel.text = "НОВОСТЬ"
-            titleLabel.text = item.info
-            subtitleLabel.text = ""
+            badgeLabel.text = "📢 НОВОСТЬ"
+            titleLabel.text = "Информация"
+            titleLabel.numberOfLines = 1
+            subtitleLabel.text = item.info
+            subtitleLabel.numberOfLines = 4
             actionButton.isHidden = true
+            subtitleTrailingToButton.isActive = false
+            subtitleTrailingToContent.isActive = true
         }
     }
 }
@@ -440,7 +481,7 @@ final class FeedV2ScheduleCell: UICollectionViewCell {
             posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             posterImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            posterImageView.heightAnchor.constraint(equalToConstant: 168),
+            posterImageView.heightAnchor.constraint(equalToConstant: 154),
 
             timeBadge.topAnchor.constraint(equalTo: posterImageView.topAnchor, constant: 8),
             timeBadge.trailingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: -8),
@@ -451,11 +492,11 @@ final class FeedV2ScheduleCell: UICollectionViewCell {
             timeLabel.leadingAnchor.constraint(equalTo: timeBadge.contentView.leadingAnchor, constant: 6),
             timeLabel.trailingAnchor.constraint(equalTo: timeBadge.contentView.trailingAnchor, constant: -6),
 
-            titleLabel.topAnchor.constraint(equalTo: posterImageView.bottomAnchor, constant: 8),
+            titleLabel.topAnchor.constraint(equalTo: posterImageView.bottomAnchor, constant: 6),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
-            episodeLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
+            episodeLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 1),
             episodeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             episodeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])
@@ -465,15 +506,18 @@ final class FeedV2ScheduleCell: UICollectionViewCell {
         posterImageView.setImage(from: item.item.poster, placeholder: DefaultPlaceholder())
         titleLabel.text = item.item.name?.main ?? item.item.alias
 
-        if let ordinal = item.newEpisodeOrdinal {
+        if let episode = item.newEpisode, let ord = episode.ordinal {
+            episodeLabel.text = "\(Int(ord)) серия вышла"
+            timeLabel.text = "ВЫШЛА"
+            timeBadge.contentView.backgroundColor = (UIColor(named: "buttons/selected") ?? .systemRed).withAlphaComponent(0.9)
+        } else if let ordinal = item.newEpisodeOrdinal {
             episodeLabel.text = "\(Int(ordinal)) серия"
             timeLabel.text = "СКОРО"
-        } else if let episode = item.newEpisode, let ord = episode.ordinal {
-            episodeLabel.text = "\(Int(ord)) серия"
-            timeLabel.text = "ВЫШЛА"
+            timeBadge.contentView.backgroundColor = UIColor.black.withAlphaComponent(0.65)
         } else {
             episodeLabel.text = item.item.season?.description ?? "Онгоинг"
             timeLabel.text = "СЕГОДНЯ"
+            timeBadge.contentView.backgroundColor = UIColor.black.withAlphaComponent(0.65)
         }
     }
 }

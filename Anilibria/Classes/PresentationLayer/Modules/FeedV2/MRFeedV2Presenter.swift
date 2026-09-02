@@ -130,11 +130,15 @@ extension FeedV2Presenter: FeedV2EventHandler {
         case .promo(let item):
             if let url = item.url {
                 router.open(url: .web(url))
+            } else if !promo.info.isEmpty {
+                router.show(title: item.title ?? "Анонс", message: promo.info)
             }
         case .release(let series):
             select(series: series)
         case nil:
-            break
+            if !promo.info.isEmpty {
+                router.show(title: "Новость", message: promo.info)
+            }
         }
     }
 

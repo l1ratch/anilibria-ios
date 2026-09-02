@@ -41,7 +41,7 @@ extension MainContainerPresenter: MainContainerEventHandler {
         let items = self.menuService.fetchItems()
         self.view.set(items: items)
 
-        self.select(item: .feed)
+        self.select(item: items.first?.type ?? .feedV2)
 
         self.menuService.fetchCurrentItem()
             .sink(onNext: { [weak self] type in
@@ -56,7 +56,7 @@ extension MainContainerPresenter: MainContainerEventHandler {
                 switch value {
                 case .guest:
                     if let current = self?.menuService.getSelected(), current == .collections {
-                        self?.menuService.setMenuItem(type: .feed)
+                        self?.menuService.setMenuItem(type: items.first?.type ?? .feedV2)
                     }
                     self?.view.change(visible: false, for: .collections)
                 case .user:
