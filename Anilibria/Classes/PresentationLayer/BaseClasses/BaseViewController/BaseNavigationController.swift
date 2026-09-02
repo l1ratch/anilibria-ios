@@ -34,17 +34,38 @@ open class BaseNavigationController: UINavigationController {
     }
 }
 
+extension Notification.Name {
+    static let shouldToggleBottomBar = Notification.Name("shouldToggleBottomBar")
+}
+
 extension BaseNavigationController: UINavigationControllerDelegate {
 
     public func navigationController(_ navigationController: UINavigationController,
                                      willShow viewController: UIViewController, animated: Bool) {
 
         setNavigationBarHidden(!viewController.isNavigationBarVisible, animated: animated)
-        topViewController?.transitionCoordinator?.notifyWhenInteractionChanges {  _ in
-            let isVisible = self.topViewController?.isNavigationBarVisible == true
-            self.setNavigationBarHidden(!isVisible, animated: true)
-        }
+        
+        let isRoot = viewController == viewControllers.first
+        let shouldHide = !isRoot || viewController.hidesBottomBarWhenPushed
+        
+        NotificationCenter.default.post(
+            name: .shouldToggleBottomBar,
+            object: nil,
+            userInfo: ["hidden": shouldHide, "animated": animated]
+        )
 
+        topViewController?.transitionCoordinator?.notifyWhenInteractionChanges { [weak self] _ in
+            let isVisible = self?.topViewController?.isNavigationBarVisible == true
+            self?.setNavigationBarHidden(!isVisible, animated: true)
+            
+            let isCurrentRoot = self?.topViewController == self?.viewControllers.first
+            let currentShouldHide = !isCurrentRoot || (self?.topViewController?.hidesBottomBarWhenPushed == true)
+            NotificationCenter.default.post(
+                name: .shouldToggleBottomBar,
+                object: nil,
+                userInfo: ["hidden": currentShouldHide, "animated": true]
+            )
+        }
     }
 }
 

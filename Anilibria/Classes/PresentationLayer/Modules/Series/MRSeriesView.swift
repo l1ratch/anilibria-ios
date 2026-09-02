@@ -67,6 +67,7 @@ final class SeriesViewController: BaseViewController {
     // MARK: - Life cycle
 
     override func viewDidLoad() {
+        self.hidesBottomBarWhenPushed = true
         super.viewDidLoad()
         self.setupNavigationButtons()
         addRefreshControl(scrollView: scrollView)

@@ -15,12 +15,48 @@ final class MainContainerViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        shadowView.shadowX = 10
-        shadowView.shadowRadius = 10
-        tabBarContainer.backgroundColor = .Surfaces.background
+        setupFloatingDock()
         setupPager()
         handler.didLoad()
         view.backgroundColor = .Surfaces.background
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleBottomBarToggle(_:)),
+            name: .shouldToggleBottomBar,
+            object: nil
+        )
+    }
+
+    private func setupFloatingDock() {
+        shadowView.shadowColor = .black
+        shadowView.shadowOpacity = 0.4
+        shadowView.shadowRadius = 16
+        shadowView.shadowY = 6
+        shadowView.clipsToBounds = false
+
+        tabBarContainer.backgroundColor = UIColor(white: 0.12, alpha: 0.8)
+        tabBarContainer.smoothCorners(with: 27)
+        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.14).cgColor
+        tabBarContainer.layer.borderWidth = 1
+        tabBarContainer.clipsToBounds = true
+
+        let blurEffect = UIBlurEffect(style: .systemMaterialDark)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.frame = tabBarContainer.bounds
+        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        tabBarContainer.insertSubview(blurView, at: 0)
+    }
+
+    @objc private func handleBottomBarToggle(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let hidden = userInfo["hidden"] as? Bool else { return }
+        let animated = userInfo["animated"] as? Bool ?? true
+
+        UIView.animate(withDuration: animated ? 0.3 : 0, delay: 0, options: [.curveEaseInOut, .allowUserInteraction]) {
+            self.shadowView.alpha = hidden ? 0 : 1
+            self.shadowView.transform = hidden ? CGAffineTransform(translationX: 0, y: 100) : .identity
+        }
     }
 
     func setupPager() {
