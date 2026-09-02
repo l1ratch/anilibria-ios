@@ -1,33 +1,34 @@
 import UIKit
 import Foundation
 
+private func uncaughtExceptionHandler(exception: NSException) {
+    let name = exception.name.rawValue
+    let reason = exception.reason ?? "No reason given"
+    let stack = exception.callStackSymbols.joined(separator: "\n")
+    let fullError = "🔥 CRASH EXCEPTION 🔥\nName: \(name)\nReason: \(reason)\n\nStack:\n\(stack)"
+    
+    print(fullError)
+    CrashDebugger.saveCrashLog(fullError)
+    
+    DispatchQueue.main.async {
+        CrashDebugger.showError(title: "App Crash: \(name)", message: reason, details: stack)
+    }
+    
+    let runLoop = CFRunLoopGetCurrent()
+    if let allModes = CFRunLoopCopyAllModes(runLoop) as? [CFRunLoopMode] {
+        while true {
+            for mode in allModes {
+                CFRunLoopRunInMode(mode, 0.5, true)
+            }
+        }
+    }
+}
+
 public final class CrashDebugger {
     private static var errorWindow: UIWindow?
 
     public static func setup() {
-        NSSetUncaughtExceptionHandler { exception in
-            let name = exception.name.rawValue
-            let reason = exception.reason ?? "No reason given"
-            let stack = exception.callStackSymbols.joined(separator: "\n")
-            let fullError = "🔥 CRASH EXCEPTION 🔥\nName: \(name)\nReason: \(reason)\n\nStack:\n\(stack)"
-            
-            print(fullError)
-            saveCrashLog(fullError)
-            
-            // Show alert synchronously if possible or loop runloop
-            DispatchQueue.main.async {
-                showError(title: "App Crash: \(name)", message: reason, details: stack)
-            }
-            
-            // Keep main runloop alive long enough for UI to show
-            let runLoop = CFRunLoopGetCurrent()
-            let allModes = CFRunLoopCopyAllModes(runLoop)
-            while true {
-                for mode in (allModes as? [CFRunLoopMode]) ?? [] {
-                    CFRunLoopRunInMode(mode, 0.5, true)
-                }
-            }
-        }
+        NSSetUncaughtExceptionHandler(uncaughtExceptionHandler)
     }
 
     public static func showError(title: String, message: String, details: String? = nil) {
@@ -80,10 +81,7 @@ public final class CrashDebugger {
             copyButton.layer.cornerRadius = 8
             copyButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
             copyButton.translatesAutoresizingMaskIntoConstraints = false
-            copyButton.addAction(UIAction { _ in
-                UIPasteboard.general.string = fullText
-                copyButton.setTitle("✅ Copied to Clipboard!", for: .normal)
-            }, for: .touchUpInside)
+            copyButton.addTarget(CrashDebugger.self, action: #selector(copyAction(_:)), for: .touchUpInside)
             container.addSubview(copyButton)
 
             NSLayoutConstraint.activate([
@@ -114,7 +112,11 @@ public final class CrashDebugger {
         }
     }
 
-    private static func saveCrashLog(_ log: String) {
+    @objc private static func copyAction(_ sender: UIButton) {
+        sender.setTitle("✅ Copied to Clipboard!", for: .normal)
+    }
+
+    public static func saveCrashLog(_ log: String) {
         if let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let fileURL = docs.appendingPathComponent("crash.log")
             try? log.write(to: fileURL, atomically: true, encoding: .utf8)
