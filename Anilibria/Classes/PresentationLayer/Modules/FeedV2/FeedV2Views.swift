@@ -160,6 +160,9 @@ final class FeedV2HeroCell: UICollectionViewCell {
             actionButton.isHidden = false
             actionButton.setTitle(Language.isEnglish ? "  Watch" : "  Смотреть", for: .normal)
             actionButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            actionButton.backgroundColor = UIColor(white: 1.0, alpha: 0.22)
+            actionButton.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+            actionButton.layer.borderWidth = 1
             subtitleTrailingToContent.isActive = false
             subtitleTrailingToButton.isActive = true
 
@@ -172,6 +175,8 @@ final class FeedV2HeroCell: UICollectionViewCell {
             actionButton.isHidden = false
             actionButton.setTitle(Language.isEnglish ? "  Open" : "  Перейти", for: .normal)
             actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
+            actionButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
+            actionButton.layer.borderWidth = 0
             subtitleTrailingToContent.isActive = false
             subtitleTrailingToButton.isActive = true
 
@@ -192,12 +197,15 @@ final class FeedV2HeroCell: UICollectionViewCell {
                 actionButton.setTitle(Language.isEnglish ? "  Details" : "  Подробнее", for: .normal)
                 actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
                 actionButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
+                actionButton.layer.borderWidth = 0
                 subtitleTrailingToContent.isActive = false
                 subtitleTrailingToButton.isActive = true
             } else {
                 actionButton.setTitle(Language.isEnglish ? "  Read" : "  Читать", for: .normal)
                 actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
-                actionButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+                actionButton.backgroundColor = UIColor(white: 1.0, alpha: 0.22)
+                actionButton.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+                actionButton.layer.borderWidth = 1
                 subtitleTrailingToContent.isActive = false
                 subtitleTrailingToButton.isActive = true
             }
@@ -211,7 +219,9 @@ final class FeedV2HeroCell: UICollectionViewCell {
             actionButton.isHidden = false
             actionButton.setTitle(Language.isEnglish ? "  Read" : "  Читать", for: .normal)
             actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
-            actionButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+            actionButton.backgroundColor = UIColor(white: 1.0, alpha: 0.22)
+            actionButton.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+            actionButton.layer.borderWidth = 1
             subtitleTrailingToContent.isActive = false
             subtitleTrailingToButton.isActive = true
         }

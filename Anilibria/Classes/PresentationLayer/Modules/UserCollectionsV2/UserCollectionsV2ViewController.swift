@@ -21,10 +21,6 @@ final class UserCollectionsV2ViewController: BaseViewController {
         self?.handler.search()
     }
 
-    private lazy var filterButton = BarButton(image: .iconFilter) { [weak self] in
-        self?.handler.openFilter()
-    }
-
     override var isNavigationBarVisible: Bool { true }
 
     // MARK: - Lifecycle
@@ -50,7 +46,7 @@ final class UserCollectionsV2ViewController: BaseViewController {
     private func setupNavigationBar() {
         navigationItem.title = Language.isEnglish ? "Lists" : "Списки"
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.setRightBarButtonItems([searchButton, filterButton], animated: false)
+        navigationItem.setRightBarButtonItems([searchButton], animated: false)
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()

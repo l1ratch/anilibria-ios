@@ -175,13 +175,25 @@ extension SettingsPresenter: SettingsEventHandler {
     
     func selectLanguage() {
         let languages = Language.allCases
-        let items = languages.map {
+        let items = languages.map { (lang: Language) in
             ChoiceItem(
-                value: $0,
-                title: $0.name,
-                isSelected: Language.current == $0,
-                didSelect: { language in
-                    Language.current = language
+                value: lang,
+                title: lang.name,
+                isSelected: Language.current == lang,
+                didSelect: { [weak self] (selected: Language) in
+                    guard Language.current != selected else { return true }
+                    Language.current = selected
+                    let isEn = selected == .en
+                    let alert = UIAlertController(
+                        title: isEn ? "Language Changed" : "Язык интерфейса",
+                        message: isEn ? "To apply the new language across all screens, a quick reload is recommended. Reload now?" : "Для полного применения языка ко всем экранам рекомендуется быстрая перезагрузка. Перезагрузить сейчас?",
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: isEn ? "Later" : "Позже", style: .cancel))
+                    alert.addAction(UIAlertAction(title: isEn ? "Reload" : "Перезагрузить", style: .default) { _ in
+                        MainAppCoordinator.shared.reloadScene()
+                    })
+                    self?.router.presentAlert(alert)
                     return true
                 }
             )

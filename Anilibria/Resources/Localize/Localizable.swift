@@ -494,7 +494,7 @@ enum L10n {
         }
 
         enum Catalog {
-            /// Search
+            /// Catalog
             static var `title`: String {
                 return L10n.tr("Localizable", "screen.catalog.title")
             }

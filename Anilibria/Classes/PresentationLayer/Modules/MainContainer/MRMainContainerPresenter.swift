@@ -50,6 +50,17 @@ extension MainContainerPresenter: MainContainerEventHandler {
             })
             .store(in: &bag)
 
+        Language.languageChanged
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let freshItems = self.menuService.fetchItems()
+                self.view.set(items: freshItems)
+                if let current = self.menuService.getSelected() {
+                    self.view.set(selected: current)
+                }
+            }
+            .store(in: &bag)
+
         self.sessionService
             .fetchState()
             .sink(onNext: { [weak self] value in

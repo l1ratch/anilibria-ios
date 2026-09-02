@@ -1782,13 +1782,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search"
+            "value" : "Catalog"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Поиск"
+            "value" : "Каталог"
           }
         }
       }

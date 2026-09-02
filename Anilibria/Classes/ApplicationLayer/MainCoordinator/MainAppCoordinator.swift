@@ -45,4 +45,8 @@ public class MainAppCoordinator: Loggable {
     private func openMainModule(on window: UIWindow) {
         router.openDefaultScene(on: window)
     }
+
+    public func reloadScene() {
+        router.reloadScene()
+    }
 }

@@ -12,4 +12,9 @@ public class AppRouter {
         SetWindowRouter(target: module,
                         window: window).move()
     }
+
+    public func reloadScene() {
+        guard let win = self.window ?? UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        openDefaultScene(on: win)
+    }
 }
