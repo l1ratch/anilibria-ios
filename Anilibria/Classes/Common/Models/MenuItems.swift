@@ -33,11 +33,11 @@ public final class MenuListItem: ListItem<[MenuItem]> {}
 public final class MenuItemsFactory {
     static func create() -> [MenuItem] {
         return [
-            MenuItem(type: .feed, icon: .System.news),
-            MenuItem(type: .catalog, icon: .System.search),
-            MenuItem(type: .news, icon: .iconYoutube),
-            MenuItem(type: .collections, icon: .System.book),
-            MenuItem(type: .other, icon: .System.dots)
+            MenuItem(type: .feed, icon: UIImage(systemName: "house.fill") ?? .System.news),
+            MenuItem(type: .catalog, icon: UIImage(systemName: "play.rectangle.on.rectangle.fill") ?? .System.search),
+            MenuItem(type: .news, icon: UIImage(systemName: "newspaper.fill") ?? .iconYoutube),
+            MenuItem(type: .collections, icon: UIImage(systemName: "square.stack.3d.up.fill") ?? .System.book),
+            MenuItem(type: .other, icon: UIImage(systemName: "ellipsis.circle.fill") ?? .System.dots)
         ]
     }
 }

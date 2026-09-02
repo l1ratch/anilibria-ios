@@ -27,6 +27,8 @@ final class MenuItemView: LoadableView {
 
     @IBAction func tapAction(_ sender: Any) {
         if let type = self.type {
+            let feedback = UIImpactFeedbackGenerator(style: .light)
+            feedback.impactOccurred()
             self.tapHandler?(type)
         }
     }
