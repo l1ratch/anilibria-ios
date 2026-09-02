@@ -72,24 +72,25 @@ jobs:
       - name: Package into IPA
         run: |
           mkdir -p Payload
-          APP_PATH=$(find ./Build -name "AniLiberty.app" -type d | head -n 1)
+          APP_PATH=$(find ./Build -name "*.app" -type d | grep -v "Index" | head -n 1)
           if [ -z "$APP_PATH" ]; then
-            echo "Error: AniLiberty.app not found in ./Build!"
+            echo "Error: .app not found in ./Build!"
             find ./Build -type d -maxdepth 4
             exit 1
           fi
           echo "Found app at: $APP_PATH"
           cp -r "$APP_PATH" Payload/
           
-          echo "Applying ad-hoc signing to frameworks and app bundle..."
+          APP_NAME_DIR=$(basename "$APP_PATH")
+          echo "Applying ad-hoc signing to frameworks and app bundle ($APP_NAME_DIR)..."
           find Payload -name "*.framework" -o -name "*.dylib" | while read -r lib; do
             codesign --force --deep --sign - "$lib" || true
           done
-          codesign --force --deep --sign - "Payload/AniLiberty.app" || true
+          codesign --force --deep --sign - "Payload/$APP_NAME_DIR" || true
 
           zip -vr AniLiberty.ipa Payload
 
-          DSYM_PATH=$(find ./Build -name "AniLiberty.app.dSYM" -type d | head -n 1)
+          DSYM_PATH=$(find ./Build -name "*.app.dSYM" -type d | grep -v "Index" | head -n 1)
           if [ -n "$DSYM_PATH" ]; then
             echo "Found dSYM at: $DSYM_PATH"
             zip -vr AniLiberty.app.dSYM.zip "$DSYM_PATH"

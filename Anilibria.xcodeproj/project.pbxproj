@@ -27,7 +27,7 @@
 
 /* Begin PBXFileReference section */
 		C7B0F2CB22D6F0B100540CA9 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		C7D4623F22CC73DF00E763DF /* AniLiberty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AniLiberty.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7D4623F22CC73DF00E763DF /* Anilibria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Anilibria.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -39,7 +39,7 @@
 				Resources/Localize/GenerationScript.swift,
 				Vendor/SpringIndicator/LICENSE,
 			);
-			target = C7D4623E22CC73DF00E763DF /* AniLiberty */;
+			target = C7D4623E22CC73DF00E763DF /* Anilibria */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -81,7 +81,7 @@
 		C7D4624022CC73DF00E763DF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7D4623F22CC73DF00E763DF /* AniLiberty.app */,
+				C7D4623F22CC73DF00E763DF /* Anilibria.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,9 +89,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C7D4623E22CC73DF00E763DF /* AniLiberty */ = {
+		C7D4623E22CC73DF00E763DF /* Anilibria */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C7D4625122CC73E100E763DF /* Build configuration list for PBXNativeTarget "AniLiberty" */;
+			buildConfigurationList = C7D4625122CC73E100E763DF /* Build configuration list for PBXNativeTarget "Anilibria" */;
 			buildPhases = (
 				C70D848E2DF06F05001ADEBE /* L10n */,
 				C7D4623B22CC73DF00E763DF /* Sources */,
@@ -107,13 +107,13 @@
 			fileSystemSynchronizedGroups = (
 				C72B5E612CB11F3B00AC89EE /* Anilibria */,
 			);
-			name = AniLiberty;
+			name = Anilibria;
 			packageProductDependencies = (
 				C72BFEE92B0F687E0093FD64 /* Kingfisher */,
 				C72BFEEC2B0F69160093FD64 /* DITranquillity */,
 			);
 			productName = Anilibria;
-			productReference = C7D4623F22CC73DF00E763DF /* AniLiberty.app */;
+			productReference = C7D4623F22CC73DF00E763DF /* Anilibria.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -158,7 +158,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C7D4623E22CC73DF00E763DF /* AniLiberty */,
+				C7D4623E22CC73DF00E763DF /* Anilibria */,
 			);
 		};
 /* End PBXProject section */
@@ -382,6 +382,7 @@
 				);
 				MARKETING_VERSION = 2.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = tv.anilibria.anilibria;
+				PRODUCT_MODULE_NAME = Anilibria;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -414,6 +415,7 @@
 				MARKETING_VERSION = 2.8.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = tv.anilibria.anilibria;
+				PRODUCT_MODULE_NAME = Anilibria;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -436,7 +438,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C7D4625122CC73E100E763DF /* Build configuration list for PBXNativeTarget "AniLiberty" */ = {
+		C7D4625122CC73E100E763DF /* Build configuration list for PBXNativeTarget "Anilibria" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C7D4625222CC73E100E763DF /* Debug */,

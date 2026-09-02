@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C7D4623E22CC73DF00E763DF"
-               BuildableName = "AniLiberty.app"
-               BlueprintName = "AniLiberty"
+               BuildableName = "Anilibria.app"
+               BlueprintName = "Anilibria"
                ReferencedContainer = "container:Anilibria.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

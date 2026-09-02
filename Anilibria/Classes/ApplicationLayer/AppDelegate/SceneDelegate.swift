@@ -30,6 +30,10 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 #endif
 
         self.window = window
-        MainAppCoordinator.shared.start(on: window)
+        do {
+            MainAppCoordinator.shared.start(on: window)
+        } catch {
+            CrashDebugger.showError(title: "Startup Error", message: error.localizedDescription, details: "\(error)")
+        }
     }
 }
