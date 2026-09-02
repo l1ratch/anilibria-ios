@@ -63,6 +63,7 @@ final class DockEditorViewController: BaseViewController {
         tableView.dataSource = self
         tableView.isEditing = true
         tableView.allowsSelectionDuringEditing = false
+        tableView.alwaysBounceVertical = false
         tableView.backgroundColor = .Surfaces.background
         tableView.register(DockCell.self, forCellReuseIdentifier: "DockCell")
     }

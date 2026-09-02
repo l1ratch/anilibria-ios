@@ -54,16 +54,16 @@ extension SettingsPresenter: SettingsEventHandler {
         )
         commonItems.append(appearanceItem)
 
+        var playerItems: [SettingsControlItem] = []
+
         if UIDevice.current.userInterfaceIdiom == .phone {
             let orientation = SettingsControlItem(
                 title: L10n.Common.orientation,
                 value: InterfaceOrientation.current.title,
                 action: { [weak self] in self?.selectOrientation($0) }
             )
-            commonItems.append(orientation)
+            playerItems.append(orientation)
         }
-
-        var playerItems: [SettingsControlItem] = []
 
         let qualityItem = SettingsControlItem(
             title: L10n.Screen.Settings.videoQuality,

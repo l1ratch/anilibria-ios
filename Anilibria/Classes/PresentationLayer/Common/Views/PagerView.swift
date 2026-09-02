@@ -36,11 +36,13 @@ open class PagerView: UIView {
     private weak var activeScrollView: UIScrollView?
     private var delayedScroll: (() -> Void)?
 
+    private var _isScrollEnabled: Bool = true
+
     public private(set) lazy var pageController: UIPageViewController = {
         let controller = PageViewController(transitionStyle: .scroll,
                                             navigationOrientation: .horizontal,
                                             options: [.interPageSpacing: interPageSpacing])
-        controller.dataSource = self
+        controller.dataSource = _isScrollEnabled ? self : nil
         controller.delegate = self
         controller.scrollDelegate = self
         self.addSubview(controller.view)
@@ -72,15 +74,11 @@ open class PagerView: UIView {
 
     public var isScrollEnabled: Bool {
         get {
-            var isEnabled: Bool = true
-            pageController.view.subviews.forEach {
-                if let subView = $0 as? UIScrollView {
-                    isEnabled = subView.isScrollEnabled
-                }
-            }
-            return isEnabled
+            return _isScrollEnabled
         }
         set {
+            _isScrollEnabled = newValue
+            pageController.dataSource = newValue ? self : nil
             pageController.view.subviews.forEach {
                 if let subview = $0 as? UIScrollView {
                     subview.isScrollEnabled = newValue
