@@ -12,7 +12,6 @@ final class FeedV2ViewController: BaseViewController {
 
     private let scrollView = UIScrollView()
     private let contentStackView = UIStackView()
-    private let refreshControl = UIRefreshControl()
 
     // MARK: - Sections
 
@@ -74,8 +73,7 @@ final class FeedV2ViewController: BaseViewController {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 96, right: 0)
 
-        refreshControl.addTarget(self, action: #selector(didPullRefresh), for: .valueChanged)
-        scrollView.refreshControl = refreshControl
+        self.addRefreshControl(scrollView: scrollView)
 
         scrollView.addSubview(contentStackView)
         contentStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -216,7 +214,8 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(scheduleCollectionView)
     }
 
-    @objc private func didPullRefresh() {
+    override func refresh() {
+        super.refresh()
         handler.refresh()
     }
 
@@ -298,6 +297,6 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
     func set(schedule: ShortSchedule) {
         self.scheduleItems = schedule.items[.today] ?? []
         self.scheduleCollectionView.reloadData()
-        self.refreshControl.endRefreshing()
+        self.refreshControl?.endRefreshing()
     }
 }

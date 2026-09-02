@@ -145,8 +145,8 @@ final class FeedV2HeroCell: UICollectionViewCell {
         switch item.content {
         case .release(let series):
             badgeLabel.text = "🔥 В ТРЕНДЕ"
-            titleLabel.text = series.title.ru
-            let genres = series.genres?.prefix(2).joined(separator: " • ") ?? ""
+            titleLabel.text = series.name?.main ?? series.alias
+            let genres = series.genres.prefix(2).map { $0.name }.joined(separator: " • ")
             subtitleLabel.text = genres.isEmpty ? (series.season?.description ?? "Аниме") : genres
             actionButton.isHidden = false
         case .ad(let ad):
@@ -367,7 +367,7 @@ final class FeedV2ContinueWatchingView: UIView {
 
     func configure(with series: Series, episodeID: String?) {
         posterImageView.setImage(from: series.poster, placeholder: DefaultPlaceholder())
-        titleLabel.text = series.title.ru
+        titleLabel.text = series.name?.main ?? series.alias
 
         if let ep = episodeID, !ep.isEmpty {
             episodeLabel.text = "Серия \(ep)"
@@ -463,13 +463,13 @@ final class FeedV2ScheduleCell: UICollectionViewCell {
 
     func configure(with item: ScheduleItem) {
         posterImageView.setImage(from: item.item.poster, placeholder: DefaultPlaceholder())
-        titleLabel.text = item.item.title.ru
+        titleLabel.text = item.item.name?.main ?? item.item.alias
 
         if let ordinal = item.newEpisodeOrdinal {
             episodeLabel.text = "\(Int(ordinal)) серия"
             timeLabel.text = "СКОРО"
-        } else if let episode = item.newEpisode {
-            episodeLabel.text = "\(episode.ordinal) серия"
+        } else if let episode = item.newEpisode, let ord = episode.ordinal {
+            episodeLabel.text = "\(Int(ord)) серия"
             timeLabel.text = "ВЫШЛА"
         } else {
             episodeLabel.text = item.item.season?.description ?? "Онгоинг"
