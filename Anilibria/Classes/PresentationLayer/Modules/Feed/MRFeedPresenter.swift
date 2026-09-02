@@ -28,10 +28,6 @@ final class FeedPresenter {
         self?.selectRandom()
     }
 
-    private lazy var history = ActionItem(L10n.Screen.Feed.history) { [weak self] in
-        self?.selectHistory()
-    }
-
     private var soonViewModel: SoonViewModel?
 
     init(mainService: MainService,
@@ -80,17 +76,21 @@ extension FeedPresenter: FeedEventHandler {
     }
 
     func didLoad() {
-        self.refresh()
+        self.activity = self.view.showLoading(fullscreen: false)
+        self.load()
     }
 
     func refresh() {
-        self.activity = nil
+        self.activity = self.view.showRefreshIndicator()
         self.load()
     }
 
     func refreshIfNeeded() {
-        if let date = lastRefreshDate, Date().timeIntervalSince(date) > refreshInterval {
-            self.refresh()
+        if let date = lastRefreshDate {
+            let duration = Date().timeIntervalSince1970 - date.timeIntervalSince1970
+            if duration >= refreshInterval {
+                refresh()
+            }
         }
     }
 
@@ -103,16 +103,16 @@ extension FeedPresenter: FeedEventHandler {
     }
 
     func selectRandom() {
-        let router = self.router
-        self.activity = self.mainService.fetchRandomSeries().sink(onNext: { item in
-            router?.open(series: item)
-        }, onError: { [weak self] error in
-            self?.router.show(error: error)
-        })
-    }
-
-    func selectHistory() {
-        self.router.history()
+        self.mainService.fetchRandom()
+            .manageActivity(self.view.showLoading(fullscreen: false))
+            .sink(onNext: { [weak self] item in
+                if let item {
+                    self?.router.open(series: item)
+                }
+            }, onError: { [weak self] error in
+                self?.router.show(error: error)
+            })
+            .store(in: &bag)
     }
 
     func search() {
@@ -120,16 +120,20 @@ extension FeedPresenter: FeedEventHandler {
     }
 
     func allSchedule() {
-        self.router.schedule()
+        self.router.openWeekSchedule()
     }
 
     func open(promo: PromoItem) {
-        switch promo.target {
-        case let .series(series):
-            self.router.open(series: series)
-        case let .url(url):
-            self.router.open(url: .external(url))
-        case .none:
+        switch promo.content {
+        case .ad(let ad):
+            router.open(url: .web(ad.url))
+        case .promo(let item):
+            if let url = item.url {
+                router.open(url: .web(url))
+            }
+        case .release(let series):
+            select(series: series)
+        case nil:
             break
         }
     }
