@@ -62,7 +62,7 @@ extension ActionSheetRoute where Self: RouterProtocol {
                 }
             }
 
-            if let targetVC = self.target {
+            if let targetVC = self.controller {
                 targetVC.present(alert, animated: true, completion: nil)
             } else if let root = UIApplication.getWindow()?.rootViewController {
                 var topVC = root
