@@ -118,11 +118,3 @@ public extension CACornerMask {
     static let topCorners: CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
     static let bottomCorners: CACornerMask = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
 }
-
-extension UIViewController {
-    public func triggerHaptic(style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
-        let generator = UIImpactFeedbackGenerator(style: style)
-        generator.prepare()
-        generator.impactOccurred()
-    }
-}

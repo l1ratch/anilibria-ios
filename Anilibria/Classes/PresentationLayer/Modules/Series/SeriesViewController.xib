@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SeriesViewController" customModule="Anilibria" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SeriesViewController" customModule="AniLiberty" customModuleProvider="target">
             <connections>
                 <outlet property="anonceLabel" destination="ocU-HM-Qgc" id="fBA-9C-84x"/>
                 <outlet property="compactEpisodesContainer" destination="QTW-l4-FX0" id="Cbj-rW-pbD"/>
@@ -50,7 +50,7 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pbg-Hf-76X">
                             <rect key="frame" x="0.0" y="0.0" width="320" height="548"/>
                             <subviews>
-                                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VTk-KK-TSM" customClass="TouchesScrollView" customModule="Anilibria" customModuleProvider="target">
+                                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VTk-KK-TSM" customClass="TouchesScrollView" customModule="AniLiberty" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="548"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Hg-c2-dS8">
@@ -82,7 +82,7 @@
                                                                 <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="PsF-aT-laX">
                                                                     <rect key="frame" x="0.0" y="0.0" width="288" height="34"/>
                                                                     <subviews>
-                                                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ke8-ep-Qva" customClass="SeriesFavoriteView" customModule="Anilibria" customModuleProvider="target">
+                                                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ke8-ep-Qva" customClass="SeriesFavoriteView" customModule="AniLiberty" customModuleProvider="target">
                                                                             <rect key="frame" x="0.0" y="0.0" width="34" height="34"/>
                                                                             <subviews>
                                                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="star" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Rql-Gn-hbn">
@@ -93,14 +93,14 @@
                                                                                         <constraint firstAttribute="width" constant="18" id="fYS-vq-iZN"/>
                                                                                     </constraints>
                                                                                 </imageView>
-                                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2K1-Xt-21R" customClass="RippleButton" customModule="Anilibria" customModuleProvider="target">
+                                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2K1-Xt-21R" customClass="RippleButton" customModule="AniLiberty" customModuleProvider="target">
                                                                                     <rect key="frame" x="0.0" y="0.0" width="34" height="34"/>
                                                                                     <connections>
                                                                                         <action selector="favoriteAction:" destination="-1" eventType="touchUpInside" id="6q3-G7-59q"/>
                                                                                         <outlet property="rippleContainerView" destination="ke8-ep-Qva" id="1pJ-aW-fdN"/>
                                                                                     </connections>
                                                                                 </button>
-                                                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9RF-91-ywf" customClass="ShimmerView" customModule="Anilibria" customModuleProvider="target">
+                                                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9RF-91-ywf" customClass="ShimmerView" customModule="AniLiberty" customModuleProvider="target">
                                                                                     <rect key="frame" x="0.0" y="0.0" width="34" height="34"/>
                                                                                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                                 </view>
@@ -127,7 +127,7 @@
                                                                                 <outlet property="starView" destination="Rql-Gn-hbn" id="xWZ-Rq-X1H"/>
                                                                             </connections>
                                                                         </view>
-                                                                        <view contentMode="scaleToFill" horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="imK-kx-ymE" customClass="SeriesCollectionTypeView" customModule="Anilibria" customModuleProvider="target">
+                                                                        <view contentMode="scaleToFill" horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="imK-kx-ymE" customClass="SeriesCollectionTypeView" customModule="AniLiberty" customModuleProvider="target">
                                                                             <rect key="frame" x="42" y="0.0" width="95" height="34"/>
                                                                             <subviews>
                                                                                 <stackView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="tDi-XS-o2k">
@@ -151,14 +151,14 @@
                                                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="75" id="zjb-MY-hdm"/>
                                                                                     </constraints>
                                                                                 </stackView>
-                                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rVc-5C-7mv" customClass="RippleButton" customModule="Anilibria" customModuleProvider="target">
+                                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rVc-5C-7mv" customClass="RippleButton" customModule="AniLiberty" customModuleProvider="target">
                                                                                     <rect key="frame" x="0.0" y="0.0" width="95" height="34"/>
                                                                                     <connections>
                                                                                         <action selector="selectTypeAction:" destination="-1" eventType="touchUpInside" id="pph-vI-cCR"/>
                                                                                         <outlet property="rippleContainerView" destination="imK-kx-ymE" id="cDK-4E-Ee9"/>
                                                                                     </connections>
                                                                                 </button>
-                                                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ojc-Gx-bOj" customClass="ShimmerView" customModule="Anilibria" customModuleProvider="target">
+                                                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ojc-Gx-bOj" customClass="ShimmerView" customModule="AniLiberty" customModuleProvider="target">
                                                                                     <rect key="frame" x="0.0" y="0.0" width="95" height="34"/>
                                                                                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                                 </view>
@@ -184,11 +184,11 @@
                                                                                 <outlet property="shimmerView" destination="ojc-Gx-bOj" id="1Ii-ZB-mFR"/>
                                                                             </connections>
                                                                         </view>
-                                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nv3-BH-JmO" customClass="ExpandedSpaceView" customModule="Anilibria" customModuleProvider="target">
+                                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nv3-BH-JmO" customClass="ExpandedSpaceView" customModule="AniLiberty" customModuleProvider="target">
                                                                             <rect key="frame" x="145" y="0.0" width="48" height="34"/>
                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         </view>
-                                                                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kHh-JB-516" userLabel="Donate" customClass="RippleButton" customModule="Anilibria" customModuleProvider="target">
+                                                                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kHh-JB-516" userLabel="Donate" customClass="RippleButton" customModule="AniLiberty" customModuleProvider="target">
                                                                             <rect key="frame" x="201" y="0.0" width="87" height="34"/>
                                                                             <color key="backgroundColor" name="buttons/selected"/>
                                                                             <inset key="contentEdgeInsets" minX="12" minY="0.0" maxX="12" maxY="0.0"/>
@@ -206,7 +206,7 @@
                                                                         </button>
                                                                     </subviews>
                                                                 </stackView>
-                                                                <view contentMode="scaleToFill" placeholderIntrinsicWidth="382" placeholderIntrinsicHeight="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="JHC-Np-JhB" customClass="TagsView" customModule="Anilibria" customModuleProvider="target">
+                                                                <view contentMode="scaleToFill" placeholderIntrinsicWidth="382" placeholderIntrinsicHeight="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="JHC-Np-JhB" customClass="TagsView" customModule="AniLiberty" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="46" width="288" height="0.0"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </view>
@@ -225,7 +225,7 @@
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fn9-QJ-OaP">
                                                             <rect key="frame" x="16" y="134" width="288" height="235.5"/>
                                                             <subviews>
-                                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="params" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Vw4-G6-Mqn" customClass="AttributeLinksView" customModule="Anilibria" customModuleProvider="target">
+                                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="params" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Vw4-G6-Mqn" customClass="AttributeLinksView" customModule="AniLiberty" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="8" width="288" height="227.5"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -237,7 +237,7 @@
                                                                         <constraint firstAttribute="width" secondItem="8On-3j-Qxd" secondAttribute="height" multiplier="7:10" id="vjy-Xg-a7T"/>
                                                                     </constraints>
                                                                 </imageView>
-                                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ElE-4n-x59" customClass="WeekDayView" customModule="Anilibria" customModuleProvider="target">
+                                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ElE-4n-x59" customClass="WeekDayView" customModule="AniLiberty" customModuleProvider="target">
                                                                     <rect key="frame" x="240" y="131.5" width="40" height="40"/>
                                                                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                     <constraints>
@@ -277,7 +277,7 @@
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qZK-Ye-Nr9">
                                                             <rect key="frame" x="16" y="594.5" width="288" height="84"/>
                                                             <subviews>
-                                                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ffy-n0-jv6" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
+                                                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ffy-n0-jv6" customClass="BorderedView" customModule="AniLiberty" customModuleProvider="target">
                                                                     <rect key="frame" x="98.5" y="20" width="91.5" height="44"/>
                                                                     <subviews>
                                                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="tfu-Ua-095">
@@ -299,7 +299,7 @@
                                                                                 </imageView>
                                                                             </subviews>
                                                                         </stackView>
-                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eXk-os-Vg9" customClass="RippleButton" customModule="Anilibria" customModuleProvider="target">
+                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eXk-os-Vg9" customClass="RippleButton" customModule="AniLiberty" customModuleProvider="target">
                                                                             <rect key="frame" x="0.0" y="0.0" width="91.5" height="44"/>
                                                                             <connections>
                                                                                 <action selector="donateAction:" destination="-1" eventType="touchUpInside" id="Bdr-82-Ypz"/>
@@ -359,7 +359,7 @@
                                                                                 <constraint firstAttribute="height" constant="1" id="csx-KA-1a8"/>
                                                                             </constraints>
                                                                         </view>
-                                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HIO-pR-qAQ" customClass="ShimmerView" customModule="Anilibria" customModuleProvider="target">
+                                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HIO-pR-qAQ" customClass="ShimmerView" customModule="AniLiberty" customModuleProvider="target">
                                                                             <rect key="frame" x="0.0" y="50" width="288" height="72"/>
                                                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                         </view>
@@ -433,10 +433,10 @@
                                     <viewLayoutGuide key="contentLayoutGuide" id="yID-yS-zIb"/>
                                     <viewLayoutGuide key="frameLayoutGuide" id="gEf-OG-6xV"/>
                                 </scrollView>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nUP-wm-vFZ" customClass="ShadowView" customModule="Anilibria" customModuleProvider="target">
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nUP-wm-vFZ" customClass="ShadowView" customModule="AniLiberty" customModuleProvider="target">
                                     <rect key="frame" x="119" y="492" width="82" height="40"/>
                                     <subviews>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VsD-Sx-2kn" customClass="CircleView" customModule="Anilibria" customModuleProvider="target">
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VsD-Sx-2kn" customClass="CircleView" customModule="AniLiberty" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="82" height="40"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="GUC-kc-48c">
@@ -454,7 +454,7 @@
                                                         </imageView>
                                                     </subviews>
                                                 </stackView>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sUt-ve-DON" customClass="RippleButton" customModule="Anilibria" customModuleProvider="target">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sUt-ve-DON" customClass="RippleButton" customModule="AniLiberty" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="82" height="40"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title=" "/>
@@ -504,7 +504,7 @@
                         </view>
                     </subviews>
                 </stackView>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ROA-Jq-GvY" customClass="GradientView" customModule="Anilibria" customModuleProvider="target">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ROA-Jq-GvY" customClass="GradientView" customModule="AniLiberty" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="20" width="320" height="5"/>
                     <viewLayoutGuide key="safeArea" id="FQx-uk-vDA"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -521,7 +521,7 @@
                         <userDefinedRuntimeAttribute type="string" keyPath="gradientTypeName" value="topBottom"/>
                     </userDefinedRuntimeAttributes>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0I8-Hm-lhg" customClass="ShimmerView" customModule="Anilibria" customModuleProvider="target">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0I8-Hm-lhg" customClass="ShimmerView" customModule="AniLiberty" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                 </view>

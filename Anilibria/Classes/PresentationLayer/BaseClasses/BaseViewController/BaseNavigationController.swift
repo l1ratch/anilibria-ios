@@ -15,13 +15,6 @@ open class BaseNavigationController: UINavigationController {
         delegate = self
     }
 
-    open override func pushViewController(_ viewController: UIViewController, animated: Bool) {
-        if !viewControllers.isEmpty {
-            viewController.hidesBottomBarWhenPushed = true
-        }
-        super.pushViewController(viewController, animated: animated)
-    }
-
     open override var preferredStatusBarStyle: UIStatusBarStyle {
         return self.viewControllers.last?.preferredStatusBarStyle ?? .default
     }
@@ -42,13 +35,16 @@ open class BaseNavigationController: UINavigationController {
 }
 
 extension BaseNavigationController: UINavigationControllerDelegate {
+
     public func navigationController(_ navigationController: UINavigationController,
                                      willShow viewController: UIViewController, animated: Bool) {
+
         setNavigationBarHidden(!viewController.isNavigationBarVisible, animated: animated)
-        topViewController?.transitionCoordinator?.notifyWhenInteractionChanges { _ in
+        topViewController?.transitionCoordinator?.notifyWhenInteractionChanges {  _ in
             let isVisible = self.topViewController?.isNavigationBarVisible == true
             self.setNavigationBarHidden(!isVisible, animated: true)
         }
+
     }
 }
 

@@ -5,8 +5,6 @@ on:
     branches:
       - master
       - main
-    tags:
-      - 'v*'
   pull_request:
     branches:
       - master
@@ -24,7 +22,7 @@ permissions:
 
 jobs:
   build:
-    name: Build IPA (Unsigned / Developer Ready)
+    name: Build IPA (Clean Official Source)
     runs-on: macos-14
     steps:
       - name: Checkout repository
