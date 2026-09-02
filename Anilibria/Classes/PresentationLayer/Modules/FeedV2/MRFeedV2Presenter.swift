@@ -15,7 +15,6 @@ final class FeedV2Presenter {
 
     private let mainService: MainService
     private var menuService: MenuService
-    private let historyRepository: HistoryRepository
     private let playerService: PlayerService
 
     private var bag = Set<AnyCancellable>()
@@ -26,12 +25,10 @@ final class FeedV2Presenter {
     init(
         mainService: MainService,
         menuService: MenuService,
-        historyRepository: HistoryRepository,
         playerService: PlayerService
     ) {
         self.mainService = mainService
         self.menuService = menuService
-        self.historyRepository = historyRepository
         self.playerService = playerService
 
         NotificationCenter.default
@@ -94,7 +91,7 @@ extension FeedV2Presenter: FeedV2EventHandler {
         Publishers.Zip3(
             mainService.fetchPromo(),
             mainService.fetchTodaySchedule(),
-            historyRepository.getSeriesHistory().setFailureType(to: Error.self)
+            playerService.fetchSeriesHistory().setFailureType(to: Error.self)
         )
         .sink(onNext: { [weak self] promo, schedule, history in
             guard let self = self else { return }

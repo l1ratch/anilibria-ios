@@ -100,7 +100,8 @@ final class FeedV2ViewController: BaseViewController {
     private func setupHeroSection() {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: UIScreen.main.bounds.width - 32, height: 230)
+        let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+        layout.itemSize = CGSize(width: screenWidth - 32, height: 230)
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
@@ -115,12 +116,10 @@ final class FeedV2ViewController: BaseViewController {
         heroCollectionView.register(FeedV2HeroCell.self, forCellWithReuseIdentifier: FeedV2HeroCell.reuseIdentifier)
 
         let heroContainer = UIStackView()
+        heroContainer.translatesAutoresizingMaskIntoConstraints = false
         heroContainer.axis = .vertical
         heroContainer.spacing = 10
-        heroContainer.alignment = .center
-
-        heroCollectionView.heightAnchor.constraint(equalToConstant: 230).isActive = true
-        heroCollectionView.widthAnchor.constraint(equalTo: heroContainer.widthAnchor).isActive = true
+        heroContainer.alignment = .fill
 
         pageControl.currentPageIndicatorTintColor = UIColor(named: "buttons/selected") ?? .systemRed
         pageControl.pageIndicatorTintColor = UIColor.white.withAlphaComponent(0.25)
@@ -131,6 +130,10 @@ final class FeedV2ViewController: BaseViewController {
         heroContainer.addArrangedSubview(pageControl)
 
         contentStackView.addArrangedSubview(heroContainer)
+
+        NSLayoutConstraint.activate([
+            heroCollectionView.heightAnchor.constraint(equalToConstant: 230)
+        ])
     }
 
     // MARK: - Quick Actions
@@ -186,15 +189,17 @@ final class FeedV2ViewController: BaseViewController {
         scheduleAllButton.addTarget(self, action: #selector(didTapAllSchedule), for: .touchUpInside)
         scheduleHeaderContainer.addSubview(scheduleAllButton)
 
+        contentStackView.addArrangedSubview(scheduleHeaderContainer)
+
         NSLayoutConstraint.activate([
+            scheduleHeaderContainer.heightAnchor.constraint(equalToConstant: 32),
+
             scheduleTitleLabel.leadingAnchor.constraint(equalTo: scheduleHeaderContainer.leadingAnchor, constant: 16),
             scheduleTitleLabel.centerYAnchor.constraint(equalTo: scheduleHeaderContainer.centerYAnchor),
 
             scheduleAllButton.trailingAnchor.constraint(equalTo: scheduleHeaderContainer.trailingAnchor, constant: -16),
             scheduleAllButton.centerYAnchor.constraint(equalTo: scheduleHeaderContainer.centerYAnchor)
         ])
-
-        contentStackView.addArrangedSubview(scheduleHeaderContainer)
 
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -209,9 +214,12 @@ final class FeedV2ViewController: BaseViewController {
         scheduleCollectionView.delegate = self
         scheduleCollectionView.dataSource = self
         scheduleCollectionView.register(FeedV2ScheduleCell.self, forCellWithReuseIdentifier: FeedV2ScheduleCell.reuseIdentifier)
-        scheduleCollectionView.heightAnchor.constraint(equalToConstant: 220).isActive = true
 
         contentStackView.addArrangedSubview(scheduleCollectionView)
+
+        NSLayoutConstraint.activate([
+            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 220)
+        ])
     }
 
     override func refresh() {

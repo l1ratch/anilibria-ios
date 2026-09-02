@@ -45,6 +45,15 @@ open class PagerView: UIView {
         controller.dataSource = _isScrollEnabled ? self : nil
         controller.delegate = self
         controller.scrollDelegate = self
+        if !_isScrollEnabled {
+            controller.gestureRecognizers.forEach { $0.isEnabled = false }
+            controller.view.subviews.forEach {
+                if let subview = $0 as? UIScrollView {
+                    subview.isScrollEnabled = false
+                    subview.panGestureRecognizer.isEnabled = false
+                }
+            }
+        }
         self.addSubview(controller.view)
         controller.view.constraintEdgesToSuperview()
         return controller
@@ -79,9 +88,13 @@ open class PagerView: UIView {
         set {
             _isScrollEnabled = newValue
             pageController.dataSource = newValue ? self : nil
+            pageController.gestureRecognizers.forEach {
+                $0.isEnabled = newValue
+            }
             pageController.view.subviews.forEach {
                 if let subview = $0 as? UIScrollView {
                     subview.isScrollEnabled = newValue
+                    subview.panGestureRecognizer.isEnabled = newValue
                 }
             }
         }
@@ -139,6 +152,15 @@ open class PagerView: UIView {
         pageController.setViewControllers([controller],
                                           direction: direction,
                                           animated: false)
+        if !_isScrollEnabled {
+            pageController.gestureRecognizers.forEach { $0.isEnabled = false }
+            pageController.view.subviews.forEach {
+                if let subview = $0 as? UIScrollView {
+                    subview.isScrollEnabled = false
+                    subview.panGestureRecognizer.isEnabled = false
+                }
+            }
+        }
         if animated { transition(direction: direction) }
         currentIndex = index
         completionHandler?()
@@ -266,6 +288,16 @@ private final class PageViewController: UIPageViewController {
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        if let parentView = view.superview as? PagerView, !parentView.isScrollEnabled {
+            gestureRecognizers.forEach { $0.isEnabled = false }
+            view.subviews.forEach {
+                if let subview = $0 as? UIScrollView {
+                    subview.isScrollEnabled = false
+                    subview.panGestureRecognizer.isEnabled = false
+                }
+            }
+        }
 
         let gesture = navigationController?.interactivePopGestureRecognizer
         view.subviews.forEach {

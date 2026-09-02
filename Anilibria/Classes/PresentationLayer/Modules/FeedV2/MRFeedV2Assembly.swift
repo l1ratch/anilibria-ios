@@ -20,7 +20,8 @@ final class FeedV2Assembly {
     static func createModule(parent: Router? = nil) -> FeedV2ViewController {
         let module = FeedV2ViewController()
         let router = FeedV2Router(view: module, parent: parent)
-        module.handler = MainAppCoordinator.shared.container.resolve()
+        let handler: FeedV2EventHandler = MainAppCoordinator.shared.container.resolve()
+        module.handler = handler
         module.handler.bind(view: module, router: router)
         return module
     }
