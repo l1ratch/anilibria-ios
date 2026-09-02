@@ -10,8 +10,6 @@
 		C72BFEEA2B0F687E0093FD64 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = C72BFEE92B0F687E0093FD64 /* Kingfisher */; };
 		C72BFEED2B0F69160093FD64 /* DITranquillity in Frameworks */ = {isa = PBXBuildFile; productRef = C72BFEEC2B0F69160093FD64 /* DITranquillity */; };
 		C7B0F2CC22D6F0B100540CA9 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B0F2CB22D6F0B100540CA9 /* WebKit.framework */; };
-		C7F05CA82E4EFC45006A021F /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = C7F05CA72E4EFC45006A021F /* AppMetricaCore */; };
-		C7F05CAA2E4EFC45006A021F /* AppMetricaCrashes in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = C7F05CA92E4EFC45006A021F /* AppMetricaCrashes */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -55,8 +53,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C72BFEED2B0F69160093FD64 /* DITranquillity in Frameworks */,
-				C7F05CAA2E4EFC45006A021F /* AppMetricaCrashes in Frameworks */,
-				C7F05CA82E4EFC45006A021F /* AppMetricaCore in Frameworks */,
 				C72BFEEA2B0F687E0093FD64 /* Kingfisher in Frameworks */,
 				C7B0F2CC22D6F0B100540CA9 /* WebKit.framework in Frameworks */,
 			);
@@ -115,8 +111,6 @@
 			packageProductDependencies = (
 				C72BFEE92B0F687E0093FD64 /* Kingfisher */,
 				C72BFEEC2B0F69160093FD64 /* DITranquillity */,
-				C7F05CA72E4EFC45006A021F /* AppMetricaCore */,
-				C7F05CA92E4EFC45006A021F /* AppMetricaCrashes */,
 			);
 			productName = Anilibria;
 			productReference = C7D4623F22CC73DF00E763DF /* AniLiberty.app */;
@@ -159,7 +153,6 @@
 			packageReferences = (
 				C72BFEE82B0F687E0093FD64 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				C72BFEEB2B0F69160093FD64 /* XCRemoteSwiftPackageReference "DITranquillity" */,
-				C7F05CA62E4EFC45006A021F /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 			);
 			productRefGroup = C7D4624022CC73DF00E763DF /* Products */;
 			projectDirPath = "";
@@ -471,14 +464,6 @@
 				version = 4.5.0;
 			};
 		};
-		C7F05CA62E4EFC45006A021F /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios";
-			requirement = {
-				kind = exactVersion;
-				version = 5.12.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -491,16 +476,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C72BFEEB2B0F69160093FD64 /* XCRemoteSwiftPackageReference "DITranquillity" */;
 			productName = DITranquillity;
-		};
-		C7F05CA72E4EFC45006A021F /* AppMetricaCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7F05CA62E4EFC45006A021F /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
-			productName = AppMetricaCore;
-		};
-		C7F05CA92E4EFC45006A021F /* AppMetricaCrashes */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7F05CA62E4EFC45006A021F /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
-			productName = AppMetricaCrashes;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

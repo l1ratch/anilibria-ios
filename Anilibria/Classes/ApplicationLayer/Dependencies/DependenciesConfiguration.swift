@@ -1,10 +1,6 @@
 import DITranquillity
 import Kingfisher
 import UIKit
-#if targetEnvironment(macCatalyst)
-#else
-import AppMetricaCore
-#endif
 
 public protocol DependenciesConfiguration: AnyObject {
     func setup()
