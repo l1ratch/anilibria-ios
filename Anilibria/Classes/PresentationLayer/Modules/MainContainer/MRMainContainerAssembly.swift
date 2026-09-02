@@ -34,6 +34,8 @@ public final class MenuItemsControllersFactory {
         switch item.type {
         case .feed:
             result = FeedAssembly.createModule()
+        case .feedV2:
+            result = FeedV2Assembly.createModule()
         case .news:
             result = NewsAssembly.createModule()
         case .catalog:

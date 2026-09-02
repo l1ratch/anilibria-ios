@@ -76,6 +76,7 @@ private class PersentersPart: DIPart {
         CatalogPart.self,
         SchedulePart.self,
         FeedPart.self,
+        FeedV2Part.self,
         NewsPart.self,
         TeamPart.self,
         LinkDevicePart.self,

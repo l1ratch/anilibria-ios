@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 public enum MenuItemType: String, CaseIterable {
-    case feed, catalog, news, collections, other
+    case feed, feedV2, catalog, news, collections, other
 
     var index: Int {
         return MenuItemType.allCases.firstIndex(of: self) ?? 0
@@ -12,6 +12,8 @@ public enum MenuItemType: String, CaseIterable {
         switch self {
         case .feed:
             return L10n.Screen.Feed.title
+        case .feedV2:
+            return "Главная (v2)"
         case .catalog:
             return L10n.Screen.Catalog.title
         case .news:
@@ -28,6 +30,8 @@ public enum MenuItemType: String, CaseIterable {
         switch self {
         case .feed:
             return UIImage(systemName: "house.fill", withConfiguration: config) ?? .System.news
+        case .feedV2:
+            return UIImage(systemName: "sparkles", withConfiguration: config) ?? .System.news
         case .catalog:
             return UIImage(systemName: "square.grid.2x2.fill", withConfiguration: config) ?? .System.search
         case .news:
@@ -62,7 +66,7 @@ public final class MenuItem: NSObject {
 public final class MenuListItem: ListItem<[MenuItem]> {}
 
 public final class MenuItemsFactory {
-    public static let defaultActiveTypes: [MenuItemType] = [.feed, .catalog, .news, .collections, .other]
+    public static let defaultActiveTypes: [MenuItemType] = [.feed, .feedV2, .catalog, .news, .collections, .other]
     private static let dockItemsKey = "dock_active_item_types"
 
     public static func getActiveTypes() -> [MenuItemType] {
@@ -70,6 +74,13 @@ public final class MenuItemsFactory {
             var result = rawArray.compactMap { MenuItemType(rawValue: $0) }
             if !result.contains(.other) {
                 result.append(.other)
+            }
+            if !result.contains(.feedV2) && !rawArray.contains("feedV2") {
+                if let feedIndex = result.firstIndex(of: .feed) {
+                    result.insert(.feedV2, at: feedIndex + 1)
+                } else {
+                    result.insert(.feedV2, at: 0)
+                }
             }
             return result
         }
