@@ -78,7 +78,7 @@ jobs:
           fi
           echo "Found app at: $APP_PATH"
           cp -r "$APP_PATH" Payload/
-          zip -vr AniLiberty.ipa Payload
+          zip -9 -r AniLiberty.ipa Payload
 
           DSYM_PATH=$(find ./Build -name "*.app.dSYM" -type d | grep -v "Index" | head -n 1)
           if [ -n "$DSYM_PATH" ]; then
