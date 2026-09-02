@@ -78,6 +78,7 @@ extension MainContainerViewController: PagerViewDelegate {
 extension MainContainerViewController: MainContainerViewBehavior {
     func set(items: [MenuItem]) {
         self.pages = MenuItemsControllersFactory.create(for: items)
+        self.pagerView.resetCurrentIndex()
         self.menuTabBar.set(items) { [weak self] type in
             self?.handler.select(item: type)
         }

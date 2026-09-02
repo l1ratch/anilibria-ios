@@ -65,6 +65,20 @@ extension MainContainerPresenter: MainContainerEventHandler {
 
             })
             .store(in: &bag)
+
+        NotificationCenter.default
+            .publisher(for: NSNotification.Name("dockItemsChanged"))
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let items = self.menuService.fetchItems()
+                self.view.set(items: items)
+                if let current = self.menuService.getSelected(), items.contains(where: { $0.type == current }) {
+                    self.view.set(selected: current)
+                } else if let first = items.first {
+                    self.select(item: first.type)
+                }
+            }
+            .store(in: &bag)
     }
 
     func select(item: MenuItemType) {

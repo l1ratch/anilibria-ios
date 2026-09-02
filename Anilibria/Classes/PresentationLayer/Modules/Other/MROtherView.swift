@@ -31,7 +31,7 @@ final class OtherViewController: BaseViewController {
     }
 
     private func setupCards() {
-        for card in [linkDeviceView?.superview?.superview, teamTitleLabel?.superview?.superview?.superview] {
+        for card in [linkDeviceView?.superview?.superview, settingsTitleLabel?.superview?.superview, teamTitleLabel?.superview?.superview?.superview] {
             card?.smoothCorners(with: 16)
             card?.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
             card?.layer.borderWidth = 1

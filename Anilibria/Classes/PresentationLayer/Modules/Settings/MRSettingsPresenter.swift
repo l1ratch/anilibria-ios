@@ -110,6 +110,54 @@ extension SettingsPresenter: SettingsEventHandler {
         self.view.set(name: Bundle.main.displayName ?? "",
                       version: Bundle.main.releaseVersionNumber ?? "")
         self.view.set(common: items)
+
+        var customItems: [SettingsControlItem] = []
+
+        let isNewsHidden = UserDefaults.standard.bool(forKey: "hideNewsOnFeed")
+        let hideNewsItem = SettingsControlItem(
+            title: "Блок новостей на главной",
+            value: isNewsHidden ? "Скрыт" : "Показывается",
+            action: { [weak self] control in self?.selectNewsVisibility(control) }
+        )
+        customItems.append(hideNewsItem)
+
+        let dockEditorItem = SettingsControlItem(
+            title: "Настройка Дока",
+            value: "",
+            action: { [weak self] _ in self?.router.openDockEditor() }
+        )
+        customItems.append(dockEditorItem)
+
+        self.view.set(customization: customItems)
+    }
+
+    func selectNewsVisibility(_ control: SettingsControlItem) {
+        let isHidden = UserDefaults.standard.bool(forKey: "hideNewsOnFeed")
+        let items = [
+            ChoiceItem(
+                value: false,
+                title: "Показывать",
+                isSelected: !isHidden,
+                didSelect: { _ in
+                    UserDefaults.standard.set(false, forKey: "hideNewsOnFeed")
+                    NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
+                    control.value = "Показывается"
+                    return true
+                }
+            ),
+            ChoiceItem(
+                value: true,
+                title: "Скрыть",
+                isSelected: isHidden,
+                didSelect: { _ in
+                    UserDefaults.standard.set(true, forKey: "hideNewsOnFeed")
+                    NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
+                    control.value = "Скрыт"
+                    return true
+                }
+            )
+        ]
+        self.router.openSheet(with: [ChoiceGroup(items: items)])
     }
 
     func selectQuality() {

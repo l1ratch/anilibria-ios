@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -16,6 +16,8 @@
                 <outlet property="appVersionLabel" destination="4MD-HM-w2R" id="mKk-XV-o9W"/>
                 <outlet property="commonStackView" destination="KeC-Kr-43u" id="fZU-Oy-nEO"/>
                 <outlet property="commonTitleLabel" destination="pc8-n4-FsJ" id="h4j-DZ-BFz"/>
+                <outlet property="customizationStackView" destination="cst-St-43u" id="cst-out-stk"/>
+                <outlet property="customizationTitleLabel" destination="cst-Lbl-FsJ" id="cst-out-lbl"/>
                 <outlet property="view" destination="avC-q5-7uI" id="dPr-11-Xas"/>
             </connections>
         </placeholder>
@@ -31,7 +33,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="414" height="848"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="38f-9L-P5k">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="202"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="308"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sw5-29-Lhq">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="0.0"/>
@@ -40,6 +42,7 @@
                                                 <constraint firstAttribute="height" id="CbX-um-ZRX"/>
                                             </constraints>
                                         </view>
+                                        <!-- Card 1: Common -->
                                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sFx-AO-C1H" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
                                             <rect key="frame" x="16" y="16" width="382" height="90"/>
                                             <subviews>
@@ -82,12 +85,60 @@
                                             </constraints>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                    <real key="value" value="5"/>
+                                                    <real key="value" value="16"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </view>
+                                        <!-- Card 2: Customization (Dock & Feed) -->
+                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cst-Cr-C1H" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
+                                            <rect key="frame" x="16" y="122" width="382" height="90"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="cst-Lm-by5">
+                                                    <rect key="frame" x="0.0" y="0.0" width="382" height="90"/>
+                                                    <subviews>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cst-Wm-gH9">
+                                                            <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                                            <subviews>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Кастомизация" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cst-Lbl-FsJ">
+                                                                    <rect key="frame" x="16" y="11.5" width="350" height="17"/>
+                                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
+                                                                    <color key="textColor" name="buttons/selected"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                            </subviews>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="trailing" secondItem="cst-Lbl-FsJ" secondAttribute="trailing" constant="16" id="cst-tr-16"/>
+                                                                <constraint firstItem="cst-Lbl-FsJ" firstAttribute="centerY" secondItem="cst-Wm-gH9" secondAttribute="centerY" id="cst-cy-00"/>
+                                                                <constraint firstItem="cst-Lbl-FsJ" firstAttribute="leading" secondItem="cst-Wm-gH9" secondAttribute="leading" constant="16" id="cst-ld-16"/>
+                                                                <constraint firstAttribute="height" constant="40" id="cst-ht-40"/>
+                                                            </constraints>
+                                                        </view>
+                                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="cst-St-43u">
+                                                            <rect key="frame" x="0.0" y="40" width="382" height="50"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" priority="1" id="cst-hp-11"/>
+                                                            </constraints>
+                                                        </stackView>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <color key="backgroundColor" name="surfaces/content"/>
+                                            <constraints>
+                                                <constraint firstItem="cst-Lm-by5" firstAttribute="top" secondItem="cst-Cr-C1H" secondAttribute="top" id="cst-top-00"/>
+                                                <constraint firstAttribute="bottom" secondItem="cst-Lm-by5" secondAttribute="bottom" id="cst-btm-00"/>
+                                                <constraint firstItem="cst-Lm-by5" firstAttribute="leading" secondItem="cst-Cr-C1H" secondAttribute="leading" id="cst-lft-00"/>
+                                                <constraint firstAttribute="trailing" secondItem="cst-Lm-by5" secondAttribute="trailing" id="cst-rgt-00"/>
+                                            </constraints>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                    <real key="value" value="16"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </view>
+                                        <!-- Card 3: About -->
                                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GOa-WO-wbt" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
-                                            <rect key="frame" x="16" y="122" width="382" height="80"/>
+                                            <rect key="frame" x="16" y="228" width="382" height="80"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="TQG-ru-Pzz">
                                                     <rect key="frame" x="0.0" y="0.0" width="382" height="80"/>
@@ -147,12 +198,14 @@
                                             </constraints>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                    <real key="value" value="5"/>
+                                                    <real key="value" value="16"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </view>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="cst-Cr-C1H" firstAttribute="leading" secondItem="38f-9L-P5k" secondAttribute="leading" constant="16" id="cst-card-ld"/>
+                                        <constraint firstAttribute="trailing" secondItem="cst-Cr-C1H" secondAttribute="trailing" constant="16" id="cst-card-tr"/>
                                         <constraint firstItem="sFx-AO-C1H" firstAttribute="leading" secondItem="38f-9L-P5k" secondAttribute="leading" constant="16" id="ORU-92-hnF"/>
                                         <constraint firstAttribute="trailing" secondItem="sFx-AO-C1H" secondAttribute="trailing" constant="16" id="a4z-7f-8zL"/>
                                         <constraint firstItem="GOa-WO-wbt" firstAttribute="leading" secondItem="38f-9L-P5k" secondAttribute="leading" constant="16" id="mSU-mP-tXr"/>

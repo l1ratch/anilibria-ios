@@ -99,6 +99,10 @@ open class PagerView: UIView {
         super.init(coder: aDecoder)
     }
 
+    open func resetCurrentIndex() {
+        self.currentIndex = -1
+    }
+
     open func didIndexChanged(_ handler: @escaping (Int) -> Void) {
         self.indexHandler = handler
     }

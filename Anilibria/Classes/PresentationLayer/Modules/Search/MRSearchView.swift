@@ -42,15 +42,13 @@ final class SearchViewController: BaseCollectionViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.showSearchView()
-        }
+        self.showSearchView()
     }
 
     private func setupSearchField() {
         self.searchField.placeholder = L10n.Common.Search.byName
         self.searchField.publisher(for: .editingChanged)
-            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(200), scheduler: DispatchQueue.main)
             .sink(onNext: { [weak self] in
                 if let text = self?.searchField.text {
                     self?.handler.search(query: text)
@@ -70,9 +68,9 @@ final class SearchViewController: BaseCollectionViewController {
     private func showSearchView() {
         let width = UIApplication.getWindow()?.frame.width ?? 0
         self.searchContainerConstraint.constant = width - 32
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 0.22, delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 1.0, options: [.curveEaseOut, .allowUserInteraction], animations: {
             self.view.layoutIfNeeded()
-        }
+        })
         self.searchField.becomeFirstResponder()
         self.setupSearchField()
     }
@@ -82,7 +80,9 @@ final class SearchViewController: BaseCollectionViewController {
         self.searchField.isUserInteractionEnabled = false
         self.set(sections: []) { [weak self] in
             self?.searchContainerConstraint.constant = 35
-            UIView.animate(withDuration: 0.3,
+            UIView.animate(withDuration: 0.18,
+                           delay: 0,
+                           options: [.curveEaseIn],
                            animations: { self?.view.layoutIfNeeded() },
                            completion: { _ in self?.handler.back() })
         }

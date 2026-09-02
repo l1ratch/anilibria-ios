@@ -5,8 +5,11 @@ import Combine
 
 final class SettingsViewController: BaseViewController {
     @IBOutlet var commonTitleLabel: UILabel!
-
     @IBOutlet var commonStackView: UIStackView!
+
+    @IBOutlet var customizationTitleLabel: UILabel!
+    @IBOutlet var customizationStackView: UIStackView!
+
     @IBOutlet var aboutTitleLabel: UILabel!
     @IBOutlet var appNameLabel: UILabel!
     @IBOutlet var appVersionLabel: UILabel!
@@ -21,7 +24,11 @@ final class SettingsViewController: BaseViewController {
     }
 
     private func setupCards() {
-        for card in [commonStackView?.superview?.superview, appNameLabel?.superview?.superview?.superview] {
+        for card in [
+            commonStackView?.superview?.superview,
+            customizationStackView?.superview?.superview,
+            appNameLabel?.superview?.superview?.superview
+        ] {
             card?.smoothCorners(with: 16)
             card?.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
             card?.layer.borderWidth = 1
@@ -33,6 +40,7 @@ final class SettingsViewController: BaseViewController {
         self.handler.didLoad()
         self.navigationItem.title = L10n.Screen.Settings.title
         self.commonTitleLabel.text = L10n.Screen.Settings.common
+        self.customizationTitleLabel?.text = "Кастомизация"
         self.aboutTitleLabel.text = L10n.Screen.Settings.aboutApp
     }
 }
@@ -53,6 +61,20 @@ extension SettingsViewController: SettingsViewBehavior {
             let view = SettingsControlView()
             view.configure(item: $0)
             commonStackView.addArrangedSubview(view)
+        }
+    }
+
+    func set(customization items: [SettingsControlItem]) {
+        guard let customizationStackView = customizationStackView else { return }
+        customizationStackView.arrangedSubviews.forEach {
+            customizationStackView.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+
+        items.forEach {
+            let view = SettingsControlView()
+            view.configure(item: $0)
+            customizationStackView.addArrangedSubview(view)
         }
     }
 }
