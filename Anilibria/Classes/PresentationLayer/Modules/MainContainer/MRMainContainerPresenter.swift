@@ -55,12 +55,14 @@ extension MainContainerPresenter: MainContainerEventHandler {
             .sink(onNext: { [weak self] value in
                 switch value {
                 case .guest:
-                    if let current = self?.menuService.getSelected(), current == .collections {
+                    if let current = self?.menuService.getSelected(), current == .collections || current == .collectionsV2 {
                         self?.menuService.setMenuItem(type: items.first?.type ?? .feedV2)
                     }
                     self?.view.change(visible: false, for: .collections)
+                    self?.view.change(visible: false, for: .collectionsV2)
                 case .user:
                     self?.view.change(visible: true, for: .collections)
+                    self?.view.change(visible: true, for: .collectionsV2)
                 }
 
             })

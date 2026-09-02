@@ -19,6 +19,7 @@ final class FeedV2ViewController: BaseViewController {
     private var heroItems: [PromoItem] = []
     private var heroCollectionView: UICollectionView!
     private let pageControl = UIPageControl()
+    private var autoScrollTimer: Timer?
 
     // 2. Quick Actions
     private let quickActionsView = FeedV2QuickActionsView()
@@ -39,6 +40,14 @@ final class FeedV2ViewController: BaseViewController {
         self?.handler.search()
     }
 
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -56,6 +65,12 @@ final class FeedV2ViewController: BaseViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         handler.refreshIfNeeded()
+        startAutoScroll()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        stopAutoScroll()
     }
 
     override func viewDidLayoutSubviews() {
@@ -279,6 +294,18 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
         }
     }
 
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if scrollView == heroCollectionView {
+            stopAutoScroll()
+        }
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if scrollView == heroCollectionView {
+            startAutoScroll()
+        }
+    }
+
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         if scrollView == heroCollectionView {
             let screenWidth = min(view.bounds.width, view.bounds.height)
@@ -312,6 +339,40 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             }
         }
     }
+
+    // MARK: - Auto Scroll
+
+    private func startAutoScroll() {
+        stopAutoScroll()
+        guard heroItems.count > 1 else { return }
+        autoScrollTimer = Timer.scheduledTimer(withTimeInterval: 5.5, repeats: true) { [weak self] _ in
+            self?.scrollToNextHero()
+        }
+    }
+
+    private func stopAutoScroll() {
+        autoScrollTimer?.invalidate()
+        autoScrollTimer = nil
+    }
+
+    private func scrollToNextHero() {
+        guard heroItems.count > 1,
+              let cv = heroCollectionView,
+              !cv.isTracking,
+              !cv.isDragging,
+              !cv.isDecelerating else { return }
+
+        let current = pageControl.currentPage
+        let next = (current + 1) % heroItems.count
+        let screenWidth = min(view.bounds.width, view.bounds.height)
+        let itemWidth = (screenWidth - 32) + 12
+        let targetX = CGFloat(next) * itemWidth
+
+        UIView.animate(withDuration: 0.45, delay: 0, options: [.curveEaseInOut, .allowUserInteraction]) {
+            self.heroCollectionView.setContentOffset(CGPoint(x: targetX, y: 0), animated: false)
+        }
+        pageControl.currentPage = next
+    }
 }
 
 // MARK: - FeedV2ViewBehavior
@@ -322,6 +383,7 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
         self.pageControl.numberOfPages = heroItems.count
         self.heroCollectionView.reloadData()
         self.heroCollectionView.superview?.isHidden = heroItems.isEmpty
+        startAutoScroll()
     }
 
     func set(continueWatching: Series?, episodeID: String?) {

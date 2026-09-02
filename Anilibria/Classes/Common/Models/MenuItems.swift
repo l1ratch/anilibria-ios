@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 public enum MenuItemType: String, CaseIterable {
-    case feed, feedV2, catalog, news, collections, other
+    case feed, feedV2, catalog, news, collections, collectionsV2, other
 
     var index: Int {
         return MenuItemType.allCases.firstIndex(of: self) ?? 0
@@ -20,6 +20,8 @@ public enum MenuItemType: String, CaseIterable {
             return "YouTube"
         case .collections:
             return "Коллекции"
+        case .collectionsV2:
+            return "Списки (v2)"
         case .other:
             return "Другое"
         }
@@ -38,6 +40,8 @@ public enum MenuItemType: String, CaseIterable {
             return UIImage(systemName: "play.rectangle.fill", withConfiguration: config) ?? .iconYoutube
         case .collections:
             return UIImage(systemName: "bookmark.fill", withConfiguration: config) ?? .System.book
+        case .collectionsV2:
+            return UIImage(systemName: "square.stack.fill", withConfiguration: config) ?? .System.book
         case .other:
             return UIImage(systemName: "ellipsis.circle.fill", withConfiguration: config) ?? .System.dots
         }
@@ -66,7 +70,7 @@ public final class MenuItem: NSObject {
 public final class MenuListItem: ListItem<[MenuItem]> {}
 
 public final class MenuItemsFactory {
-    public static let defaultActiveTypes: [MenuItemType] = [.feedV2, .catalog, .news, .collections, .other]
+    public static let defaultActiveTypes: [MenuItemType] = [.feedV2, .catalog, .news, .collections, .collectionsV2, .other]
     private static let dockItemsKey = "dock_active_item_types"
 
     public static func getActiveTypes() -> [MenuItemType] {
@@ -81,6 +85,13 @@ public final class MenuItemsFactory {
             }
             if !result.contains(.feedV2) && !result.contains(.feed) {
                 result.insert(.feedV2, at: 0)
+            }
+            if !result.contains(.collectionsV2) && !rawArray.contains("collectionsV2") {
+                if let collectionsIndex = result.firstIndex(of: .collections) {
+                    result.insert(.collectionsV2, at: collectionsIndex + 1)
+                } else {
+                    result.insert(.collectionsV2, at: max(0, result.count - 1))
+                }
             }
             if !result.contains(.other) {
                 result.append(.other)

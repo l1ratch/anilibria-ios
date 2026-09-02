@@ -44,6 +44,8 @@ public final class MenuItemsControllersFactory {
             result = OtherAssembly.createModule()
         case .collections:
             result = UserCollectionsAssembly.createModule()
+        case .collectionsV2:
+            result = UserCollectionsV2Assembly.createModule()
         }
 
         if UIDevice.current.userInterfaceIdiom == .pad {
