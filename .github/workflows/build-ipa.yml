@@ -68,6 +68,14 @@ jobs:
             DEVELOPMENT_TEAM="" \
             ONLY_ACTIVE_ARCH=NO 2>&1 | tee xcodebuild.log || (echo "=== XCODEBUILD FAILED - LAST 200 LINES ===" && tail -n 200 xcodebuild.log && exit 1)
 
+      - name: Print Build Errors
+        if: failure()
+        run: |
+          echo "=== EXTRACTED ERRORS ==="
+          grep -C 3 -i "error:" xcodebuild.log || true
+          echo "=== TAIL LOG ==="
+          tail -n 80 xcodebuild.log || true
+
       - name: Upload Build Log Artifact
         if: always()
         uses: actions/upload-artifact@v4
