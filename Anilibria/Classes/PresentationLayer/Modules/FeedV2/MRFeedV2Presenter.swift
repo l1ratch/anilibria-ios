@@ -149,11 +149,11 @@ extension FeedV2Presenter: FeedV2EventHandler {
             title = ad.title
         case .promo(let item):
             let t = item.title?.trimmingCharacters(in: .whitespacesAndNewlines)
-            title = (t?.isEmpty == false) ? t! : "Анонс"
+            title = (t?.isEmpty == false) ? t! : (Language.isEnglish ? "Announcement" : "Анонс")
         case .release(let series):
             title = series.name?.main ?? series.alias
         case nil:
-            title = "Новость"
+            title = Language.isEnglish ? "News" : "Новость"
         }
 
         if !promo.info.isEmpty {

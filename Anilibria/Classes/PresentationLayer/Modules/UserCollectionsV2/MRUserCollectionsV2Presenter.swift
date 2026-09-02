@@ -60,14 +60,14 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
     private func loadAllCollections() {
         view.showLoading(true)
 
-        // Favorite is now #1, followed by Watching, Planned, Watched, Postponed, Abandoned
+        // Favorite is now #1, watched is last
         let orderedKeys: [UserCollectionKey] = [
             .favorite,
             .watching,
             .planned,
-            .watched,
             .postponed,
-            .abandoned
+            .abandoned,
+            .watched
         ]
 
         var loadedSections: [UserCollectionGroupSection] = orderedKeys.map {

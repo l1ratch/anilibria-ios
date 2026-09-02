@@ -52,7 +52,7 @@ final class UserCollectionHeaderReusableView: UICollectionReusableView {
         addSubview(countLabel)
 
         seeAllButton.translatesAutoresizingMaskIntoConstraints = false
-        seeAllButton.setTitle("Все  ", for: .normal)
+        seeAllButton.setTitle(Language.isEnglish ? "All  " : "Все  ", for: .normal)
         seeAllButton.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: 11, weight: .semibold)), for: .normal)
         seeAllButton.semanticContentAttribute = .forceRightToLeft
         seeAllButton.tintColor = UIColor(named: "buttons/selected") ?? .systemRed
@@ -213,7 +213,8 @@ final class UserCollectionCardCell: UICollectionViewCell {
         titleLabel.text = series.name?.main ?? series.alias
 
         let genres = series.genres.prefix(2).map { $0.name }.joined(separator: " • ")
-        subtitleLabel.text = genres.isEmpty ? (series.season?.description ?? "Аниме") : genres
+        let defaultAnime = Language.isEnglish ? "Anime" : "Аниме"
+        subtitleLabel.text = genres.isEmpty ? (series.season?.description ?? defaultAnime) : genres
     }
 }
 
@@ -252,7 +253,7 @@ final class UserCollectionEmptyCell: UICollectionViewCell {
         container.addSubview(iconImageView)
 
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
-        messageLabel.text = "В этом списке пока пусто"
+        messageLabel.text = Language.isEnglish ? "This list is currently empty" : "В этом списке пока пусто"
         messageLabel.font = .systemFont(ofSize: 13, weight: .medium)
         messageLabel.textColor = .Text.secondary
         container.addSubview(messageLabel)

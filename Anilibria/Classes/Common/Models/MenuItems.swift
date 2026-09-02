@@ -11,19 +11,19 @@ public enum MenuItemType: String, CaseIterable {
     public var title: String {
         switch self {
         case .feed:
-            return "Главная (резерв)"
+            return Language.isEnglish ? "Home (Backup)" : "Главная (резерв)"
         case .feedV2:
-            return "Главная"
+            return Language.isEnglish ? "Home" : "Главная"
         case .catalog:
             return L10n.Screen.Catalog.title
         case .news:
             return "YouTube"
         case .collections:
-            return "Коллекции"
+            return Language.isEnglish ? "Collections" : "Коллекции"
         case .collectionsV2:
-            return "Списки (v2)"
+            return Language.isEnglish ? "Lists (v2)" : "Списки (v2)"
         case .other:
-            return "Другое"
+            return Language.isEnglish ? "Other" : "Другое"
         }
     }
 

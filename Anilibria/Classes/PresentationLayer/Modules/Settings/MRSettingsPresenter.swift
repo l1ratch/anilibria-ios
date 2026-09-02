@@ -117,7 +117,7 @@ extension SettingsPresenter: SettingsEventHandler {
         var customItems: [SettingsControlItem] = []
 
         let dockEditorItem = SettingsControlItem(
-            title: "Настройка Дока",
+            title: Language.isEnglish ? "Dock Settings" : "Настройка Дока",
             value: "",
             action: { [weak self] _ in self?.router.openDockEditor() }
         )

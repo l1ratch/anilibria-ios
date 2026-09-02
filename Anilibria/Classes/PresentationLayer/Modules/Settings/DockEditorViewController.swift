@@ -34,7 +34,7 @@ final class DockEditorViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Настройка Дока"
+        title = Language.isEnglish ? "Dock Settings" : "Настройка Дока"
         setupNavigation()
         setupTableView()
         loadData()
@@ -42,7 +42,7 @@ final class DockEditorViewController: BaseViewController {
 
     private func setupNavigation() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Сбросить",
+            title: Language.isEnglish ? "Reset" : "Сбросить",
             style: .plain,
             target: self,
             action: #selector(resetToDefaults)
@@ -84,12 +84,12 @@ final class DockEditorViewController: BaseViewController {
 
     @objc private func resetToDefaults() {
         let alert = UIAlertController(
-            title: "Сброс панели",
-            message: "Вернуть расположение и список кнопок в доке по умолчанию?",
+            title: Language.isEnglish ? "Reset Dock" : "Сброс панели",
+            message: Language.isEnglish ? "Reset dock buttons and order to defaults?" : "Вернуть расположение и список кнопок в доке по умолчанию?",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Сбросить", style: .destructive) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: Language.isEnglish ? "Cancel" : "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: Language.isEnglish ? "Reset" : "Сбросить", style: .destructive) { [weak self] _ in
             MenuItemsFactory.setActiveTypes(MenuItemsFactory.defaultActiveTypes, notify: false)
             self?.loadData()
         })
@@ -118,15 +118,15 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
-            return "Активные кнопки в доке"
+            return Language.isEnglish ? "Active Dock Items" : "Активные кнопки в доке"
         } else {
-            return "Скрытые кнопки"
+            return Language.isEnglish ? "Hidden Items" : "Скрытые кнопки"
         }
     }
 
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 0 {
-            return "Перетаскивайте кнопки за правый край для изменения порядка. Кнопку «Другое» скрыть нельзя."
+            return Language.isEnglish ? "Drag handles on the right to reorder. 'Other' cannot be removed." : "Перетаскивайте кнопки за правый край для изменения порядка. Кнопку «Другое» скрыть нельзя."
         }
         return nil
     }
@@ -147,7 +147,7 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
             cell.imageView?.tintColor = .Tint.active
 
             if item == .other {
-                cell.detailTextLabel?.text = "Обязательная"
+                cell.detailTextLabel?.text = Language.isEnglish ? "Required" : "Обязательная"
                 cell.detailTextLabel?.textColor = .Text.secondary
                 cell.detailTextLabel?.font = .systemFont(ofSize: 13, weight: .regular)
             } else {

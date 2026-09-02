@@ -19,6 +19,10 @@ public enum Language: String, Equatable, Codable, CaseIterable {
         return languageChangedSubject.eraseToAnyPublisher()
     }
     
+    public static var isEnglish: Bool {
+        return current == .en
+    }
+
     private static let names: [Language: String] = [
         .ru: "Русский",
         .en: "English"

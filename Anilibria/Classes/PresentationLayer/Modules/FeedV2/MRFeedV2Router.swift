@@ -21,6 +21,6 @@ protocol FeedV2Routable: BaseRoutable,
 
 final class FeedV2Router: BaseRouter, FeedV2Routable {
     func show(title: String, message: String) {
-        MRAppAlertController.alert(title, message: message, acceptMessage: "Понятно")
+        MRAppAlertController.alert(title, message: message, acceptMessage: Language.isEnglish ? "Got it" : "Понятно")
     }
 }

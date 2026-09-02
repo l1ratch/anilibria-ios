@@ -150,52 +150,52 @@ final class FeedV2HeroCell: UICollectionViewCell {
 
         switch item.content {
         case .release(let series):
-            badgeLabel.text = "🔥 В ТРЕНДЕ"
+            badgeLabel.text = Language.isEnglish ? "🔥 TRENDING" : "🔥 В ТРЕНДЕ"
             titleLabel.text = series.name?.main ?? series.alias
             titleLabel.numberOfLines = 2
             let genres = series.genres.prefix(2).map { $0.name }.joined(separator: " • ")
-            subtitleLabel.text = genres.isEmpty ? (series.season?.description ?? "Аниме") : genres
+            let defaultAnime = Language.isEnglish ? "Anime" : "Аниме"
+            subtitleLabel.text = genres.isEmpty ? (series.season?.description ?? defaultAnime) : genres
             subtitleLabel.numberOfLines = 1
             actionButton.isHidden = false
-            actionButton.setTitle("  Смотреть", for: .normal)
+            actionButton.setTitle(Language.isEnglish ? "  Watch" : "  Смотреть", for: .normal)
             actionButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
             subtitleTrailingToContent.isActive = false
             subtitleTrailingToButton.isActive = true
 
         case .ad(let ad):
-            badgeLabel.text = "РЕКЛАМА"
+            badgeLabel.text = Language.isEnglish ? "AD" : "РЕКЛАМА"
             titleLabel.text = ad.title
             titleLabel.numberOfLines = 2
             subtitleLabel.text = ad.info
             subtitleLabel.numberOfLines = 2
             actionButton.isHidden = false
-            actionButton.setTitle("  Перейти", for: .normal)
+            actionButton.setTitle(Language.isEnglish ? "  Open" : "  Перейти", for: .normal)
             actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
             subtitleTrailingToContent.isActive = false
             subtitleTrailingToButton.isActive = true
 
         case .promo(let promo):
-            badgeLabel.text = "📢 АНОНС"
+            badgeLabel.text = Language.isEnglish ? "📢 ANNOUNCEMENT" : "📢 АНОНС"
             let title = promo.title?.trimmingCharacters(in: .whitespacesAndNewlines)
             if let title = title, !title.isEmpty {
                 titleLabel.text = title
             } else {
-                titleLabel.text = "Анонс"
+                titleLabel.text = Language.isEnglish ? "Announcement" : "Анонс"
             }
             titleLabel.numberOfLines = 2
             subtitleLabel.text = item.info
             subtitleLabel.numberOfLines = 4
 
+            actionButton.isHidden = false
             if promo.url != nil {
-                actionButton.isHidden = false
-                actionButton.setTitle("  Подробнее", for: .normal)
+                actionButton.setTitle(Language.isEnglish ? "  Details" : "  Подробнее", for: .normal)
                 actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
                 actionButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
                 subtitleTrailingToContent.isActive = false
                 subtitleTrailingToButton.isActive = true
             } else {
-                actionButton.isHidden = false
-                actionButton.setTitle("  Читать", for: .normal)
+                actionButton.setTitle(Language.isEnglish ? "  Read" : "  Читать", for: .normal)
                 actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
                 actionButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
                 subtitleTrailingToContent.isActive = false
@@ -203,13 +203,13 @@ final class FeedV2HeroCell: UICollectionViewCell {
             }
 
         case nil:
-            badgeLabel.text = "📢 НОВОСТЬ"
-            titleLabel.text = "Информация"
+            badgeLabel.text = Language.isEnglish ? "📢 NEWS" : "📢 НОВОСТЬ"
+            titleLabel.text = Language.isEnglish ? "Information" : "Информация"
             titleLabel.numberOfLines = 1
             subtitleLabel.text = item.info
             subtitleLabel.numberOfLines = 4
             actionButton.isHidden = false
-            actionButton.setTitle("  Читать", for: .normal)
+            actionButton.setTitle(Language.isEnglish ? "  Read" : "  Читать", for: .normal)
             actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
             actionButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
             subtitleTrailingToContent.isActive = false
@@ -253,19 +253,19 @@ final class FeedV2QuickActionsView: UIView {
         ])
 
         let randomBtn = makeButton(
-            title: "Рандом",
+            title: Language.isEnglish ? "Random" : "Рандом",
             icon: "dice.fill",
             tint: UIColor(named: "buttons/selected") ?? .systemRed,
             action: #selector(didTapRandom)
         )
         let scheduleBtn = makeButton(
-            title: "Неделя",
+            title: Language.isEnglish ? "Week" : "Неделя",
             icon: "calendar",
             tint: .systemTeal,
             action: #selector(didTapSchedule)
         )
         let catalogBtn = makeButton(
-            title: "Каталог",
+            title: Language.isEnglish ? "Catalog" : "Каталог",
             icon: "square.grid.2x2.fill",
             tint: .systemOrange,
             action: #selector(didTapCatalog)
@@ -355,7 +355,7 @@ final class FeedV2ContinueWatchingView: UIView {
         posterImageView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(posterImageView)
 
-        sectionLabel.text = "ПРОДОЛЖИТЬ ПРОСМОТР"
+        sectionLabel.text = Language.isEnglish ? "CONTINUE WATCHING" : "ПРОДОЛЖИТЬ ПРОСМОТР"
         sectionLabel.font = .systemFont(ofSize: 10, weight: .bold)
         sectionLabel.textColor = UIColor(named: "buttons/selected") ?? .systemRed
         sectionLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -418,9 +418,9 @@ final class FeedV2ContinueWatchingView: UIView {
         titleLabel.text = series.name?.main ?? series.alias
 
         if let ep = episodeID, !ep.isEmpty {
-            episodeLabel.text = "Серия \(ep)"
+            episodeLabel.text = Language.isEnglish ? "Episode \(ep)" : "Серия \(ep)"
         } else {
-            episodeLabel.text = "Нажмите для воспроизведения"
+            episodeLabel.text = Language.isEnglish ? "Tap to play" : "Нажмите для воспроизведения"
         }
     }
 }
@@ -514,16 +514,17 @@ final class FeedV2ScheduleCell: UICollectionViewCell {
         titleLabel.text = item.item.name?.main ?? item.item.alias
 
         if let episode = item.newEpisode, let ord = episode.ordinal {
-            episodeLabel.text = "\(Int(ord)) серия вышла"
-            timeLabel.text = "ВЫШЛА"
+            episodeLabel.text = Language.isEnglish ? "Ep. \(Int(ord)) out" : "\(Int(ord)) серия вышла"
+            timeLabel.text = Language.isEnglish ? "OUT" : "ВЫШЛА"
             timeBadge.contentView.backgroundColor = (UIColor(named: "buttons/selected") ?? .systemRed).withAlphaComponent(0.9)
         } else if let ordinal = item.newEpisodeOrdinal {
-            episodeLabel.text = "\(Int(ordinal)) серия"
-            timeLabel.text = "СКОРО"
+            episodeLabel.text = Language.isEnglish ? "Episode \(Int(ordinal))" : "\(Int(ordinal)) серия"
+            timeLabel.text = Language.isEnglish ? "SOON" : "СКОРО"
             timeBadge.contentView.backgroundColor = UIColor.black.withAlphaComponent(0.65)
         } else {
-            episodeLabel.text = item.item.season?.description ?? "Онгоинг"
-            timeLabel.text = "СЕГОДНЯ"
+            let defaultOngoing = Language.isEnglish ? "Ongoing" : "Онгоинг"
+            episodeLabel.text = item.item.season?.description ?? defaultOngoing
+            timeLabel.text = Language.isEnglish ? "TODAY" : "СЕГОДНЯ"
             timeBadge.contentView.backgroundColor = UIColor.black.withAlphaComponent(0.65)
         }
     }

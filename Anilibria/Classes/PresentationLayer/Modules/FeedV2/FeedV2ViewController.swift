@@ -198,12 +198,14 @@ final class FeedV2ViewController: BaseViewController {
         scheduleHeaderContainer.addSubview(scheduleTitleLabel)
 
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.locale = Language.isEnglish ? Locale(identifier: "en_US") : Locale(identifier: "ru_RU")
         formatter.dateFormat = "EEEE"
         let dayName = formatter.string(from: Date()).capitalized
-        scheduleTitleLabel.text = "Сегодня, \(dayName)"
+        let todayPrefix = Language.isEnglish ? "Today" : "Сегодня"
+        scheduleTitleLabel.text = "\(todayPrefix), \(dayName)"
 
-        scheduleAllButton.setTitle("Вся неделя  ", for: .normal)
+        let allWeekTitle = Language.isEnglish ? "Full week  " : "Вся неделя  "
+        scheduleAllButton.setTitle(allWeekTitle, for: .normal)
         scheduleAllButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
         scheduleAllButton.semanticContentAttribute = .forceRightToLeft
         scheduleAllButton.tintColor = UIColor(named: "buttons/selected") ?? .systemRed

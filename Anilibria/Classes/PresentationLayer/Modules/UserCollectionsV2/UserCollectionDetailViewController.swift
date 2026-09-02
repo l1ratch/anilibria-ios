@@ -13,15 +13,13 @@ final class UserCollectionDetailViewController: BaseCollectionViewController {
     private var viewModel: (any UserCollectionViewModelProtocol)!
     private var bag = Set<AnyCancellable>()
 
-    private let searchView = SearchView()
-    private var searchHeightConstraint: NSLayoutConstraint!
-    private var isSearchVisible = false
+    private var router: UserCollectionRouter!
 
     private lazy var searchButton = BarButton(
         image: .System.search,
         imageEdge: inset(0, 5, 0, 5)
     ) { [weak self] in
-        self?.toggleSearch()
+        self?.router.openSearchScreen()
     }
 
     private lazy var filterButton = BarButton(image: .iconFilter) { [weak self] in
@@ -60,6 +58,13 @@ final class UserCollectionDetailViewController: BaseCollectionViewController {
         root.addSubview(cv)
         self.collectionView = cv
         self.view = root
+
+        NSLayoutConstraint.activate([
+            cv.topAnchor.constraint(equalTo: root.topAnchor),
+            cv.leadingAnchor.constraint(equalTo: root.leadingAnchor),
+            cv.trailingAnchor.constraint(equalTo: root.trailingAnchor),
+            cv.bottomAnchor.constraint(equalTo: root.bottomAnchor)
+        ])
     }
 
     override func viewDidLoad() {
@@ -68,7 +73,6 @@ final class UserCollectionDetailViewController: BaseCollectionViewController {
         self.view.backgroundColor = .Surfaces.background
 
         setupNavbar()
-        setupSearchView()
         setupViewModel()
         self.addRefreshControl(scrollView: collectionView)
         self.collectionView.contentInset.top = 10
@@ -95,52 +99,9 @@ final class UserCollectionDetailViewController: BaseCollectionViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
 
-    private func setupSearchView() {
-        searchView.translatesAutoresizingMaskIntoConstraints = false
-        searchView.clipsToBounds = true
-        view.addSubview(searchView)
-
-        searchHeightConstraint = searchView.heightAnchor.constraint(equalToConstant: 0)
-
-        NSLayoutConstraint.activate([
-            searchView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            searchHeightConstraint,
-
-            collectionView.topAnchor.constraint(equalTo: searchView.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        searchView.querySequence()
-            .dropFirst()
-            .map { $0.trim() }
-            .removeDuplicates()
-            .debounce(for: .milliseconds(400), scheduler: DispatchQueue.main)
-            .sink { [weak self] text in
-                self?.viewModel.search(query: text)
-            }
-            .store(in: &bag)
-    }
-
-    private func toggleSearch() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        isSearchVisible.toggle()
-        searchHeightConstraint.constant = isSearchVisible ? 44 : 0
-
-        UIView.animate(withDuration: 0.25) {
-            self.view.layoutIfNeeded()
-        } completion: { _ in
-            if !self.isSearchVisible {
-                self.viewModel.search(query: "")
-            }
-        }
-    }
-
     private func setupViewModel() {
         let router = UserCollectionRouter(view: self, parent: nil)
+        self.router = router
         if let type = key.collectionType {
             let vm: UserCollectionViewModel = MainAppCoordinator.shared.container.resolve()
             router.responder = vm

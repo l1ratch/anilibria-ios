@@ -31,7 +31,7 @@ final class UserCollectionsV2ViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Списки"
+        title = Language.isEnglish ? "Lists" : "Списки"
         view.backgroundColor = .Surfaces.background
 
         setupNavigationBar()
@@ -48,7 +48,7 @@ final class UserCollectionsV2ViewController: BaseViewController {
     // MARK: - Setup Navigation Bar
 
     private func setupNavigationBar() {
-        navigationItem.title = "Списки"
+        navigationItem.title = Language.isEnglish ? "Lists" : "Списки"
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.setRightBarButtonItems([searchButton, filterButton], animated: false)
 
