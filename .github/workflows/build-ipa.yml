@@ -52,6 +52,7 @@ jobs:
 
       - name: Build iOS App (.app)
         run: |
+          set -o pipefail
           xcodebuild build \
             -project Anilibria.xcodeproj \
             -scheme Anilibria \
@@ -65,7 +66,7 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM="" \
-            ONLY_ACTIVE_ARCH=NO
+            ONLY_ACTIVE_ARCH=NO 2>&1 | tee xcodebuild.log || (echo "=== BUILD ERRORS ===" && cat xcodebuild.log | grep -E "(error:|fatal error:)" | head -n 30 && exit 1)
 
       - name: Package into IPA
         run: |
