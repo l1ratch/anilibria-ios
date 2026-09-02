@@ -29,14 +29,49 @@ protocol ActionSheetRoute {
 
 extension ActionSheetRoute where Self: RouterProtocol {
     func openSheet(with source: any ActionSheetGroupSource) {
-        let module = ActionSheetAssembly.createModule(source: source, parent: self)
-        PresentRouter(target: module,
-                      from: nil,
-                      use: BlurPresentationController.self,
-                      configure: {
-                          $0.isBlured = false
-                          $0.transformation = ScaleTransformation()
-        }).move()
+        source.fetchItems { [weak self] groups in
+            guard let self else { return }
+            let groupTitle = groups.first?.title?.string
+            let alert = UIAlertController(
+                title: (groupTitle?.isEmpty == false) ? groupTitle : nil,
+                message: nil,
+                preferredStyle: .actionSheet
+            )
+            alert.view.tintColor = .Tint.active
+
+            for group in groups {
+                for item in group.items {
+                    var title = item.title.string
+                    if item.isSelected {
+                        title = "✓ " + title
+                    }
+                    let action = UIAlertAction(title: title, style: .default) { _ in
+                        _ = item.select()
+                    }
+                    alert.addAction(action)
+                }
+            }
+
+            alert.addAction(UIAlertAction(title: L10n.Buttons.cancel, style: .cancel, handler: nil))
+
+            if let popover = alert.popoverPresentationController {
+                if let root = UIApplication.getWindow()?.rootViewController {
+                    popover.sourceView = root.view
+                    popover.sourceRect = CGRect(x: root.view.bounds.midX, y: root.view.bounds.midY, width: 0, height: 0)
+                    popover.permittedArrowDirections = []
+                }
+            }
+
+            if let targetVC = self.target {
+                targetVC.present(alert, animated: true, completion: nil)
+            } else if let root = UIApplication.getWindow()?.rootViewController {
+                var topVC = root
+                while let presented = topVC.presentedViewController {
+                    topVC = presented
+                }
+                topVC.present(alert, animated: true, completion: nil)
+            }
+        }
     }
 
     func openSheet(with items: [ChoiceGroup]) {
