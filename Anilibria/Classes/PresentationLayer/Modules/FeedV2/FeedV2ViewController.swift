@@ -250,6 +250,8 @@ final class FeedV2ViewController: BaseViewController {
         handler.refresh()
     }
 
+    private let heroMultiplier = 200
+
     @objc private func didTapAllSchedule() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         handler.allSchedule()
@@ -261,7 +263,8 @@ final class FeedV2ViewController: BaseViewController {
 extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == heroCollectionView {
-            return heroItems.count
+            guard !heroItems.isEmpty else { return 0 }
+            return heroItems.count > 1 ? heroItems.count * heroMultiplier : 1
         } else {
             return scheduleItems.count
         }
@@ -270,10 +273,18 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == heroCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2HeroCell.reuseIdentifier, for: indexPath) as! FeedV2HeroCell
-            let item = heroItems[indexPath.item]
+            let actualIndex = indexPath.item % heroItems.count
+            let item = heroItems[actualIndex]
             cell.configure(with: item)
             cell.onActionTap = { [weak self] in
-                self?.handler.select(promo: item)
+                switch item.content {
+                case .promo(let p) where p.url == nil:
+                    self?.handler.selectPromoDetails(promo: item)
+                case nil:
+                    self?.handler.selectPromoDetails(promo: item)
+                default:
+                    self?.handler.select(promo: item)
+                }
             }
             return cell
         } else {
@@ -286,9 +297,12 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == heroCollectionView {
-            let item = heroItems[indexPath.item]
-            handler.select(promo: item)
+            guard !heroItems.isEmpty else { return }
+            let actualIndex = indexPath.item % heroItems.count
+            let item = heroItems[actualIndex]
+            handler.selectPromoDetails(promo: item)
         } else {
+            guard indexPath.item < scheduleItems.count else { return }
             let item = scheduleItems[indexPath.item]
             handler.select(series: item.item)
         }
@@ -323,19 +337,19 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
                 index = round(rawTarget / itemWidth)
             }
 
-            let clampedIndex = max(0, min(Int(index), heroItems.count - 1))
-            let targetX = CGFloat(clampedIndex) * itemWidth
+            let targetX = index * itemWidth
             targetContentOffset.pointee = CGPoint(x: targetX, y: targetContentOffset.pointee.y)
         }
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView == heroCollectionView {
+        if scrollView == heroCollectionView, !heroItems.isEmpty {
             let screenWidth = min(view.bounds.width, view.bounds.height)
             let itemWidth = (screenWidth - 32) + 12
             if itemWidth > 0 {
-                let page = Int(round(scrollView.contentOffset.x / itemWidth))
-                pageControl.currentPage = max(0, min(page, heroItems.count - 1))
+                let rawIndex = Int(round(scrollView.contentOffset.x / itemWidth))
+                let page = ((rawIndex % heroItems.count) + heroItems.count) % heroItems.count
+                pageControl.currentPage = page
             }
         }
     }
@@ -362,16 +376,18 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
               !cv.isDragging,
               !cv.isDecelerating else { return }
 
-        let current = pageControl.currentPage
-        let next = (current + 1) % heroItems.count
         let screenWidth = min(view.bounds.width, view.bounds.height)
         let itemWidth = (screenWidth - 32) + 12
-        let targetX = CGFloat(next) * itemWidth
+        guard itemWidth > 0 else { return }
+        let currentRawIndex = Int(round(cv.contentOffset.x / itemWidth))
+        let nextRawIndex = currentRawIndex + 1
+        let targetX = CGFloat(nextRawIndex) * itemWidth
 
         UIView.animate(withDuration: 0.45, delay: 0, options: [.curveEaseInOut, .allowUserInteraction]) {
             self.heroCollectionView.setContentOffset(CGPoint(x: targetX, y: 0), animated: false)
         }
-        pageControl.currentPage = next
+        let page = ((nextRawIndex % heroItems.count) + heroItems.count) % heroItems.count
+        pageControl.currentPage = page
     }
 }
 
@@ -381,8 +397,20 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
     func set(heroItems: [PromoItem]) {
         self.heroItems = heroItems
         self.pageControl.numberOfPages = heroItems.count
+        self.pageControl.currentPage = 0
         self.heroCollectionView.reloadData()
         self.heroCollectionView.superview?.isHidden = heroItems.isEmpty
+
+        if heroItems.count > 1 {
+            let middleIndex = (heroMultiplier / 2) * heroItems.count
+            let screenWidth = min(view.bounds.width, view.bounds.height)
+            let cardWidth = screenWidth - 32
+            let spacing: CGFloat = 12
+            let itemWidth = cardWidth + spacing
+            DispatchQueue.main.async { [weak self] in
+                self?.heroCollectionView.contentOffset = CGPoint(x: CGFloat(middleIndex) * itemWidth, y: 0)
+            }
+        }
         startAutoScroll()
     }
 

@@ -190,12 +190,16 @@ final class FeedV2HeroCell: UICollectionViewCell {
                 actionButton.isHidden = false
                 actionButton.setTitle("  Подробнее", for: .normal)
                 actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
+                actionButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
                 subtitleTrailingToContent.isActive = false
                 subtitleTrailingToButton.isActive = true
             } else {
-                actionButton.isHidden = true
-                subtitleTrailingToButton.isActive = false
-                subtitleTrailingToContent.isActive = true
+                actionButton.isHidden = false
+                actionButton.setTitle("  Читать", for: .normal)
+                actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
+                actionButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+                subtitleTrailingToContent.isActive = false
+                subtitleTrailingToButton.isActive = true
             }
 
         case nil:
@@ -204,9 +208,12 @@ final class FeedV2HeroCell: UICollectionViewCell {
             titleLabel.numberOfLines = 1
             subtitleLabel.text = item.info
             subtitleLabel.numberOfLines = 4
-            actionButton.isHidden = true
-            subtitleTrailingToButton.isActive = false
-            subtitleTrailingToContent.isActive = true
+            actionButton.isHidden = false
+            actionButton.setTitle("  Читать", for: .normal)
+            actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
+            actionButton.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+            subtitleTrailingToContent.isActive = false
+            subtitleTrailingToButton.isActive = true
         }
     }
 }

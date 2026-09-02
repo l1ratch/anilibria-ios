@@ -8,18 +8,30 @@
 import Combine
 import UIKit
 
-final class UserCollectionDetailViewController: BaseViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+final class UserCollectionDetailViewController: BaseCollectionViewController {
     private let key: UserCollectionKey
-    private var seriesList: [Series] = []
-    private var currentPage: Int = 1
-    private var hasMorePages: Bool = true
-    private var isLoadingPage: Bool = false
-
-    private var collectionView: UICollectionView!
+    private var viewModel: (any UserCollectionViewModelProtocol)!
     private var bag = Set<AnyCancellable>()
 
-    private lazy var userCollectionsService: UserCollectionsService = MainAppCoordinator.shared.container.resolve()
-    private lazy var favoriteService: FavoriteService = MainAppCoordinator.shared.container.resolve()
+    private let searchView = SearchView()
+    private var searchHeightConstraint: NSLayoutConstraint!
+    private var isSearchVisible = false
+
+    private lazy var searchButton = BarButton(
+        image: .System.search,
+        imageEdge: inset(0, 5, 0, 5)
+    ) { [weak self] in
+        self?.toggleSearch()
+    }
+
+    private lazy var filterButton = BarButton(image: .iconFilter) { [weak self] in
+        self?.viewModel.openFilter()
+    }
+
+    private let stubView: StubView? = StubView.fromNib()?.apply {
+        $0.set(image: .System.book, color: .Text.secondary)
+        $0.title = L10n.Stub.title
+    }
 
     init(key: UserCollectionKey) {
         self.key = key
@@ -32,114 +44,133 @@ final class UserCollectionDetailViewController: BaseViewController, UICollection
 
     override var isNavigationBarVisible: Bool { true }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        title = key.title
-        view.backgroundColor = .Surfaces.background
+    override func loadView() {
+        let root = UIView()
+        root.backgroundColor = .Surfaces.background
 
-        setupCollectionView()
-        loadData(page: 1)
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 16, right: 0)
+
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.backgroundColor = .clear
+        cv.translatesAutoresizingMaskIntoConstraints = false
+
+        root.addSubview(cv)
+        self.collectionView = cv
+        self.view = root
     }
 
-    private func setupCollectionView() {
-        let layout = UICollectionViewFlowLayout()
-        let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        let spacing: CGFloat = 12
-        let sideInset: CGFloat = 16
-        let totalSpacing = sideInset * 2 + spacing
-        let itemWidth = floor((screenWidth - totalSpacing) / 2)
-        let itemHeight: CGFloat = itemWidth * 1.5 + 44
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.title = key.title
+        self.view.backgroundColor = .Surfaces.background
 
-        layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
-        layout.minimumInteritemSpacing = spacing
-        layout.minimumLineSpacing = 16
-        layout.sectionInset = UIEdgeInsets(top: 16, left: sideInset, bottom: 96, right: sideInset)
-
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .clear
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.register(UserCollectionCardCell.self, forCellWithReuseIdentifier: UserCollectionCardCell.reuseIdentifier)
-
+        setupNavbar()
+        setupSearchView()
+        setupViewModel()
         self.addRefreshControl(scrollView: collectionView)
-
-        view.addSubview(collectionView)
-
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        self.collectionView.contentInset.top = 10
+        self.collectionView.contentInset.bottom = 88
     }
 
     override func refresh() {
         super.refresh()
-        loadData(page: 1)
+        viewModel.refresh()
     }
 
-    private func loadData(page: Int) {
-        guard !isLoadingPage else { return }
-        isLoadingPage = true
+    private func setupNavbar() {
+        navigationItem.setRightBarButtonItems([searchButton, filterButton], animated: false)
 
-        let publisher: AnyPublisher<[Series], Error>
-        if let type = key.collectionType {
-            publisher = userCollectionsService.fetchSeries(type: type, limit: 20, page: page, data: SeriesSearchData())
-        } else {
-            publisher = favoriteService.fetchSeries(limit: 20, page: page, data: SeriesSearchData())
-        }
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundEffect = UIBlurEffect(style: .systemMaterialDark)
+        appearance.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        appearance.titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 18, weight: .bold)
+        ]
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
 
-        publisher
-            .sink(onNext: { [weak self] items in
-                guard let self = self else { return }
-                self.isLoadingPage = false
-                self.refreshControl?.endRefreshing()
-                if page == 1 {
-                    self.seriesList = items
-                } else {
-                    self.seriesList.append(contentsOf: items)
-                }
-                self.hasMorePages = items.count >= 20
-                self.currentPage = page
-                self.collectionView.reloadData()
-            }, onError: { [weak self] _ in
-                guard let self = self else { return }
-                self.isLoadingPage = false
-                self.refreshControl?.endRefreshing()
-            })
+    private func setupSearchView() {
+        searchView.translatesAutoresizingMaskIntoConstraints = false
+        searchView.clipsToBounds = true
+        view.addSubview(searchView)
+
+        searchHeightConstraint = searchView.heightAnchor.constraint(equalToConstant: 0)
+
+        NSLayoutConstraint.activate([
+            searchView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            searchHeightConstraint,
+
+            collectionView.topAnchor.constraint(equalTo: searchView.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        searchView.querySequence()
+            .dropFirst()
+            .map { $0.trim() }
+            .removeDuplicates()
+            .debounce(for: .milliseconds(400), scheduler: DispatchQueue.main)
+            .sink { [weak self] text in
+                self?.viewModel.search(query: text)
+            }
             .store(in: &bag)
     }
 
-    // MARK: - UICollectionViewDataSource
+    private func toggleSearch() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        isSearchVisible.toggle()
+        searchHeightConstraint.constant = isSearchVisible ? 44 : 0
 
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        seriesList.count
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: UserCollectionCardCell.reuseIdentifier,
-            for: indexPath
-        ) as? UserCollectionCardCell else {
-            return UICollectionViewCell()
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            if !self.isSearchVisible {
+                self.viewModel.search(query: "")
+            }
         }
-        cell.configure(with: seriesList[indexPath.item])
-        return cell
     }
 
-    // MARK: - UICollectionViewDelegate
-
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let series = seriesList[indexPath.item]
-        let seriesVC = SeriesAssembly.createModule(series: series)
-        navigationController?.pushViewController(seriesVC, animated: true)
-    }
-
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if indexPath.item == seriesList.count - 4 && hasMorePages && !isLoadingPage {
-            loadData(page: currentPage + 1)
+    private func setupViewModel() {
+        let router = UserCollectionRouter(view: self, parent: nil)
+        if let type = key.collectionType {
+            let vm: UserCollectionViewModel = MainAppCoordinator.shared.container.resolve()
+            router.responder = vm
+            vm.bind(type: type, router: router)
+            self.viewModel = vm
+        } else {
+            let vm: FavoriteViewModel = MainAppCoordinator.shared.container.resolve()
+            router.responder = vm
+            vm.bind(router: router)
+            self.viewModel = vm
         }
+
+        viewModel.activityBehavior = self
+        set(sections: [SeriesSectionsAdapter(viewModel)])
+
+        viewModel.items.dropFirst().sink { [weak self] items in
+            guard let self = self else { return }
+            if items.isEmpty {
+                self.stubView?.message = L10n.Stub.Collection.message
+                self.collectionView.backgroundView = self.stubView
+            } else {
+                self.collectionView.backgroundView = nil
+            }
+        }.store(in: &bag)
+
+        viewModel.filterActive.sink { [weak self] active in
+            guard let self = self else { return }
+            self.filterButton.tintColor = active ? .Tint.active : .Tint.main
+        }.store(in: &bag)
+
+        viewModel.didLoad()
     }
 }

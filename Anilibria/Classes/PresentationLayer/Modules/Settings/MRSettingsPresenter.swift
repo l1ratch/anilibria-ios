@@ -116,14 +116,6 @@ extension SettingsPresenter: SettingsEventHandler {
 
         var customItems: [SettingsControlItem] = []
 
-        let isNewsHidden = UserDefaults.standard.bool(forKey: "hideNewsOnFeed")
-        let hideNewsItem = SettingsControlItem(
-            title: "Блок новостей на главной",
-            value: isNewsHidden ? "Скрыт" : "Показывается",
-            action: { [weak self] control in self?.selectNewsVisibility(control) }
-        )
-        customItems.append(hideNewsItem)
-
         let dockEditorItem = SettingsControlItem(
             title: "Настройка Дока",
             value: "",

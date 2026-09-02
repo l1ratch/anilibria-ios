@@ -30,13 +30,14 @@ protocol UserCollectionsV2EventHandler: AnyObject {
     func bind(view: UserCollectionsV2ViewBehavior, router: UserCollectionsV2Routable)
     func didLoad()
     func refresh()
-    func search(query: String)
+    func search()
+    func openFilter()
     func select(series: Series)
     func openDetail(for key: UserCollectionKey)
 }
 
 // MARK: - Routable
 
-protocol UserCollectionsV2Routable: BaseRoutable, SeriesRoute {
+protocol UserCollectionsV2Routable: BaseRoutable, SeriesRoute, SearchRoute, FilterRoute {
     func openDetail(for key: UserCollectionKey)
 }

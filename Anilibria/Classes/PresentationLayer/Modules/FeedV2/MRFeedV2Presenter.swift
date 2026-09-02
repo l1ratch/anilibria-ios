@@ -142,6 +142,27 @@ extension FeedV2Presenter: FeedV2EventHandler {
         }
     }
 
+    func selectPromoDetails(promo: PromoItem) {
+        let title: String
+        switch promo.content {
+        case .ad(let ad):
+            title = ad.title
+        case .promo(let item):
+            let t = item.title?.trimmingCharacters(in: .whitespacesAndNewlines)
+            title = (t?.isEmpty == false) ? t! : "Анонс"
+        case .release(let series):
+            title = series.name?.main ?? series.alias
+        case nil:
+            title = "Новость"
+        }
+
+        if !promo.info.isEmpty {
+            router.show(title: title, message: promo.info)
+        } else {
+            select(promo: promo)
+        }
+    }
+
     func selectRandom() {
         self.mainService.fetchRandom()
             .manageActivity(self.view.showLoading(fullscreen: false))

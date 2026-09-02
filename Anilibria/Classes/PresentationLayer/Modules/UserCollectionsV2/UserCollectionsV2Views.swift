@@ -61,7 +61,7 @@ final class UserCollectionHeaderReusableView: UICollectionReusableView {
         addSubview(seeAllButton)
 
         NSLayoutConstraint.activate([
-            iconContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            iconContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
             iconContainer.centerYAnchor.constraint(equalTo: centerYAnchor),
             iconContainer.widthAnchor.constraint(equalToConstant: 28),
             iconContainer.heightAnchor.constraint(equalToConstant: 28),
@@ -77,7 +77,7 @@ final class UserCollectionHeaderReusableView: UICollectionReusableView {
             countLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 6),
             countLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
 
-            seeAllButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            seeAllButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
             seeAllButton.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
     }

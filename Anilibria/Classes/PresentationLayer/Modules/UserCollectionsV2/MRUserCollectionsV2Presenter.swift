@@ -31,6 +31,7 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
     func bind(view: UserCollectionsV2ViewBehavior, router: UserCollectionsV2Routable) {
         self.view = view
         self.router = router
+        self.router.responder = self
     }
 
     func didLoad() {
@@ -59,14 +60,14 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
     private func loadAllCollections() {
         view.showLoading(true)
 
-        // Preferred order: Watching, Planned, Watched, Postponed, Abandoned, Favorite
+        // Favorite is now #1, followed by Watching, Planned, Watched, Postponed, Abandoned
         let orderedKeys: [UserCollectionKey] = [
+            .favorite,
             .watching,
             .planned,
             .watched,
             .postponed,
-            .abandoned,
-            .favorite
+            .abandoned
         ]
 
         var loadedSections: [UserCollectionGroupSection] = orderedKeys.map {
@@ -127,38 +128,22 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
             self.sections = loadedSections
             self.allSections = loadedSections
             self.view.showLoading(false)
-            if !self.currentQuery.isEmpty {
-                self.applySearchFilter(query: self.currentQuery)
-            } else {
-                self.view.set(sections: loadedSections)
-            }
+            self.view.set(sections: loadedSections)
         }
     }
 
-    func search(query: String) {
-        currentQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        applySearchFilter(query: currentQuery)
+    func search() {
+        router.openSearchScreen()
     }
 
-    private func applySearchFilter(query: String) {
-        if query.isEmpty {
-            sections = allSections
-        } else {
-            let lower = query.lowercased()
-            sections = allSections.compactMap { section in
-                let filteredItems = section.items.filter { item in
-                    let mainName = item.name?.main.lowercased() ?? ""
-                    let engName = item.name?.english.lowercased() ?? ""
-                    let alias = item.alias.lowercased()
-                    return mainName.contains(lower) || engName.contains(lower) || alias.contains(lower)
-                }
-                if filteredItems.isEmpty {
-                    return nil
-                }
-                return UserCollectionGroupSection(key: section.key, items: filteredItems, isLoading: false)
-            }
-        }
-        view.set(sections: sections)
+    func openFilter() {
+        userCollectionsService.fetchFilterData()
+            .sink(onNext: { [weak self] data in
+                self?.router.open(filter: [:], data: data)
+            }, onError: { [weak self] error in
+                self?.router.show(error: error)
+            })
+            .store(in: &bag)
     }
 
     func select(series: Series) {
@@ -167,5 +152,22 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
 
     func openDetail(for key: UserCollectionKey) {
         router.openDetail(for: key)
+    }
+}
+
+extension UserCollectionsV2Presenter: RouterCommandResponder {
+    func respond(command: RouteCommand) -> Bool {
+        if let searchCommand = command as? SearchResultCommand {
+            switch searchCommand.value {
+            case let .series(item):
+                self.select(series: item)
+            case let .google(query):
+                break
+            case .filter:
+                break
+            }
+            return true
+        }
+        return false
     }
 }

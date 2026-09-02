@@ -14,19 +14,15 @@ final class UserCollectionsV2ViewController: BaseViewController {
     private var sections: [UserCollectionGroupSection] = []
     private var collectionView: UICollectionView!
 
-    // Search Bar UI
-    private let searchContainer = UIView()
-    private var searchContainerHeightConstraint: NSLayoutConstraint!
-    private let searchTextField = UITextField()
-    private let searchIconView = UIImageView()
-    private let searchClearButton = UIButton(type: .system)
-    private var isSearchVisible = false
-
     private lazy var searchButton = BarButton(
-        image: UIImage(systemName: "magnifyingglass") ?? .System.search,
+        image: .System.search,
         imageEdge: inset(0, 5, 0, 5)
     ) { [weak self] in
-        self?.toggleSearch()
+        self?.handler.search()
+    }
+
+    private lazy var filterButton = BarButton(image: .iconFilter) { [weak self] in
+        self?.handler.openFilter()
     }
 
     override var isNavigationBarVisible: Bool { true }
@@ -39,7 +35,6 @@ final class UserCollectionsV2ViewController: BaseViewController {
         view.backgroundColor = .Surfaces.background
 
         setupNavigationBar()
-        setupSearchContainer()
         setupCollectionView()
 
         handler.didLoad()
@@ -55,7 +50,7 @@ final class UserCollectionsV2ViewController: BaseViewController {
     private func setupNavigationBar() {
         navigationItem.title = "Списки"
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.rightBarButtonItem = searchButton
+        navigationItem.setRightBarButtonItems([searchButton, filterButton], animated: false)
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
@@ -67,108 +62,6 @@ final class UserCollectionsV2ViewController: BaseViewController {
         ]
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-    }
-
-    // MARK: - Setup Search
-
-    private func setupSearchContainer() {
-        searchContainer.translatesAutoresizingMaskIntoConstraints = false
-        searchContainer.clipsToBounds = true
-        searchContainer.backgroundColor = .clear
-        view.addSubview(searchContainer)
-
-        let fieldBackground = UIView()
-        fieldBackground.translatesAutoresizingMaskIntoConstraints = false
-        fieldBackground.backgroundColor = UIColor.white.withAlphaComponent(0.08)
-        fieldBackground.layer.cornerRadius = 12
-        fieldBackground.layer.cornerCurve = .continuous
-        fieldBackground.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
-        fieldBackground.layer.borderWidth = 1
-        searchContainer.addSubview(fieldBackground)
-
-        searchIconView.translatesAutoresizingMaskIntoConstraints = false
-        searchIconView.image = UIImage(systemName: "magnifyingglass")
-        searchIconView.tintColor = .Text.secondary
-        searchIconView.contentMode = .scaleAspectFit
-        fieldBackground.addSubview(searchIconView)
-
-        searchTextField.translatesAutoresizingMaskIntoConstraints = false
-        searchTextField.placeholder = "Поиск по всем спискам..."
-        searchTextField.font = .systemFont(ofSize: 14, weight: .medium)
-        searchTextField.textColor = .Text.main
-        searchTextField.tintColor = UIColor(named: "buttons/selected") ?? .systemRed
-        searchTextField.returnKeyType = .search
-        searchTextField.autocorrectionType = .no
-        searchTextField.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
-        fieldBackground.addSubview(searchTextField)
-
-        searchClearButton.translatesAutoresizingMaskIntoConstraints = false
-        searchClearButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
-        searchClearButton.tintColor = .Text.secondary
-        searchClearButton.isHidden = true
-        searchClearButton.addTarget(self, action: #selector(didTapClearSearch), for: .touchUpInside)
-        fieldBackground.addSubview(searchClearButton)
-
-        searchContainerHeightConstraint = searchContainer.heightAnchor.constraint(equalToConstant: 0)
-
-        NSLayoutConstraint.activate([
-            searchContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            searchContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            searchContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            searchContainerHeightConstraint,
-
-            fieldBackground.topAnchor.constraint(equalTo: searchContainer.topAnchor, constant: 4),
-            fieldBackground.leadingAnchor.constraint(equalTo: searchContainer.leadingAnchor, constant: 16),
-            fieldBackground.trailingAnchor.constraint(equalTo: searchContainer.trailingAnchor, constant: -16),
-            fieldBackground.bottomAnchor.constraint(equalTo: searchContainer.bottomAnchor, constant: -4),
-
-            searchIconView.leadingAnchor.constraint(equalTo: fieldBackground.leadingAnchor, constant: 10),
-            searchIconView.centerYAnchor.constraint(equalTo: fieldBackground.centerYAnchor),
-            searchIconView.widthAnchor.constraint(equalToConstant: 18),
-            searchIconView.heightAnchor.constraint(equalToConstant: 18),
-
-            searchClearButton.trailingAnchor.constraint(equalTo: fieldBackground.trailingAnchor, constant: -10),
-            searchClearButton.centerYAnchor.constraint(equalTo: fieldBackground.centerYAnchor),
-            searchClearButton.widthAnchor.constraint(equalToConstant: 20),
-            searchClearButton.heightAnchor.constraint(equalToConstant: 20),
-
-            searchTextField.leadingAnchor.constraint(equalTo: searchIconView.trailingAnchor, constant: 8),
-            searchTextField.trailingAnchor.constraint(equalTo: searchClearButton.leadingAnchor, constant: -8),
-            searchTextField.centerYAnchor.constraint(equalTo: fieldBackground.centerYAnchor),
-            searchTextField.heightAnchor.constraint(equalToConstant: 32)
-        ])
-    }
-
-    private func toggleSearch() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        isSearchVisible.toggle()
-
-        searchContainerHeightConstraint.constant = isSearchVisible ? 48 : 0
-
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-            self.view.layoutIfNeeded()
-        } completion: { _ in
-            if self.isSearchVisible {
-                self.searchTextField.becomeFirstResponder()
-            } else {
-                self.searchTextField.text = ""
-                self.searchClearButton.isHidden = true
-                self.searchTextField.resignFirstResponder()
-                self.handler.search(query: "")
-            }
-        }
-    }
-
-    @objc private func searchTextChanged() {
-        let text = searchTextField.text ?? ""
-        searchClearButton.isHidden = text.isEmpty
-        handler.search(query: text)
-    }
-
-    @objc private func didTapClearSearch() {
-        searchTextField.text = ""
-        searchClearButton.isHidden = true
-        handler.search(query: "")
     }
 
     // MARK: - Setup Collection View
@@ -196,7 +89,7 @@ final class UserCollectionsV2ViewController: BaseViewController {
         view.addSubview(collectionView)
 
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: searchContainer.bottomAnchor),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)

@@ -22,6 +22,7 @@ protocol FeedV2EventHandler: ViewControllerEventHandler, RefreshEventHandler {
 
     func select(series: Series)
     func select(promo: PromoItem)
+    func selectPromoDetails(promo: PromoItem)
     func selectRandom()
     func allSchedule()
     func openCatalog()
