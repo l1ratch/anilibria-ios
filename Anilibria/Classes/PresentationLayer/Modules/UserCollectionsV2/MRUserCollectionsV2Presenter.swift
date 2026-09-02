@@ -148,7 +148,7 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
             sections = allSections.compactMap { section in
                 let filteredItems = section.items.filter { item in
                     let mainName = item.name?.main.lowercased() ?? ""
-                    let engName = item.name?.english?.lowercased() ?? ""
+                    let engName = item.name?.english.lowercased() ?? ""
                     let alias = item.alias.lowercased()
                     return mainName.contains(lower) || engName.contains(lower) || alias.contains(lower)
                 }
