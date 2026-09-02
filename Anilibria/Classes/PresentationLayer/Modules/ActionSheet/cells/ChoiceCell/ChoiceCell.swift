@@ -11,8 +11,10 @@ public final class ChoiceCell: RippleViewCell {
     func configure(_ item: ChoiceItem) {
         cancellables.removeAll()
         self.titleLabel.attributedText = item.title
+        self.iconView.image = UIImage(systemName: "checkmark")
+        self.iconView.tintColor = .Tint.active
         self.iconView.isHidden = !item.isSelected
-        self.rippleContainerView.smoothCorners(with: 4)
+        self.rippleContainerView.smoothCorners(with: 10)
 
         item.$isSelected.sink(receiveValue: { [weak self] value in
             self?.iconView.isHidden = !value

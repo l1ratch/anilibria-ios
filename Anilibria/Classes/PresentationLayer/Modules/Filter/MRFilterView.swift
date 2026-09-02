@@ -22,7 +22,7 @@ final class FilterViewController: BaseCollectionViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .clear
         self.backView.backgroundColor = .Surfaces.background
-        self.backView.smoothCorners(with: 5, maskedCorners: .topCorners)
+        self.backView.smoothCorners(with: 16, maskedCorners: .topCorners)
         self.collectionView.frame = UIApplication.getWindow()?.frame ?? .zero
         self.handler.didLoad()
 
@@ -30,7 +30,7 @@ final class FilterViewController: BaseCollectionViewController {
             self?.handler.back()
         }
 
-        self.collectionView.layer.cornerRadius = 5
+        self.collectionView.layer.cornerRadius = 16
         self.collectionView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         self.bag = self.collectionView.observe(\UICollectionView.contentSize) { [weak self] _, _ in
             if let height = self?.collectionView.contentSize.height {
