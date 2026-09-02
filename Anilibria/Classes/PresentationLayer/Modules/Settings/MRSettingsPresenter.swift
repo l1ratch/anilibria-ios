@@ -118,19 +118,11 @@ extension SettingsPresenter: SettingsEventHandler {
 
         let isNewsHidden = UserDefaults.standard.bool(forKey: "hideNewsOnFeed")
         let hideNewsItem = SettingsControlItem(
-            title: "Баннеры новостей на главной",
-            value: isNewsHidden ? "Скрыты" : "Показываются",
+            title: "Блок новостей на главной",
+            value: isNewsHidden ? "Скрыт" : "Показывается",
             action: { [weak self] control in self?.selectNewsVisibility(control) }
         )
         customItems.append(hideNewsItem)
-
-        let isScheduleHidden = UserDefaults.standard.bool(forKey: "hideScheduleOnFeed")
-        let hideScheduleItem = SettingsControlItem(
-            title: "Расписание на главной",
-            value: isScheduleHidden ? "Скрыто" : "Показывается",
-            action: { [weak self] control in self?.selectScheduleVisibility(control) }
-        )
-        customItems.append(hideScheduleItem)
 
         let dockEditorItem = SettingsControlItem(
             title: "Настройка Дока",
@@ -152,7 +144,7 @@ extension SettingsPresenter: SettingsEventHandler {
                 didSelect: { _ in
                     UserDefaults.standard.set(false, forKey: "hideNewsOnFeed")
                     NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
-                    control.value = "Показываются"
+                    control.value = "Показывается"
                     return true
                 }
             ),
@@ -163,36 +155,7 @@ extension SettingsPresenter: SettingsEventHandler {
                 didSelect: { _ in
                     UserDefaults.standard.set(true, forKey: "hideNewsOnFeed")
                     NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
-                    control.value = "Скрыты"
-                    return true
-                }
-            )
-        ]
-        self.router.openSheet(with: [ChoiceGroup(items: items)])
-    }
-
-    func selectScheduleVisibility(_ control: SettingsControlItem) {
-        let isHidden = UserDefaults.standard.bool(forKey: "hideScheduleOnFeed")
-        let items = [
-            ChoiceItem(
-                value: false,
-                title: "Показывать",
-                isSelected: !isHidden,
-                didSelect: { _ in
-                    UserDefaults.standard.set(false, forKey: "hideScheduleOnFeed")
-                    NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
-                    control.value = "Показывается"
-                    return true
-                }
-            ),
-            ChoiceItem(
-                value: true,
-                title: "Скрывать",
-                isSelected: isHidden,
-                didSelect: { _ in
-                    UserDefaults.standard.set(true, forKey: "hideScheduleOnFeed")
-                    NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
-                    control.value = "Скрыто"
+                    control.value = "Скрыт"
                     return true
                 }
             )

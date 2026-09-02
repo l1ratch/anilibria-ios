@@ -25,7 +25,7 @@ public final class MenuItemsControllersFactory {
         items.map(create(for:))
     }
 
-    public static func createSingle(for item: MenuItem) -> MenuControllerData {
+    static func createSingle(for item: MenuItem) -> MenuControllerData {
         return create(for: item)
     }
 

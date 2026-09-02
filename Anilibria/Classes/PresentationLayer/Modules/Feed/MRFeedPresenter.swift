@@ -166,8 +166,7 @@ extension FeedPresenter: FeedEventHandler {
 
         items.append([randomSeries])
 
-        let hideSchedule = UserDefaults.standard.bool(forKey: "hideScheduleOnFeed")
-        if !hideSchedule, schedule.items.isEmpty == false {
+        if schedule.items.isEmpty == false {
             soonViewModel = SoonViewModel(schedule)
             soonViewModel?.selectSeries = { [weak self] series in
                 self?.select(series: series)
