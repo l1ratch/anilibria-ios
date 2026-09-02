@@ -139,7 +139,7 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
     func openFilter() {
         userCollectionsService.fetchFilterData()
             .sink(onNext: { [weak self] data in
-                self?.router.open(filter: [:], data: data)
+                self?.router.open(filter: .init(), data: data)
             }, onError: { [weak self] error in
                 self?.router.show(error: error)
             })
@@ -161,7 +161,7 @@ extension UserCollectionsV2Presenter: RouterCommandResponder {
             switch searchCommand.value {
             case let .series(item):
                 self.select(series: item)
-            case let .google(query):
+            case .google:
                 break
             case .filter:
                 break
