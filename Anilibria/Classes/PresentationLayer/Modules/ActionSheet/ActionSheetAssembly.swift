@@ -31,7 +31,7 @@ extension ActionSheetRoute where Self: RouterProtocol {
     func openSheet(with source: any ActionSheetGroupSource) {
         source.fetchItems { [weak self] groups in
             guard let self else { return }
-            let groupTitle = groups.first?.title?.string
+            let groupTitle = groups.first?.title
             let alert = UIAlertController(
                 title: (groupTitle?.isEmpty == false) ? groupTitle : nil,
                 message: nil,

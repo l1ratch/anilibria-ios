@@ -58,7 +58,7 @@ public final class ChoiceItem: NSObject {
         self.isSelected = isSelected
     }
 
-    fileprivate func select() -> Bool {
+    public func select() -> Bool {
         didSelect?(self)
         return value.select()
     }
