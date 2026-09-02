@@ -18,7 +18,7 @@ public final class LinkView: UIView {
     }
 
     private func setup() {
-        self.smoothCorners(with: 5)
+        self.smoothCorners(with: 10)
     }
 
     func setTap(handler: Action<LinkData>?) {

@@ -23,7 +23,7 @@ final class EpisodeCell: RippleViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        timeLabel.superview?.smoothCorners(with: 6)
+        timeLabel.superview?.smoothCorners(with: 8)
         progressView.transform = .init(scaleX: 1, y: 2)
     }
 

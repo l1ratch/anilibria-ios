@@ -29,7 +29,7 @@ public final class SeriesCollectionTypeView: UIView {
 
     public override func awakeFromNib() {
         super.awakeFromNib()
-        smoothCorners(with: 8)
+        smoothCorners(with: 12)
         shimmerView.backgroundColor = .Tint.shimmer
         shimmerView.shimmerColor = .Surfaces.base
         isLoading = false
