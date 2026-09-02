@@ -73,8 +73,11 @@ jobs:
         run: |
           echo "=== EXTRACTED ERRORS ==="
           grep -C 3 -i "error:" xcodebuild.log || true
-          echo "=== TAIL LOG ==="
-          tail -n 80 xcodebuild.log || true
+          echo "=== STEP SUMMARY ==="
+          echo "### Build Errors" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -C 4 -i "error:" xcodebuild.log | head -n 50 >> $GITHUB_STEP_SUMMARY || tail -n 50 xcodebuild.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Build Log Artifact
         if: always()
