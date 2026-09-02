@@ -10,6 +10,6 @@ import UIKit
 
 // MARK: - Router
 
-protocol UserCollectionRoutable: BaseRoutable, SeriesRoute, FilterRoute {}
+protocol UserCollectionRoutable: BaseRoutable, SeriesRoute, FilterRoute, SearchRoute {}
 
 final class UserCollectionRouter: BaseRouter, UserCollectionRoutable {}
