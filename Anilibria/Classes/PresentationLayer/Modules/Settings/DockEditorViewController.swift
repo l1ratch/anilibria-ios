@@ -64,6 +64,7 @@ final class DockEditorViewController: BaseViewController {
         tableView.isEditing = true
         tableView.allowsSelectionDuringEditing = false
         tableView.alwaysBounceVertical = false
+        tableView.isScrollEnabled = false
         tableView.backgroundColor = .Surfaces.background
         tableView.register(DockCell.self, forCellReuseIdentifier: "DockCell")
     }
@@ -74,9 +75,11 @@ final class DockEditorViewController: BaseViewController {
         tableView.reloadData()
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        NotificationCenter.default.post(name: NSNotification.Name("dockItemsChanged"), object: nil)
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isMovingFromParent || navigationController == nil {
+            NotificationCenter.default.post(name: NSNotification.Name("dockItemsChanged"), object: nil)
+        }
     }
 
     @objc private func resetToDefaults() {

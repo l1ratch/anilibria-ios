@@ -58,6 +58,12 @@ final class FeedV2ViewController: BaseViewController {
         handler.refreshIfNeeded()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let contentHeight = contentStackView.frame.height + scrollView.contentInset.top + scrollView.contentInset.bottom
+        scrollView.isScrollEnabled = contentHeight > scrollView.bounds.height
+    }
+
     // MARK: - Setup Navigation & Scroll
 
     private func setupNavigationBar() {
@@ -69,7 +75,7 @@ final class FeedV2ViewController: BaseViewController {
     private func setupScrollView() {
         view.addSubview(scrollView)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.alwaysBounceVertical = true
+        scrollView.alwaysBounceVertical = false
         scrollView.showsVerticalScrollIndicator = false
         scrollView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 96, right: 0)
 
@@ -271,11 +277,35 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
         }
     }
 
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if scrollView == heroCollectionView {
+            let screenWidth = min(view.bounds.width, view.bounds.height)
+            let cardWidth = screenWidth - 32
+            let spacing: CGFloat = 12
+            let itemWidth = cardWidth + spacing
+
+            let rawTarget = targetContentOffset.pointee.x
+            let index: CGFloat
+            if velocity.x > 0.2 {
+                index = ceil(scrollView.contentOffset.x / itemWidth)
+            } else if velocity.x < -0.2 {
+                index = floor(scrollView.contentOffset.x / itemWidth)
+            } else {
+                index = round(rawTarget / itemWidth)
+            }
+
+            let clampedIndex = max(0, min(Int(index), heroItems.count - 1))
+            let targetX = CGFloat(clampedIndex) * itemWidth
+            targetContentOffset.pointee = CGPoint(x: targetX, y: targetContentOffset.pointee.y)
+        }
+    }
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView == heroCollectionView {
-            let pageWidth = scrollView.frame.width - 32
-            if pageWidth > 0 {
-                let page = Int((scrollView.contentOffset.x + pageWidth / 2) / pageWidth)
+            let screenWidth = min(view.bounds.width, view.bounds.height)
+            let itemWidth = (screenWidth - 32) + 12
+            if itemWidth > 0 {
+                let page = Int(round(scrollView.contentOffset.x / itemWidth))
                 pageControl.currentPage = max(0, min(page, heroItems.count - 1))
             }
         }
