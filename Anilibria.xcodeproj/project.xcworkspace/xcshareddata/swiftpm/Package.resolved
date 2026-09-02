@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "appmetrica-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/appmetrica/appmetrica-sdk-ios",
+      "state" : {
+        "revision" : "5c2dfd7532e355fd5b487c1d773834a4ff01a755",
+        "version" : "5.12.0"
+      }
+    },
+    {
       "identity" : "ditranquillity",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ivlevAstef/DITranquillity.git",
@@ -16,6 +25,15 @@
       "state" : {
         "revision" : "277f1ab2c6664b19b4a412e32b094b201e2d5757",
         "version" : "7.10.0"
+      }
+    },
+    {
+      "identity" : "kscrash",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kstenerud/KSCrash",
+      "state" : {
+        "revision" : "c0177658fc771ae833b6d3b8f5f3f5a14d59ec03",
+        "version" : "2.1.2"
       }
     },
     {
