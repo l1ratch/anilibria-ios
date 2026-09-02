@@ -7,6 +7,30 @@ public enum MenuItemType: String, CaseIterable {
     var index: Int {
         return MenuItemType.allCases.firstIndex(of: self) ?? 0
     }
+
+    public var title: String {
+        switch self {
+        case .feed: return "Главная"
+        case .catalog: return "Каталог"
+        case .news: return "Новости"
+        case .collections: return "Коллекции"
+        case .other: return "Другое"
+        }
+    }
+
+    public var sfSymbol: String {
+        switch self {
+        case .feed: return "house.fill"
+        case .catalog: return "play.rectangle.on.rectangle.fill"
+        case .news: return "newspaper.fill"
+        case .collections: return "square.stack.3d.up.fill"
+        case .other: return "ellipsis.circle.fill"
+        }
+    }
+
+    public var icon: UIImage? {
+        return UIImage(systemName: sfSymbol)
+    }
 }
 
 public typealias DoubleImage = (normal: UIImage, selected: UIImage)
@@ -32,12 +56,8 @@ public final class MenuListItem: ListItem<[MenuItem]> {}
 
 public final class MenuItemsFactory {
     static func create() -> [MenuItem] {
-        return [
-            MenuItem(type: .feed, icon: .System.news),
-            MenuItem(type: .catalog, icon: .System.search),
-            MenuItem(type: .news, icon: .iconYoutube),
-            MenuItem(type: .collections, icon: .System.book),
-            MenuItem(type: .other, icon: .System.dots)
-        ]
+        return MenuItemType.allCases.map { type in
+            MenuItem(type: type, icon: type.icon)
+        }
     }
 }

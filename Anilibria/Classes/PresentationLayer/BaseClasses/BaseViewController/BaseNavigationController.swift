@@ -15,6 +15,13 @@ open class BaseNavigationController: UINavigationController {
         delegate = self
     }
 
+    open override func pushViewController(_ viewController: UIViewController, animated: Bool) {
+        if !viewControllers.isEmpty {
+            viewController.hidesBottomBarWhenPushed = true
+        }
+        super.pushViewController(viewController, animated: animated)
+    }
+
     open override var preferredStatusBarStyle: UIStatusBarStyle {
         return self.viewControllers.last?.preferredStatusBarStyle ?? .default
     }
