@@ -41,12 +41,7 @@ public class DependenciesConfigurationBase: DependenciesConfiguration, Loggable 
     }
 
     private func setupMetrica() {
-        #if targetEnvironment(macCatalyst)
-        #else
-        if let config = AppMetricaConfiguration(apiKey: Keys.yandexMetricaApiKey) {
-            AppMetrica.activate(with: config)
-        }
-        #endif
+        // Disabled to prevent legacy AppMetrica crashes on iOS 16+ / modern iOS betas
     }
 
     private func setupModulesDependencies() {

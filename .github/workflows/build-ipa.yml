@@ -80,6 +80,13 @@ jobs:
           fi
           echo "Found app at: $APP_PATH"
           cp -r "$APP_PATH" Payload/
+          
+          echo "Applying ad-hoc signing to frameworks and app bundle..."
+          find Payload -name "*.framework" -o -name "*.dylib" | while read -r lib; do
+            codesign --force --deep --sign - "$lib" || true
+          done
+          codesign --force --deep --sign - "Payload/AniLiberty.app" || true
+
           zip -vr AniLiberty.ipa Payload
 
           DSYM_PATH=$(find ./Build -name "AniLiberty.app.dSYM" -type d | head -n 1)
