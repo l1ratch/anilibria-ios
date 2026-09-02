@@ -73,6 +73,11 @@ final class DockEditorViewController: BaseViewController {
         tableView.reloadData()
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.post(name: NSNotification.Name("dockItemsChanged"), object: nil)
+    }
+
     @objc private func resetToDefaults() {
         let alert = UIAlertController(
             title: "Сброс панели",
@@ -81,14 +86,14 @@ final class DockEditorViewController: BaseViewController {
         )
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         alert.addAction(UIAlertAction(title: "Сбросить", style: .destructive) { [weak self] _ in
-            MenuItemsFactory.setActiveTypes(MenuItemsFactory.defaultActiveTypes)
+            MenuItemsFactory.setActiveTypes(MenuItemsFactory.defaultActiveTypes, notify: false)
             self?.loadData()
         })
         present(alert, animated: true)
     }
 
     private func saveChanges() {
-        MenuItemsFactory.setActiveTypes(activeItems)
+        MenuItemsFactory.setActiveTypes(activeItems, notify: false)
     }
 }
 

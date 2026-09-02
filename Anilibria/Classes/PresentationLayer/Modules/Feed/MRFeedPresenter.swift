@@ -156,14 +156,17 @@ extension FeedPresenter: FeedEventHandler {
     private func create(promo: [PromoItem], schedule: ShortSchedule) {
         var items: [any Hashable] = []
 
-        let promoModel = PromoViewModel(items: promo) { [weak self] item in
-            self?.open(promo: item)
+        let hideNews = UserDefaults.standard.bool(forKey: "hideNewsOnFeed")
+        if !hideNews, !promo.isEmpty {
+            let promoModel = PromoViewModel(items: promo) { [weak self] item in
+                self?.open(promo: item)
+            }
+            items.append(promoModel)
         }
 
-        items.append(promoModel)
         items.append([randomSeries])
 
-        let hideSchedule = UserDefaults.standard.bool(forKey: "hideNewsOnFeed")
+        let hideSchedule = UserDefaults.standard.bool(forKey: "hideScheduleOnFeed")
         if !hideSchedule, schedule.items.isEmpty == false {
             soonViewModel = SoonViewModel(schedule)
             soonViewModel?.selectSeries = { [weak self] series in

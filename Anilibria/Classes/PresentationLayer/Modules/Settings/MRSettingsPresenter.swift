@@ -39,20 +39,20 @@ extension SettingsPresenter: SettingsEventHandler {
 
     func didLoad() {
         bag.removeAll()
-        var items: [SettingsControlItem] = []
+        var commonItems: [SettingsControlItem] = []
         let languageItem = SettingsControlItem(
             title: L10n.Screen.Settings.language,
             value: Language.current.name,
             action: { [weak self] _ in self?.selectLanguage() }
         )
-        items.append(languageItem)
+        commonItems.append(languageItem)
 
         let appearanceItem = SettingsControlItem(
             title: L10n.Common.appearance,
             value: InterfaceAppearance.current.title,
             action: { [weak self] in self?.selectAppearance($0) }
         )
-        items.append(appearanceItem)
+        commonItems.append(appearanceItem)
 
         if UIDevice.current.userInterfaceIdiom == .phone {
             let orientation = SettingsControlItem(
@@ -60,43 +60,45 @@ extension SettingsPresenter: SettingsEventHandler {
                 value: InterfaceOrientation.current.title,
                 action: { [weak self] in self?.selectOrientation($0) }
             )
-            items.append(orientation)
+            commonItems.append(orientation)
         }
+
+        var playerItems: [SettingsControlItem] = []
 
         let qualityItem = SettingsControlItem(
             title: L10n.Screen.Settings.videoQuality,
             value: "",
             action: { [weak self] _ in self?.selectQuality() }
         )
-        items.append(qualityItem)
+        playerItems.append(qualityItem)
 
         let speedItem = SettingsControlItem(
             title: L10n.Common.playbackRate,
             value: "",
             action: { [weak self] _ in self?.selectPlaybackRate() }
         )
-        items.append(speedItem)
+        playerItems.append(speedItem)
 
         let skipItem = SettingsControlItem(
             title: L10n.Common.skipCredits,
             value: "",
             action: { [weak self] _ in self?.selectSkipMode() }
         )
-        items.append(skipItem)
+        playerItems.append(skipItem)
 
         let autoplayItem = SettingsControlItem(
             title: L10n.Common.autoPlayLong,
             value: "",
             action: { [weak self] _ in self?.selectAutoplay() }
         )
-        items.append(autoplayItem)
+        playerItems.append(autoplayItem)
 
         let startupItem = SettingsControlItem(
             title: L10n.Common.playOnStartup,
             value: "",
             action: { [weak self] _ in self?.selectStartupPlay() }
         )
-        items.append(startupItem)
+        playerItems.append(startupItem)
 
         playerService.observeSettings().sink { [weak self] settings in
             self?.playerSettings = settings
@@ -109,17 +111,26 @@ extension SettingsPresenter: SettingsEventHandler {
 
         self.view.set(name: Bundle.main.displayName ?? "",
                       version: Bundle.main.releaseVersionNumber ?? "")
-        self.view.set(common: items)
+        self.view.set(common: commonItems)
+        self.view.set(player: playerItems)
 
         var customItems: [SettingsControlItem] = []
 
         let isNewsHidden = UserDefaults.standard.bool(forKey: "hideNewsOnFeed")
         let hideNewsItem = SettingsControlItem(
-            title: "Блок новостей на главной",
-            value: isNewsHidden ? "Скрыт" : "Показывается",
+            title: "Баннеры новостей на главной",
+            value: isNewsHidden ? "Скрыты" : "Показываются",
             action: { [weak self] control in self?.selectNewsVisibility(control) }
         )
         customItems.append(hideNewsItem)
+
+        let isScheduleHidden = UserDefaults.standard.bool(forKey: "hideScheduleOnFeed")
+        let hideScheduleItem = SettingsControlItem(
+            title: "Расписание на главной",
+            value: isScheduleHidden ? "Скрыто" : "Показывается",
+            action: { [weak self] control in self?.selectScheduleVisibility(control) }
+        )
+        customItems.append(hideScheduleItem)
 
         let dockEditorItem = SettingsControlItem(
             title: "Настройка Дока",
@@ -141,18 +152,47 @@ extension SettingsPresenter: SettingsEventHandler {
                 didSelect: { _ in
                     UserDefaults.standard.set(false, forKey: "hideNewsOnFeed")
                     NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
+                    control.value = "Показываются"
+                    return true
+                }
+            ),
+            ChoiceItem(
+                value: true,
+                title: "Скрывать",
+                isSelected: isHidden,
+                didSelect: { _ in
+                    UserDefaults.standard.set(true, forKey: "hideNewsOnFeed")
+                    NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
+                    control.value = "Скрыты"
+                    return true
+                }
+            )
+        ]
+        self.router.openSheet(with: [ChoiceGroup(items: items)])
+    }
+
+    func selectScheduleVisibility(_ control: SettingsControlItem) {
+        let isHidden = UserDefaults.standard.bool(forKey: "hideScheduleOnFeed")
+        let items = [
+            ChoiceItem(
+                value: false,
+                title: "Показывать",
+                isSelected: !isHidden,
+                didSelect: { _ in
+                    UserDefaults.standard.set(false, forKey: "hideScheduleOnFeed")
+                    NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
                     control.value = "Показывается"
                     return true
                 }
             ),
             ChoiceItem(
                 value: true,
-                title: "Скрыть",
+                title: "Скрывать",
                 isSelected: isHidden,
                 didSelect: { _ in
-                    UserDefaults.standard.set(true, forKey: "hideNewsOnFeed")
+                    UserDefaults.standard.set(true, forKey: "hideScheduleOnFeed")
                     NotificationCenter.default.post(name: NSNotification.Name("feedSettingsChanged"), object: nil)
-                    control.value = "Скрыт"
+                    control.value = "Скрыто"
                     return true
                 }
             )

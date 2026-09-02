@@ -25,6 +25,10 @@ public final class MenuItemsControllersFactory {
         items.map(create(for:))
     }
 
+    public static func createSingle(for item: MenuItem) -> MenuControllerData {
+        return create(for: item)
+    }
+
     private static func create(for item: MenuItem) -> MenuControllerData {
         var result: UIViewController
         switch item.type {

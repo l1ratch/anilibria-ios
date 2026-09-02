@@ -16,6 +16,8 @@
                 <outlet property="appVersionLabel" destination="4MD-HM-w2R" id="mKk-XV-o9W"/>
                 <outlet property="commonStackView" destination="KeC-Kr-43u" id="fZU-Oy-nEO"/>
                 <outlet property="commonTitleLabel" destination="pc8-n4-FsJ" id="h4j-DZ-BFz"/>
+                <outlet property="playerStackView" destination="plr-St-43u" id="plr-out-stk"/>
+                <outlet property="playerTitleLabel" destination="plr-Lbl-FsJ" id="plr-out-lbl"/>
                 <outlet property="customizationStackView" destination="cst-St-43u" id="cst-out-stk"/>
                 <outlet property="customizationTitleLabel" destination="cst-Lbl-FsJ" id="cst-out-lbl"/>
                 <outlet property="view" destination="avC-q5-7uI" id="dPr-11-Xas"/>
@@ -33,7 +35,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="414" height="848"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="38f-9L-P5k">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="308"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="414"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sw5-29-Lhq">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="0.0"/>
@@ -89,9 +91,56 @@
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </view>
-                                        <!-- Card 2: Customization (Dock & Feed) -->
-                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cst-Cr-C1H" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
+                                        <!-- Card 2: Player -->
+                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="plr-Cr-C1H" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
                                             <rect key="frame" x="16" y="122" width="382" height="90"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="plr-Lm-by5">
+                                                    <rect key="frame" x="0.0" y="0.0" width="382" height="90"/>
+                                                    <subviews>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="plr-Wm-gH9">
+                                                            <rect key="frame" x="0.0" y="0.0" width="382" height="40"/>
+                                                            <subviews>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Плеер" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="plr-Lbl-FsJ">
+                                                                    <rect key="frame" x="16" y="11.5" width="350" height="17"/>
+                                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
+                                                                    <color key="textColor" name="buttons/selected"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                            </subviews>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="trailing" secondItem="plr-Lbl-FsJ" secondAttribute="trailing" constant="16" id="plr-tr-16"/>
+                                                                <constraint firstItem="plr-Lbl-FsJ" firstAttribute="centerY" secondItem="plr-Wm-gH9" secondAttribute="centerY" id="plr-cy-00"/>
+                                                                <constraint firstItem="plr-Lbl-FsJ" firstAttribute="leading" secondItem="plr-Wm-gH9" secondAttribute="leading" constant="16" id="plr-ld-16"/>
+                                                                <constraint firstAttribute="height" constant="40" id="plr-ht-40"/>
+                                                            </constraints>
+                                                        </view>
+                                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="plr-St-43u">
+                                                            <rect key="frame" x="0.0" y="40" width="382" height="50"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" priority="1" id="plr-hp-11"/>
+                                                            </constraints>
+                                                        </stackView>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <color key="backgroundColor" name="surfaces/content"/>
+                                            <constraints>
+                                                <constraint firstItem="plr-Lm-by5" firstAttribute="top" secondItem="plr-Cr-C1H" secondAttribute="top" id="plr-top-00"/>
+                                                <constraint firstAttribute="bottom" secondItem="plr-Lm-by5" secondAttribute="bottom" id="plr-btm-00"/>
+                                                <constraint firstItem="plr-Lm-by5" firstAttribute="leading" secondItem="plr-Cr-C1H" secondAttribute="leading" id="plr-lft-00"/>
+                                                <constraint firstAttribute="trailing" secondItem="plr-Lm-by5" secondAttribute="trailing" id="plr-rgt-00"/>
+                                            </constraints>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                    <real key="value" value="16"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </view>
+                                        <!-- Card 3: Customization (Dock & Feed) -->
+                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cst-Cr-C1H" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
+                                            <rect key="frame" x="16" y="228" width="382" height="90"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="cst-Lm-by5">
                                                     <rect key="frame" x="0.0" y="0.0" width="382" height="90"/>
@@ -136,9 +185,9 @@
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </view>
-                                        <!-- Card 3: About -->
+                                        <!-- Card 4: About -->
                                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GOa-WO-wbt" customClass="BorderedView" customModule="Anilibria" customModuleProvider="target">
-                                            <rect key="frame" x="16" y="228" width="382" height="80"/>
+                                            <rect key="frame" x="16" y="334" width="382" height="80"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="TQG-ru-Pzz">
                                                     <rect key="frame" x="0.0" y="0.0" width="382" height="80"/>
@@ -204,6 +253,8 @@
                                         </view>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="plr-Cr-C1H" firstAttribute="leading" secondItem="38f-9L-P5k" secondAttribute="leading" constant="16" id="plr-card-ld"/>
+                                        <constraint firstAttribute="trailing" secondItem="plr-Cr-C1H" secondAttribute="trailing" constant="16" id="plr-card-tr"/>
                                         <constraint firstItem="cst-Cr-C1H" firstAttribute="leading" secondItem="38f-9L-P5k" secondAttribute="leading" constant="16" id="cst-card-ld"/>
                                         <constraint firstAttribute="trailing" secondItem="cst-Cr-C1H" secondAttribute="trailing" constant="16" id="cst-card-tr"/>
                                         <constraint firstItem="sFx-AO-C1H" firstAttribute="leading" secondItem="38f-9L-P5k" secondAttribute="leading" constant="16" id="ORU-92-hnF"/>

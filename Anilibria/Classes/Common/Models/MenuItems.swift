@@ -76,14 +76,16 @@ public final class MenuItemsFactory {
         return defaultActiveTypes
     }
 
-    public static func setActiveTypes(_ types: [MenuItemType]) {
+    public static func setActiveTypes(_ types: [MenuItemType], notify: Bool = true) {
         var finalTypes = types
         if !finalTypes.contains(.other) {
             finalTypes.append(.other)
         }
         let rawArray = finalTypes.map { $0.rawValue }
         UserDefaults.standard.set(rawArray, forKey: dockItemsKey)
-        NotificationCenter.default.post(name: NSNotification.Name("dockItemsChanged"), object: nil)
+        if notify {
+            NotificationCenter.default.post(name: NSNotification.Name("dockItemsChanged"), object: nil)
+        }
     }
 
     public static func getHiddenTypes() -> [MenuItemType] {

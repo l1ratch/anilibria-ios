@@ -60,9 +60,12 @@ final class SettingsControlView: LoadableView {
         } else if title == L10n.Common.playOnStartup {
             symbolName = "play.rectangle.fill"
             tint = .systemRed
-        } else if title.contains("новост") || title.contains("News") || title.contains("Лент") {
+        } else if title.contains("новост") || title.contains("News") || title.contains("Баннер") {
             symbolName = "newspaper.fill"
             tint = .systemOrange
+        } else if title.contains("Расписан") || title.contains("Schedule") {
+            symbolName = "calendar"
+            tint = .systemTeal
         } else if title.contains("Док") || title.contains("Dock") || title.contains("панел") {
             symbolName = "dock.rectangle"
             tint = .systemPurple

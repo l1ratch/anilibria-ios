@@ -7,6 +7,9 @@ final class SettingsViewController: BaseViewController {
     @IBOutlet var commonTitleLabel: UILabel!
     @IBOutlet var commonStackView: UIStackView!
 
+    @IBOutlet var playerTitleLabel: UILabel!
+    @IBOutlet var playerStackView: UIStackView!
+
     @IBOutlet var customizationTitleLabel: UILabel!
     @IBOutlet var customizationStackView: UIStackView!
 
@@ -26,6 +29,7 @@ final class SettingsViewController: BaseViewController {
     private func setupCards() {
         for card in [
             commonStackView?.superview?.superview,
+            playerStackView?.superview?.superview,
             customizationStackView?.superview?.superview,
             appNameLabel?.superview?.superview?.superview
         ] {
@@ -40,6 +44,7 @@ final class SettingsViewController: BaseViewController {
         self.handler.didLoad()
         self.navigationItem.title = L10n.Screen.Settings.title
         self.commonTitleLabel.text = L10n.Screen.Settings.common
+        self.playerTitleLabel?.text = "Плеер"
         self.customizationTitleLabel?.text = "Кастомизация"
         self.aboutTitleLabel.text = L10n.Screen.Settings.aboutApp
     }
@@ -61,6 +66,20 @@ extension SettingsViewController: SettingsViewBehavior {
             let view = SettingsControlView()
             view.configure(item: $0)
             commonStackView.addArrangedSubview(view)
+        }
+    }
+
+    func set(player items: [SettingsControlItem]) {
+        guard let playerStackView = playerStackView else { return }
+        playerStackView.arrangedSubviews.forEach {
+            playerStackView.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+
+        items.forEach {
+            let view = SettingsControlView()
+            view.configure(item: $0)
+            playerStackView.addArrangedSubview(view)
         }
     }
 
