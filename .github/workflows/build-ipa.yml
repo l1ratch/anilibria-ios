@@ -56,7 +56,7 @@ jobs:
         run: |
           xcodebuild build \
             -project Anilibria.xcodeproj \
-            -scheme AniLiberty \
+            -scheme Anilibria \
             -destination "generic/platform=iOS" \
             -configuration Release \
             -derivedDataPath ./Build \
