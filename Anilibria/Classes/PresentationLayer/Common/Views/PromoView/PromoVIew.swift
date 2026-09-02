@@ -37,7 +37,7 @@ final class PromoView: LoadableView {
         adView.borderColor = .Text.monoLight
         adView.borderThickness = 1
         adLabel.text = L10n.Common.ad
-        contentView.smoothCorners(with: 8)
+        contentView.smoothCorners(with: 12)
     }
 
     func configure(with viewModel: PromoViewModel) {

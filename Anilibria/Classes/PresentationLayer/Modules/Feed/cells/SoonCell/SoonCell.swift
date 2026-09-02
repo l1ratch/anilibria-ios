@@ -10,7 +10,7 @@ final class SoonCell: RippleViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         titleLabel.text = L10n.Screen.Feed.schedule
-        rippleContainerView?.smoothCorners(with: 8)
+        rippleContainerView?.smoothCorners(with: 12)
         segmentControl.setTitleTextAttributes([
             .foregroundColor: UIColor.Text.monoLight,
         ], for: .selected)

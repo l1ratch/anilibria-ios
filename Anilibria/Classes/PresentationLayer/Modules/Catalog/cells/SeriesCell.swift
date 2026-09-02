@@ -15,7 +15,7 @@ public final class SeriesCell: RippleViewCell {
         super.awakeFromNib()
         titleLabel.font = .font(ofSize: 16, weight: .bold)
         titleLabel.textColor = .Text.main
-        containerView.smoothCorners(with: 4)
+        containerView.smoothCorners(with: 12)
         containerView.backgroundColor = .Surfaces.content
     }
     
