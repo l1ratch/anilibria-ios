@@ -1,10 +1,7 @@
 import DITranquillity
 import Kingfisher
 import UIKit
-#if targetEnvironment(macCatalyst)
-#else
 import AppMetricaCore
-#endif
 
 public protocol DependenciesConfiguration: AnyObject {
     func setup()
@@ -41,12 +38,9 @@ public class DependenciesConfigurationBase: DependenciesConfiguration, Loggable 
     }
 
     private func setupMetrica() {
-        #if targetEnvironment(macCatalyst)
-        #else
         if let config = AppMetricaConfiguration(apiKey: Keys.yandexMetricaApiKey) {
             AppMetrica.activate(with: config)
         }
-        #endif
     }
 
     private func setupModulesDependencies() {
