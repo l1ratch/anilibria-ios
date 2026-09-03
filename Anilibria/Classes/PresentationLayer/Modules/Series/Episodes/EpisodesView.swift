@@ -148,8 +148,8 @@ final class EpisodesView: UIView {
 
         NSLayoutConstraint.activate([
             headerContainer.topAnchor.constraint(equalTo: topAnchor),
-            headerContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            headerContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            headerContainer.leadingAnchor.constraint(equalTo: leadingAnchor),
+            headerContainer.trailingAnchor.constraint(equalTo: trailingAnchor),
             headerContainer.heightAnchor.constraint(equalToConstant: 34),
 
             leftStack.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor),

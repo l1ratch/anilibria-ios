@@ -12,7 +12,7 @@ class EpisodesSectionAdapter: SectionAdapterProtocol {
     let uid: AnyHashable = UUID()
     private(set) var items: OrderedSet<AnyCellAdapter> = []
 
-    private let insets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+    private let insets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 8)
     private let expectedWidth: CGFloat = 220
     private let estimatedHeight: CGFloat = 156
     var isCompact: Bool = true

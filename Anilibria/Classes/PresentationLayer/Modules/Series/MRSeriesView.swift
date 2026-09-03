@@ -152,7 +152,7 @@ final class SeriesViewController: BaseViewController {
             modernContentStack.topAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.topAnchor, constant: 12),
             modernContentStack.leadingAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.leadingAnchor, constant: 16),
             modernContentStack.trailingAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.trailingAnchor, constant: -16),
-            modernContentStack.bottomAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.bottomAnchor, constant: -32),
+            modernContentStack.bottomAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.bottomAnchor, constant: -12),
             modernContentStack.widthAnchor.constraint(equalTo: modernScrollView.frameLayoutGuide.widthAnchor, constant: -32)
         ])
 
@@ -198,8 +198,19 @@ final class SeriesViewController: BaseViewController {
         row.addArrangedSubview(spacer)
 
         row.addArrangedSubview(donateButton)
+        donateButton.translatesAutoresizingMaskIntoConstraints = false
+        donateButton.heightAnchor.constraint(equalToConstant: 34).isActive = true
         donateButton.layer.cornerRadius = 10
         donateButton.layer.cornerCurve = .continuous
+        donateButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
+        donateButton.tintColor = .white
+        donateButton.setTitleColor(.white, for: .normal)
+        donateButton.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+        let giftConfig = UIImage.SymbolConfiguration(pointSize: 13, weight: .semibold)
+        let giftImg = UIImage(systemName: "gift.fill", withConfiguration: giftConfig)
+        donateButton.setImage(giftImg, for: .normal)
+        donateButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 4)
+        donateButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 12)
 
         let stack = UIStackView()
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -541,12 +552,12 @@ final class SeriesViewController: BaseViewController {
         relatedTitleLabel.font = .systemFont(ofSize: 18, weight: .bold)
         relatedTitleLabel.textColor = .Text.main
 
-        relatedView.constraints.forEach {
-            if $0.firstItem === relatedStackView || $0.secondItem === relatedStackView {
-                relatedView.removeConstraint($0)
+        // Remove old separators, constraints and stack view from relatedView
+        relatedView.subviews.forEach { view in
+            if view !== relatedTitleLabel && view !== relatedShimmerView {
+                view.removeFromSuperview()
             }
         }
-        relatedStackView.isHidden = true
         relatedCarouselView.translatesAutoresizingMaskIntoConstraints = false
         relatedView.addSubview(relatedCarouselView)
 
@@ -588,7 +599,7 @@ final class SeriesViewController: BaseViewController {
     }
 
     private func updateInsets() {
-        modernScrollView.contentInset.bottom = max(keyboardInset, 24)
+        modernScrollView.contentInset.bottom = max(keyboardInset, 0)
     }
 
     override func setupStrings() {
@@ -869,7 +880,9 @@ extension SeriesViewController: SeriesViewBehavior {
         titleLbl.font = .systemFont(ofSize: 12, weight: .semibold)
         titleLbl.textColor = .Text.secondary
         titleLbl.text = "\(title):"
-        titleLbl.widthAnchor.constraint(equalToConstant: 105).isActive = true
+        titleLbl.numberOfLines = 0
+        titleLbl.lineBreakMode = .byWordWrapping
+        titleLbl.widthAnchor.constraint(equalToConstant: 112).isActive = true
         row.addArrangedSubview(titleLbl)
 
         let valueLbl = UILabel()
