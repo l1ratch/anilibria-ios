@@ -49,30 +49,32 @@ class TeamMemberSectionAdapter: SectionAdapterProtocol {
         guard identifier == uid else { return nil }
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .estimated(50)
+            heightDimension: .estimated(64)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .estimated(50)
+            heightDimension: .estimated(64)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
             subitems: [item]
         )
         let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 8
+        section.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 16, bottom: 20, trailing: 16)
 
         let header = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: .init(
                 widthDimension: .fractionalWidth(1),
-                heightDimension: .estimated(50)
+                heightDimension: .estimated(44)
             ),
             elementKind: headerKind,
             alignment: .top
         )
 
-        header.pinToVisibleBounds = true
+        header.pinToVisibleBounds = false
 
         section.boundarySupplementaryItems = [header]
         return section

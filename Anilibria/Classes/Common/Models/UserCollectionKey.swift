@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum UserCollectionKey: Hashable, Codable, CaseIterable {
+enum UserCollectionKey: String, Hashable, Codable, CaseIterable {
     case favorite
     case planned
     case watching
@@ -40,5 +40,47 @@ enum UserCollectionKey: Hashable, Codable, CaseIterable {
 
     var title: String {
         collectionType?.localizedTitle ?? L10n.Common.Collections.favorites
+    }
+}
+
+final class UserCollectionsPreferences {
+    static let notificationName = NSNotification.Name("userCollectionsChanged")
+    private static let storageKey = "userCollections_active_keys"
+
+    static let defaultOrder: [UserCollectionKey] = [
+        .favorite,
+        .watching,
+        .planned,
+        .postponed,
+        .abandoned,
+        .watched
+    ]
+
+    static func getActiveKeys() -> [UserCollectionKey] {
+        guard let rawValues = UserDefaults.standard.stringArray(forKey: storageKey) else {
+            return defaultOrder
+        }
+        let keys = rawValues.compactMap { UserCollectionKey(rawValue: $0) }
+        return keys.isEmpty ? defaultOrder : keys
+    }
+
+    static func getHiddenKeys() -> [UserCollectionKey] {
+        let active = Set(getActiveKeys())
+        return defaultOrder.filter { !active.contains($0) }
+    }
+
+    static func setActiveKeys(_ keys: [UserCollectionKey], notify: Bool = true) {
+        let rawValues = keys.map { $0.rawValue }
+        UserDefaults.standard.set(rawValues, forKey: storageKey)
+        if notify {
+            NotificationCenter.default.post(name: notificationName, object: nil)
+        }
+    }
+
+    static func resetToDefaults(notify: Bool = true) {
+        UserDefaults.standard.removeObject(forKey: storageKey)
+        if notify {
+            NotificationCenter.default.post(name: notificationName, object: nil)
+        }
     }
 }

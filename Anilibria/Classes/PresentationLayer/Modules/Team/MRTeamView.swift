@@ -15,6 +15,8 @@ final class TeamViewController: BaseCollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = .Surfaces.background
+        self.collectionView.backgroundColor = .Surfaces.background
         self.setupNavbar()
         self.addRefreshControl(scrollView: collectionView)
         self.handler.didLoad()

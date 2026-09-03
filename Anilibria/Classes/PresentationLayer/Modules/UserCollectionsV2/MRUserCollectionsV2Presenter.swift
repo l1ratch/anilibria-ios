@@ -63,23 +63,22 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
                 self?.loadAllCollections()
             })
             .store(in: &bag)
+
+        NotificationCenter.default.publisher(for: UserCollectionsPreferences.notificationName)
+            .sink { [weak self] _ in
+                Self.cachedSections = nil
+                self?.loadAllCollections()
+            }
+            .store(in: &bag)
     }
 
     private func loadAllCollections() {
-        // Favorite is now #1, watched is last
-        let orderedKeys: [UserCollectionKey] = [
-            .favorite,
-            .watching,
-            .planned,
-            .postponed,
-            .abandoned,
-            .watched
-        ]
+        let orderedKeys = UserCollectionsPreferences.getActiveKeys()
 
         view.showLoading(true)
 
         var loadedSections: [UserCollectionGroupSection]
-        if let cached = Self.cachedSections, cached.count == orderedKeys.count {
+        if let cached = Self.cachedSections, cached.map({ $0.key }) == orderedKeys {
             loadedSections = cached
         } else {
             loadedSections = orderedKeys.map {

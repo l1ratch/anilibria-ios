@@ -123,6 +123,13 @@ extension SettingsPresenter: SettingsEventHandler {
         )
         customItems.append(dockEditorItem)
 
+        let collectionsEditorItem = SettingsControlItem(
+            title: Language.isEnglish ? "Lists Settings" : "Настройка списков",
+            value: "",
+            action: { [weak self] _ in self?.router.openCollectionsEditor() }
+        )
+        customItems.append(collectionsEditorItem)
+
         self.view.set(customization: customItems)
     }
 
