@@ -93,17 +93,15 @@ final class SeriesViewController: BaseViewController {
         self.hidesBottomBarWhenPushed = true
         super.viewDidLoad()
         self.setupNavigationButtons()
-        addRefreshControl(scrollView: scrollView)
-        updateEpisodesUI()
         setupModernLayout()
-
-        supportLabelContainer.cornerRadius = 14
+        updateEpisodesUI()
 
         relatedShimmerView.smoothCorners(with: 14)
         relatedShimmerView.backgroundColor = .Tint.shimmer
         relatedShimmerView.shimmerColor = .Surfaces.base
         relatedShimmerView.run()
 
+        // Hide the legacy XIB shimmer overlay immediately — it is no longer needed
         contentShimmerViews.forEach {
             $0.stop()
             $0.isHidden = true
@@ -117,89 +115,107 @@ final class SeriesViewController: BaseViewController {
             .store(in: &bag)
     }
 
-    private func setupModernLayout() {
-        guard let mainStack = compactEpisodesContainer.superview as? UIStackView else { return }
-        guard let headerContainer = infoTextView.superview else { return }
-        guard let actionsContainer = favoriteView.superview?.superview else { return }
+    // MARK: - Modern Layout (overlay approach — zero XIB conflict)
 
-        // 1. Hide floating play button container
-        playButtonContainer.superview?.isHidden = true
+    /// The fresh UIScrollView we own, pinned directly to the safe area.
+    private let modernScrollView = UIScrollView()
+    /// Root UIStackView inside modernScrollView.
+    private let modernContentStack = UIStackView()
+
+    private func setupModernLayout() {
+        // 1. Hide every legacy XIB view so only our modern overlay is visible.
+        scrollView.superview?.isHidden = true   // hides pbg-Hf-76X (contains legacy scroll + play button)
         playButtonContainer.isHidden = true
 
-        // 2. Hide old title stack and old anonce
-        titleLabel.superview?.isHidden = true
-        anonceLabel.isHidden = true
+        // 2. Build our own scrollView pinned to the safe-area of view.
+        modernScrollView.translatesAutoresizingMaskIntoConstraints = false
+        modernScrollView.alwaysBounceVertical = true
+        modernScrollView.showsVerticalScrollIndicator = true
+        view.addSubview(modernScrollView)
+        let safeArea = view.safeAreaLayoutGuide
+        NSLayoutConstraint.activate([
+            modernScrollView.topAnchor.constraint(equalTo: safeArea.topAnchor),
+            modernScrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            modernScrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            modernScrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
 
-        // 3. Clear headerContainer and mount modernHeaderView
-        headerContainer.subviews.forEach { $0.removeFromSuperview() }
+        addRefreshControl(scrollView: modernScrollView)
+
+        // 3. Content stack inside the scroll view.
+        modernContentStack.translatesAutoresizingMaskIntoConstraints = false
+        modernContentStack.axis = .vertical
+        modernContentStack.spacing = 16
+        modernContentStack.alignment = .fill
+        modernScrollView.addSubview(modernContentStack)
+        NSLayoutConstraint.activate([
+            modernContentStack.topAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.topAnchor, constant: 12),
+            modernContentStack.leadingAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.leadingAnchor, constant: 16),
+            modernContentStack.trailingAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.trailingAnchor, constant: -16),
+            modernContentStack.bottomAnchor.constraint(equalTo: modernScrollView.contentLayoutGuide.bottomAnchor, constant: -32),
+            modernContentStack.widthAnchor.constraint(equalTo: modernScrollView.frameLayoutGuide.widthAnchor, constant: -32)
+        ])
+
+        // 4. Build sections — purely programmatic, no XIB views reparented here.
         setupHeaderSection()
-        modernHeaderView.translatesAutoresizingMaskIntoConstraints = false
-        headerContainer.addSubview(modernHeaderView)
-        NSLayoutConstraint.activate([
-            modernHeaderView.topAnchor.constraint(equalTo: headerContainer.topAnchor),
-            modernHeaderView.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor),
-            modernHeaderView.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor),
-            modernHeaderView.bottomAnchor.constraint(equalTo: headerContainer.bottomAnchor)
-        ])
-
-        // 4. Configure mainStack
-        mainStack.spacing = 16
-
-        // Position 0: Header
-        mainStack.insertArrangedSubview(headerContainer, at: 0)
-
-        // Position 1: Watch Button
         setupWatchButton()
-        mainStack.insertArrangedSubview(modernWatchButton, at: 1)
-        NSLayoutConstraint.activate([
-            modernWatchButton.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
-            modernWatchButton.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
-        ])
+        setupGenresSection()
+        setupSynopsisSection()
+        setupCreditsSection()
+        setupEpisodesSection()
+        setupRelatedSection()
+        setupSupportSection()
 
-        // Position 2: Secondary Actions
-        mainStack.insertArrangedSubview(actionsContainer, at: 2)
+        // 5. Assemble stack.
+        modernContentStack.addArrangedSubview(modernHeaderView)
+        modernContentStack.addArrangedSubview(modernWatchButton)
+        modernContentStack.addArrangedSubview(buildActionsView())
+        modernContentStack.addArrangedSubview(genresScrollView)
+        modernContentStack.addArrangedSubview(synopsisContainer)
+        modernContentStack.addArrangedSubview(creditsCard)
+        modernContentStack.addArrangedSubview(compactEpisodesContainer)
+        modernContentStack.addArrangedSubview(relatedView)
+        modernContentStack.addArrangedSubview(supportLabelContainer)
+    }
+
+    /// Build a pure-code actions row with favorite, type, spacer, donate.
+    private func buildActionsView() -> UIView {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+
+        let row = UIStackView()
+        row.translatesAutoresizingMaskIntoConstraints = false
+        row.axis = .horizontal
+        row.spacing = 8
+        row.alignment = .center
+
+        // Re-use existing IBOutlet views — just reparent them; their internal constraints stay valid.
+        row.addArrangedSubview(favoriteView)
+        row.addArrangedSubview(typeView)
+
+        let spacer = UIView()
+        spacer.translatesAutoresizingMaskIntoConstraints = false
+        row.addArrangedSubview(spacer)
+
+        row.addArrangedSubview(donateButton)
         donateButton.layer.cornerRadius = 10
         donateButton.layer.cornerCurve = .continuous
 
-        // Position 3: Genres
-        setupGenresSection()
-        mainStack.insertArrangedSubview(genresScrollView, at: 3)
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.addArrangedSubview(row)
+        stack.addArrangedSubview(tagsView)
+
+        container.addSubview(stack)
         NSLayoutConstraint.activate([
-            genresScrollView.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
-            genresScrollView.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
+            stack.topAnchor.constraint(equalTo: container.topAnchor),
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor)
         ])
-
-        // Position 4: Synopsis
-        setupSynopsisSection()
-        mainStack.insertArrangedSubview(synopsisContainer, at: 4)
-        NSLayoutConstraint.activate([
-            synopsisContainer.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
-            synopsisContainer.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
-        ])
-
-        // Position 5: Credits Card
-        setupCreditsSection()
-        mainStack.insertArrangedSubview(creditsCard, at: 5)
-        NSLayoutConstraint.activate([
-            creditsCard.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
-            creditsCard.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
-        ])
-
-        // Position 6: Episodes
-        setupEpisodesSection()
-        mainStack.insertArrangedSubview(compactEpisodesContainer, at: 6)
-
-        // Position 7: Related (franchise carousel)
-        setupRelatedSection()
-        if let relatedWrapper = relatedView.superview {
-            mainStack.insertArrangedSubview(relatedWrapper, at: 7)
-        }
-
-        // Position 8: Support
-        setupSupportSection()
-        if let supportWrapper = supportLabelContainer.superview {
-            mainStack.insertArrangedSubview(supportWrapper, at: 8)
-        }
+        return container
     }
 
     private func setupHeaderSection() {
@@ -572,7 +588,7 @@ final class SeriesViewController: BaseViewController {
     }
 
     private func updateInsets() {
-        scrollView.contentInset.bottom = max(keyboardInset, 24)
+        modernScrollView.contentInset.bottom = max(keyboardInset, 24)
     }
 
     override func setupStrings() {
