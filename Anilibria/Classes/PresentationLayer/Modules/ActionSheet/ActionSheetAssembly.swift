@@ -32,7 +32,7 @@ extension ActionSheetRoute where Self: RouterProtocol {
         source.fetchItems { [weak self] groups in
             guard let self else { return }
             if groups.count > 1 {
-                let module = ActionSheetAssembly.createModule(source: source, parent: self as? Router)
+                let module = ActionSheetAssembly.createModule(source: source, parent: self)
                 PresentRouter(target: module,
                               from: nil,
                               use: BlurPresentationController.self,
