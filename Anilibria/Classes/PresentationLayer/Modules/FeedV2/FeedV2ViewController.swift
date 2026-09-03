@@ -113,14 +113,11 @@ final class FeedV2ViewController: BaseViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let contentHeight = contentStackView.frame.height + scrollView.contentInset.top + scrollView.contentInset.bottom
-        scrollView.isScrollEnabled = contentHeight > (scrollView.bounds.height + 4)
-
         let screenWidth = min(view.bounds.width, view.bounds.height)
         if screenWidth > 0, let layout = heroCollectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
             let expectedWidth = screenWidth - 32
-            if layout.itemSize.width != expectedWidth || layout.itemSize.height != 192 {
-                layout.itemSize = CGSize(width: expectedWidth, height: 192)
+            if layout.itemSize.width != expectedWidth || layout.itemSize.height != 216 {
+                layout.itemSize = CGSize(width: expectedWidth, height: 216)
                 layout.invalidateLayout()
             }
         }
@@ -140,14 +137,15 @@ final class FeedV2ViewController: BaseViewController {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceVertical = true
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.contentInset = UIEdgeInsets(top: 2, left: 0, bottom: 74, right: 0)
+        scrollView.contentInset = .zero
+        scrollView.delegate = self
 
         self.addRefreshControl(scrollView: scrollView)
 
         scrollView.addSubview(contentStackView)
         contentStackView.translatesAutoresizingMaskIntoConstraints = false
         contentStackView.axis = .vertical
-        contentStackView.spacing = 8
+        contentStackView.spacing = 10
         contentStackView.alignment = .fill
 
         NSLayoutConstraint.activate([
@@ -170,7 +168,7 @@ final class FeedV2ViewController: BaseViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        layout.itemSize = CGSize(width: screenWidth - 32, height: 192)
+        layout.itemSize = CGSize(width: screenWidth - 32, height: 216)
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
@@ -187,7 +185,7 @@ final class FeedV2ViewController: BaseViewController {
         let heroContainer = UIStackView()
         heroContainer.translatesAutoresizingMaskIntoConstraints = false
         heroContainer.axis = .vertical
-        heroContainer.spacing = 2
+        heroContainer.spacing = 4
         heroContainer.alignment = .fill
 
         pageControl.currentPageIndicatorTintColor = UIColor(named: "buttons/selected") ?? .systemRed
@@ -206,8 +204,8 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(heroContainer)
 
         NSLayoutConstraint.activate([
-            heroCollectionView.heightAnchor.constraint(equalToConstant: 192),
-            pageControl.heightAnchor.constraint(equalToConstant: 14)
+            heroCollectionView.heightAnchor.constraint(equalToConstant: 216),
+            pageControl.heightAnchor.constraint(equalToConstant: 16)
         ])
     }
 
@@ -249,7 +247,7 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(continueCollectionView)
 
         NSLayoutConstraint.activate([
-            continueCollectionView.heightAnchor.constraint(equalToConstant: 72)
+            continueCollectionView.heightAnchor.constraint(equalToConstant: 76)
         ])
     }
 
@@ -257,7 +255,7 @@ final class FeedV2ViewController: BaseViewController {
 
     private func setupScheduleSection() {
         scheduleHeaderContainer.translatesAutoresizingMaskIntoConstraints = false
-        scheduleHeaderContainer.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        scheduleHeaderContainer.heightAnchor.constraint(equalToConstant: 28).isActive = true
 
         scheduleTitleLabel.font = .systemFont(ofSize: 18, weight: .bold)
         scheduleTitleLabel.textColor = .Text.main
@@ -284,7 +282,7 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(scheduleHeaderContainer)
 
         NSLayoutConstraint.activate([
-            scheduleHeaderContainer.heightAnchor.constraint(equalToConstant: 24),
+            scheduleHeaderContainer.heightAnchor.constraint(equalToConstant: 28),
 
             scheduleTitleLabel.leadingAnchor.constraint(equalTo: scheduleHeaderContainer.leadingAnchor, constant: 16),
             scheduleTitleLabel.centerYAnchor.constraint(equalTo: scheduleHeaderContainer.centerYAnchor),
@@ -295,8 +293,8 @@ final class FeedV2ViewController: BaseViewController {
 
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 108, height: 190)
-        layout.minimumLineSpacing = 10
+        layout.itemSize = CGSize(width: 114, height: 206)
+        layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
         scheduleCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -310,7 +308,7 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(scheduleCollectionView)
 
         NSLayoutConstraint.activate([
-            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 190)
+            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 206)
         ])
     }
 
@@ -382,15 +380,15 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = min(view.bounds.width, view.bounds.height)
         if collectionView == heroCollectionView {
-            return CGSize(width: max(0, screenWidth - 32), height: 192)
+            return CGSize(width: max(0, screenWidth - 32), height: 216)
         } else if collectionView == continueCollectionView {
             if continueItems.count == 1 {
-                return CGSize(width: max(0, screenWidth - 32), height: 72)
+                return CGSize(width: max(0, screenWidth - 32), height: 76)
             }
             let cardWidth = min(max(240, screenWidth - 56), 310)
-            return CGSize(width: cardWidth, height: 72)
+            return CGSize(width: cardWidth, height: 76)
         } else {
-            return CGSize(width: 108, height: 190)
+            return CGSize(width: 114, height: 206)
         }
     }
 
@@ -488,7 +486,11 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView == heroCollectionView, !heroItems.isEmpty {
+        if scrollView == self.scrollView {
+            if scrollView.contentOffset.y > 0 {
+                scrollView.contentOffset.y = 0
+            }
+        } else if scrollView == heroCollectionView, !heroItems.isEmpty {
             let screenWidth = min(view.bounds.width, view.bounds.height)
             let itemWidth = (screenWidth - 32) + 12
             if itemWidth > 0 {
