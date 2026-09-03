@@ -35,10 +35,6 @@ final class FeedV2ViewController: BaseViewController {
     private let scheduleAllButton = UIButton(type: .system)
     private var scheduleCollectionView: UICollectionView!
 
-    // Skeletons
-    private let heroSkeletonView = ShimmerView()
-    private let scheduleSkeletonContainer = UIStackView()
-
     private lazy var searchButton = BarButton(image: .System.search,
                                               imageEdge: inset(0, 5, 0, 5)) { [weak self] in
         self?.handler.search()
@@ -81,6 +77,15 @@ final class FeedV2ViewController: BaseViewController {
         super.viewDidLayoutSubviews()
         let contentHeight = contentStackView.frame.height + scrollView.contentInset.top + scrollView.contentInset.bottom
         scrollView.isScrollEnabled = contentHeight > scrollView.bounds.height
+
+        let screenWidth = min(view.bounds.width, view.bounds.height)
+        if screenWidth > 0, let layout = heroCollectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
+            let expectedWidth = screenWidth - 32
+            if layout.itemSize.width != expectedWidth {
+                layout.itemSize = CGSize(width: expectedWidth, height: 220)
+                layout.invalidateLayout()
+            }
+        }
     }
 
     // MARK: - Setup Navigation & Scroll
@@ -159,26 +164,12 @@ final class FeedV2ViewController: BaseViewController {
         heroContainer.addArrangedSubview(heroCollectionView)
         heroContainer.addArrangedSubview(pageControl)
 
-        heroSkeletonView.translatesAutoresizingMaskIntoConstraints = false
-        heroSkeletonView.layer.cornerRadius = 18
-        heroSkeletonView.layer.cornerCurve = .continuous
-        heroSkeletonView.backgroundColor = .Surfaces.content
-        heroSkeletonView.shimmerColor = UIColor.white.withAlphaComponent(0.08)
-        heroContainer.addSubview(heroSkeletonView)
-
         contentStackView.addArrangedSubview(heroContainer)
 
         NSLayoutConstraint.activate([
             heroCollectionView.heightAnchor.constraint(equalToConstant: 220),
-            pageControl.heightAnchor.constraint(equalToConstant: 16),
-
-            heroSkeletonView.topAnchor.constraint(equalTo: heroCollectionView.topAnchor),
-            heroSkeletonView.bottomAnchor.constraint(equalTo: heroCollectionView.bottomAnchor),
-            heroSkeletonView.leadingAnchor.constraint(equalTo: heroContainer.leadingAnchor, constant: 16),
-            heroSkeletonView.trailingAnchor.constraint(equalTo: heroContainer.trailingAnchor, constant: -16)
+            pageControl.heightAnchor.constraint(equalToConstant: 16)
         ])
-
-        heroSkeletonView.run()
     }
 
     // MARK: - Quick Actions
@@ -262,42 +253,17 @@ final class FeedV2ViewController: BaseViewController {
         scheduleCollectionView.dataSource = self
         scheduleCollectionView.register(FeedV2ScheduleCell.self, forCellWithReuseIdentifier: FeedV2ScheduleCell.reuseIdentifier)
 
-        scheduleSkeletonContainer.axis = .horizontal
-        scheduleSkeletonContainer.spacing = 12
-        scheduleSkeletonContainer.alignment = .fill
-        scheduleSkeletonContainer.distribution = .fillEqually
-        scheduleSkeletonContainer.translatesAutoresizingMaskIntoConstraints = false
-
-        for _ in 0..<3 {
-            let card = ShimmerView()
-            card.layer.cornerRadius = 14
-            card.layer.cornerCurve = .continuous
-            card.backgroundColor = .Surfaces.content
-            card.shimmerColor = UIColor.white.withAlphaComponent(0.08)
-            card.translatesAutoresizingMaskIntoConstraints = false
-            scheduleSkeletonContainer.addArrangedSubview(card)
-            card.run()
-        }
-
-        contentStackView.addArrangedSubview(scheduleSkeletonContainer)
         contentStackView.addArrangedSubview(scheduleCollectionView)
 
         NSLayoutConstraint.activate([
-            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 206),
-            scheduleSkeletonContainer.heightAnchor.constraint(equalToConstant: 206),
-            scheduleSkeletonContainer.leadingAnchor.constraint(equalTo: contentStackView.leadingAnchor, constant: 16),
-            scheduleSkeletonContainer.trailingAnchor.constraint(equalTo: contentStackView.trailingAnchor, constant: -16)
+            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 206)
         ])
-
-        scheduleCollectionView.isHidden = true
     }
 
     override func refresh() {
         super.refresh()
         handler.refresh()
     }
-
-    private let heroMultiplier = 200
 
     @objc private func didTapAllSchedule() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -310,8 +276,7 @@ final class FeedV2ViewController: BaseViewController {
 extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == heroCollectionView {
-            guard !heroItems.isEmpty else { return 0 }
-            return heroItems.count > 1 ? heroItems.count * heroMultiplier : 1
+            return heroItems.count
         } else {
             return scheduleItems.count
         }
@@ -320,8 +285,7 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == heroCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2HeroCell.reuseIdentifier, for: indexPath) as! FeedV2HeroCell
-            let actualIndex = indexPath.item % heroItems.count
-            let item = heroItems[actualIndex]
+            let item = heroItems[indexPath.item]
             cell.configure(with: item)
             cell.onActionTap = { [weak self] in
                 switch item.content {
@@ -344,9 +308,8 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == heroCollectionView {
-            guard !heroItems.isEmpty else { return }
-            let actualIndex = indexPath.item % heroItems.count
-            let item = heroItems[actualIndex]
+            guard indexPath.item < heroItems.count else { return }
+            let item = heroItems[indexPath.item]
             switch item.content {
             case .release:
                 return
@@ -388,9 +351,8 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             } else {
                 index = round(rawTarget / itemWidth)
             }
-
-            let targetX = index * itemWidth
-            targetContentOffset.pointee = CGPoint(x: targetX, y: targetContentOffset.pointee.y)
+            let clampedIndex = max(0, min(CGFloat(heroItems.count - 1), index))
+            targetContentOffset.pointee = CGPoint(x: clampedIndex * itemWidth, y: targetContentOffset.pointee.y)
         }
     }
 
@@ -400,7 +362,7 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             let itemWidth = (screenWidth - 32) + 12
             if itemWidth > 0 {
                 let rawIndex = Int(round(scrollView.contentOffset.x / itemWidth))
-                let page = ((rawIndex % heroItems.count) + heroItems.count) % heroItems.count
+                let page = max(0, min(heroItems.count - 1, rawIndex))
                 pageControl.currentPage = page
             }
         }
@@ -432,14 +394,10 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
         let itemWidth = (screenWidth - 32) + 12
         guard itemWidth > 0 else { return }
         let currentRawIndex = Int(round(cv.contentOffset.x / itemWidth))
-        let nextRawIndex = currentRawIndex + 1
-        let targetX = CGFloat(nextRawIndex) * itemWidth
+        let nextIndex = (currentRawIndex + 1) % heroItems.count
 
-        UIView.animate(withDuration: 0.45, delay: 0, options: [.curveEaseInOut, .allowUserInteraction]) {
-            self.heroCollectionView.setContentOffset(CGPoint(x: targetX, y: 0), animated: false)
-        }
-        let page = ((nextRawIndex % heroItems.count) + heroItems.count) % heroItems.count
-        pageControl.currentPage = page
+        cv.scrollToItem(at: IndexPath(item: nextIndex, section: 0), at: .centeredHorizontally, animated: true)
+        pageControl.currentPage = nextIndex
     }
 }
 
@@ -451,30 +409,7 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
         self.pageControl.numberOfPages = heroItems.count
         self.pageControl.currentPage = 0
         self.heroCollectionView.reloadData()
-
-        let hasData = !heroItems.isEmpty
-        if hasData {
-            heroSkeletonView.stop()
-            heroSkeletonView.isHidden = true
-            heroCollectionView.isHidden = false
-            pageControl.isHidden = false
-        } else {
-            heroSkeletonView.run()
-            heroSkeletonView.isHidden = false
-            heroCollectionView.isHidden = true
-            pageControl.isHidden = true
-        }
-
-        if heroItems.count > 1 {
-            let middleIndex = (heroMultiplier / 2) * heroItems.count
-            let screenWidth = min(view.bounds.width, view.bounds.height)
-            let cardWidth = screenWidth - 32
-            let spacing: CGFloat = 12
-            let itemWidth = cardWidth + spacing
-            DispatchQueue.main.async { [weak self] in
-                self?.heroCollectionView.contentOffset = CGPoint(x: CGFloat(middleIndex) * itemWidth, y: 0)
-            }
-        }
+        self.heroCollectionView.superview?.isHidden = heroItems.isEmpty
         startAutoScroll()
     }
 
@@ -493,12 +428,6 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
         self.scheduleItems = items
         self.scheduleCollectionView.reloadData()
         self.refreshControl?.endRefreshing()
-
-        let hasData = !items.isEmpty
-        scheduleSkeletonContainer.arrangedSubviews.compactMap { $0 as? ShimmerView }.forEach {
-            if hasData { $0.stop() } else { $0.run() }
-        }
-        scheduleSkeletonContainer.isHidden = hasData
-        scheduleCollectionView.isHidden = !hasData
+        self.scheduleCollectionView.isHidden = items.isEmpty
     }
 }

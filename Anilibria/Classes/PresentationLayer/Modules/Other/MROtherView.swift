@@ -57,6 +57,7 @@ final class OtherViewController: BaseViewController {
             if let cachedUser = UserRepositoryImp().getUser() {
                 profileCardView.configure(with: cachedUser)
             }
+            (contentStackView.superview as? UIScrollView)?.contentInset = UIEdgeInsets(top: 14, left: 0, bottom: 84, right: 0)
         }
     }
     

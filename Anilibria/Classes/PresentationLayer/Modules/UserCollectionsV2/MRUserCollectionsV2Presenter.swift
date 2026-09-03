@@ -34,12 +34,20 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
         self.router.responder = self
     }
 
+    private static var cachedSections: [UserCollectionGroupSection]?
+
     func didLoad() {
         subscribeToUpdates()
+        if let cached = Self.cachedSections, !cached.isEmpty {
+            self.sections = cached
+            self.allSections = cached
+            self.view.set(sections: cached)
+        }
         loadAllCollections()
     }
 
     func refresh() {
+        Self.cachedSections = nil
         loadAllCollections()
     }
 
@@ -58,8 +66,6 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
     }
 
     private func loadAllCollections() {
-        view.showLoading(true)
-
         // Favorite is now #1, watched is last
         let orderedKeys: [UserCollectionKey] = [
             .favorite,
@@ -70,12 +76,18 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
             .watched
         ]
 
-        var loadedSections: [UserCollectionGroupSection] = orderedKeys.map {
-            UserCollectionGroupSection(key: $0, items: [], isLoading: true)
+        var loadedSections: [UserCollectionGroupSection]
+        if let cached = Self.cachedSections, cached.count == orderedKeys.count {
+            loadedSections = cached
+        } else {
+            view.showLoading(true)
+            loadedSections = orderedKeys.map {
+                UserCollectionGroupSection(key: $0, items: [], isLoading: true)
+            }
+            self.sections = loadedSections
+            self.allSections = loadedSections
+            self.view.set(sections: loadedSections)
         }
-        self.sections = loadedSections
-        self.allSections = loadedSections
-        self.view.set(sections: loadedSections)
 
         let dispatchGroup = DispatchGroup()
 
@@ -127,6 +139,7 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
             guard let self = self else { return }
             self.sections = loadedSections
             self.allSections = loadedSections
+            Self.cachedSections = loadedSections
             self.view.showLoading(false)
             self.view.set(sections: loadedSections)
         }
