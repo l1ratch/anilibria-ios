@@ -120,7 +120,7 @@ final class SeriesViewController: BaseViewController {
     }
 
     private func setupModernLayout() {
-        guard let mainStack = titleLabel.superview?.superview as? UIStackView else { return }
+        guard let contentView = scrollView.subviews.first else { return }
 
         // 1. Hide the old floating play button container
         playButtonContainer.superview?.isHidden = true
@@ -132,16 +132,49 @@ final class SeriesViewController: BaseViewController {
         anonceLabel.isHidden = true
         titleLabel.superview?.isHidden = true
 
-        // 3. Configure mainStack
+        // 3. Remove old stack view from contentView along with all conflicting XIB constraints
+        if let oldStack = contentView.subviews.first(where: { $0 is UIStackView }) {
+            oldStack.removeFromSuperview()
+        }
+
+        // Clean constraints from reparented views
+        seriesImageView.translatesAutoresizingMaskIntoConstraints = false
+        seriesImageView.removeConstraints(seriesImageView.constraints)
+
+        weekDayView.translatesAutoresizingMaskIntoConstraints = false
+        weekDayView.constraints.forEach {
+            if $0.firstAttribute == .width || $0.firstAttribute == .height {
+                weekDayView.removeConstraint($0)
+            }
+        }
+
+        compactEpisodesContainer.translatesAutoresizingMaskIntoConstraints = false
+        compactEpisodesContainer.constraints.forEach {
+            if $0.firstAttribute == .height {
+                compactEpisodesContainer.removeConstraint($0)
+            }
+        }
+
+        relatedView.translatesAutoresizingMaskIntoConstraints = false
+        relatedView.removeConstraints(relatedView.constraints)
+
+        supportLabelContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        // 4. Create brand new clean mainStack
+        let mainStack = UIStackView()
+        mainStack.translatesAutoresizingMaskIntoConstraints = false
         mainStack.axis = .vertical
         mainStack.spacing = 16
         mainStack.alignment = .fill
-        mainStack.isLayoutMarginsRelativeArrangement = true
-        mainStack.layoutMargins = UIEdgeInsets(top: 8, left: 16, bottom: 32, right: 16)
+        contentView.addSubview(mainStack)
 
-        // Clear existing arranged subviews
-        let oldSubviews = mainStack.arrangedSubviews
-        oldSubviews.forEach { mainStack.removeArrangedSubview($0) }
+        NSLayoutConstraint.activate([
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -32),
+            mainStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, constant: -32)
+        ])
 
         // Setup individual sections
         setupHeaderSection()
@@ -480,7 +513,11 @@ final class SeriesViewController: BaseViewController {
 
     private func setupEpisodesSection() {
         compactEpisodesContainer.translatesAutoresizingMaskIntoConstraints = false
-        compactEpisodesContainer.constraints.first { $0.firstAttribute == .height }?.constant = 214
+        if let heightConstraint = compactEpisodesContainer.constraints.first(where: { $0.firstAttribute == .height }) {
+            heightConstraint.constant = 216
+        } else {
+            compactEpisodesContainer.heightAnchor.constraint(equalToConstant: 216).isActive = true
+        }
     }
 
     private func setupRelatedSection() {

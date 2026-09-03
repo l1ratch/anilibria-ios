@@ -72,6 +72,7 @@ extension SeriesPresenter: SeriesEventHandler {
 
     func didLoad() {
         view.set(episodes: episodesModel)
+        view.set(series: series)
 
         self.favoriteService.favoritesUpdates().sink { [weak self] update in
             switch update {
