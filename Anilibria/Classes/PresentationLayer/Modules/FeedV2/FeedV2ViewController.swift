@@ -143,7 +143,11 @@ final class FeedV2ViewController: BaseViewController {
         heroContainer.alignment = .fill
 
         pageControl.currentPageIndicatorTintColor = UIColor(named: "buttons/selected") ?? .systemRed
-        pageControl.pageIndicatorTintColor = UIColor.white.withAlphaComponent(0.25)
+        pageControl.pageIndicatorTintColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor.white.withAlphaComponent(0.25)
+                : UIColor.black.withAlphaComponent(0.20)
+        }
         pageControl.hidesForSinglePage = true
         pageControl.isUserInteractionEnabled = false
         pageControl.translatesAutoresizingMaskIntoConstraints = false

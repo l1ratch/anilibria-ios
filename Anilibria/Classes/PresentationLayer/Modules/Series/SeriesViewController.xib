@@ -504,23 +504,6 @@
                         </view>
                     </subviews>
                 </stackView>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ROA-Jq-GvY" customClass="GradientView" customModule="AniLiberty" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="20" width="320" height="5"/>
-                    <viewLayoutGuide key="safeArea" id="FQx-uk-vDA"/>
-                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="5" identifier="C1" id="jYb-lZ-NVZ"/>
-                    </constraints>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="color" keyPath="firstColor">
-                            <color key="value" red="0.0" green="0.0" blue="0.0" alpha="0.14999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="color" keyPath="secondColor">
-                            <color key="value" red="0.0" green="0.0" blue="0.0" alpha="0.01" colorSpace="custom" customColorSpace="sRGB"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="string" keyPath="gradientTypeName" value="topBottom"/>
-                    </userDefinedRuntimeAttributes>
-                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0I8-Hm-lhg" customClass="ShimmerView" customModule="AniLiberty" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -533,13 +516,10 @@
                 <constraint firstItem="lOv-g8-YcO" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="7gZ-rT-Ulg"/>
                 <constraint firstAttribute="bottom" secondItem="lOv-g8-YcO" secondAttribute="bottom" id="99p-vJ-9J1"/>
                 <constraint firstAttribute="bottom" secondItem="0I8-Hm-lhg" secondAttribute="bottom" id="9Dq-gy-GK5"/>
-                <constraint firstItem="ROA-Jq-GvY" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" identifier="D4" id="QpP-gi-PGX"/>
                 <constraint firstItem="0I8-Hm-lhg" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="V2X-9D-fh5"/>
                 <constraint firstItem="0I8-Hm-lhg" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="c27-OR-w82"/>
                 <constraint firstItem="lOv-g8-YcO" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="gcD-ac-i1B"/>
                 <constraint firstItem="lOv-g8-YcO" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="ot0-ca-OlD"/>
-                <constraint firstItem="ROA-Jq-GvY" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" identifier="D3" id="veF-B4-BXK"/>
-                <constraint firstItem="ROA-Jq-GvY" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" identifier="D2" id="yby-Nb-4mN"/>
             </constraints>
             <point key="canvasLocation" x="47.826086956521742" y="35.491071428571423"/>
         </view>
