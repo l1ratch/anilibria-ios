@@ -105,10 +105,8 @@ final class SeriesViewController: BaseViewController {
         relatedShimmerView.run()
 
         contentShimmerViews.forEach {
-            $0.smoothCorners(with: 14)
-            $0.backgroundColor = .Tint.shimmer
-            $0.shimmerColor = .Surfaces.base
-            $0.run()
+            $0.stop()
+            $0.isHidden = true
         }
 
         NotificationCenter.default
@@ -120,86 +118,88 @@ final class SeriesViewController: BaseViewController {
     }
 
     private func setupModernLayout() {
-        guard let contentView = scrollView.subviews.first else { return }
+        guard let mainStack = compactEpisodesContainer.superview as? UIStackView else { return }
+        guard let headerContainer = infoTextView.superview else { return }
+        guard let actionsContainer = favoriteView.superview?.superview else { return }
 
-        // 1. Hide the old floating play button container
+        // 1. Hide floating play button container
         playButtonContainer.superview?.isHidden = true
         playButtonContainer.isHidden = true
 
-        // 2. Hide old newspaper-layout container and old labels
-        infoTextView.isHidden = true
-        infoTextView.superview?.isHidden = true
-        anonceLabel.isHidden = true
+        // 2. Hide old title stack and old anonce
         titleLabel.superview?.isHidden = true
+        anonceLabel.isHidden = true
 
-        // 3. Remove old stack view from contentView along with all conflicting XIB constraints
-        if let oldStack = contentView.subviews.first(where: { $0 is UIStackView }) {
-            oldStack.removeFromSuperview()
-        }
-
-        // Clean constraints from reparented views
-        seriesImageView.translatesAutoresizingMaskIntoConstraints = false
-        seriesImageView.removeConstraints(seriesImageView.constraints)
-
-        weekDayView.translatesAutoresizingMaskIntoConstraints = false
-        weekDayView.constraints.forEach {
-            if $0.firstAttribute == .width || $0.firstAttribute == .height {
-                weekDayView.removeConstraint($0)
-            }
-        }
-
-        compactEpisodesContainer.translatesAutoresizingMaskIntoConstraints = false
-        compactEpisodesContainer.constraints.forEach {
-            if $0.firstAttribute == .height {
-                compactEpisodesContainer.removeConstraint($0)
-            }
-        }
-
-        relatedView.translatesAutoresizingMaskIntoConstraints = false
-        relatedView.removeConstraints(relatedView.constraints)
-
-        supportLabelContainer.translatesAutoresizingMaskIntoConstraints = false
-
-        // 4. Create brand new clean mainStack
-        let mainStack = UIStackView()
-        mainStack.translatesAutoresizingMaskIntoConstraints = false
-        mainStack.axis = .vertical
-        mainStack.spacing = 16
-        mainStack.alignment = .fill
-        contentView.addSubview(mainStack)
-
+        // 3. Clear headerContainer and mount modernHeaderView
+        headerContainer.subviews.forEach { $0.removeFromSuperview() }
+        setupHeaderSection()
+        modernHeaderView.translatesAutoresizingMaskIntoConstraints = false
+        headerContainer.addSubview(modernHeaderView)
         NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -32),
-            mainStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, constant: -32)
+            modernHeaderView.topAnchor.constraint(equalTo: headerContainer.topAnchor),
+            modernHeaderView.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor),
+            modernHeaderView.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor),
+            modernHeaderView.bottomAnchor.constraint(equalTo: headerContainer.bottomAnchor)
         ])
 
-        // Setup individual sections
-        setupHeaderSection()
-        setupWatchButton()
-        setupSecondaryActions()
-        setupGenresSection()
-        setupSynopsisSection()
-        setupCreditsSection()
-        setupEpisodesSection()
-        setupRelatedSection()
-        setupSupportSection()
+        // 4. Configure mainStack
+        mainStack.spacing = 16
 
-        // Assemble into mainStack
-        mainStack.addArrangedSubview(modernHeaderView)
-        mainStack.addArrangedSubview(modernWatchButton)
-        mainStack.addArrangedSubview(actionsContainerView)
-        mainStack.addArrangedSubview(genresScrollView)
-        mainStack.addArrangedSubview(synopsisContainer)
-        mainStack.addArrangedSubview(creditsCard)
-        mainStack.addArrangedSubview(compactEpisodesContainer)
-        mainStack.addArrangedSubview(relatedView)
-        mainStack.addArrangedSubview(supportLabelContainer)
-        #if targetEnvironment(macCatalyst)
-        mainStack.addArrangedSubview(torrentsStackView)
-        #endif
+        // Position 0: Header
+        mainStack.insertArrangedSubview(headerContainer, at: 0)
+
+        // Position 1: Watch Button
+        setupWatchButton()
+        mainStack.insertArrangedSubview(modernWatchButton, at: 1)
+        NSLayoutConstraint.activate([
+            modernWatchButton.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
+            modernWatchButton.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
+        ])
+
+        // Position 2: Secondary Actions
+        mainStack.insertArrangedSubview(actionsContainer, at: 2)
+        donateButton.layer.cornerRadius = 10
+        donateButton.layer.cornerCurve = .continuous
+
+        // Position 3: Genres
+        setupGenresSection()
+        mainStack.insertArrangedSubview(genresScrollView, at: 3)
+        NSLayoutConstraint.activate([
+            genresScrollView.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
+            genresScrollView.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
+        ])
+
+        // Position 4: Synopsis
+        setupSynopsisSection()
+        mainStack.insertArrangedSubview(synopsisContainer, at: 4)
+        NSLayoutConstraint.activate([
+            synopsisContainer.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
+            synopsisContainer.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
+        ])
+
+        // Position 5: Credits Card
+        setupCreditsSection()
+        mainStack.insertArrangedSubview(creditsCard, at: 5)
+        NSLayoutConstraint.activate([
+            creditsCard.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 16),
+            creditsCard.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -16)
+        ])
+
+        // Position 6: Episodes
+        setupEpisodesSection()
+        mainStack.insertArrangedSubview(compactEpisodesContainer, at: 6)
+
+        // Position 7: Related (franchise carousel)
+        setupRelatedSection()
+        if let relatedWrapper = relatedView.superview {
+            mainStack.insertArrangedSubview(relatedWrapper, at: 7)
+        }
+
+        // Position 8: Support
+        setupSupportSection()
+        if let supportWrapper = supportLabelContainer.superview {
+            mainStack.insertArrangedSubview(supportWrapper, at: 8)
+        }
     }
 
     private func setupHeaderSection() {
@@ -525,6 +525,11 @@ final class SeriesViewController: BaseViewController {
         relatedTitleLabel.font = .systemFont(ofSize: 18, weight: .bold)
         relatedTitleLabel.textColor = .Text.main
 
+        relatedView.constraints.forEach {
+            if $0.firstItem === relatedStackView || $0.secondItem === relatedStackView {
+                relatedView.removeConstraint($0)
+            }
+        }
         relatedStackView.isHidden = true
         relatedCarouselView.translatesAutoresizingMaskIntoConstraints = false
         relatedView.addSubview(relatedCarouselView)
