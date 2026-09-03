@@ -82,7 +82,7 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
         group.enter()
         backendRepository.request(FavoriteIDsRequest())
             .sink(onNext: { [weak self] ids in
-                self?.collectionCounts[.favorites] = ids.count
+                self?.collectionCounts[.favorite] = ids.count
                 group.leave()
             }, onError: { _ in
                 group.leave()
