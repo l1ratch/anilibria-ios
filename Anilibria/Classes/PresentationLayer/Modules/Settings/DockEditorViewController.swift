@@ -126,7 +126,9 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 0 {
-            return Language.isEnglish ? "Drag handles on the right to reorder. 'Other' cannot be removed." : "Перетаскивайте кнопки за правый край для изменения порядка. Кнопку «Другое» скрыть нельзя."
+            return Language.isEnglish
+                ? "Drag handles on the right to reorder. 'Main' is fixed. Hiding 'Other' moves it to the top-left menu on Main."
+                : "Перетаскивайте кнопки за правый край для смены порядка. «Главная» зафиксирована. Скрытие «Другое» переносит раздел в левую верхнюю кнопку на Главной."
         }
         return nil
     }
@@ -146,8 +148,8 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
             cell.imageView?.image = item.icon
             cell.imageView?.tintColor = .Tint.active
 
-            if item == .other {
-                cell.detailTextLabel?.text = Language.isEnglish ? "Required" : "Обязательная"
+            if item == .feedV2 {
+                cell.detailTextLabel?.text = Language.isEnglish ? "Fixed" : "Закреплена"
                 cell.detailTextLabel?.textColor = .Text.secondary
                 cell.detailTextLabel?.font = .systemFont(ofSize: 13, weight: .regular)
             } else {
@@ -169,7 +171,7 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         if indexPath.section == 0 {
             let item = activeItems[indexPath.row]
-            return item == .other ? .none : .delete
+            return item == .feedV2 ? .none : .delete
         } else {
             return .insert
         }
@@ -180,30 +182,44 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return indexPath.section == 0
+        guard indexPath.section == 0 else { return false }
+        return activeItems[indexPath.row] != .feedV2
     }
 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete && indexPath.section == 0 {
             let item = activeItems[indexPath.row]
-            guard item != .other else { return }
+            guard item != .feedV2 else { return }
+
+            if item == .other {
+                let alert = UIAlertController(
+                    title: Language.isEnglish ? "Hide 'Other'?" : "Скрыть «Другое»?",
+                    message: Language.isEnglish
+                        ? "The 'Other' section will be moved to a button in the top left corner of the Main screen. Continue?"
+                        : "Раздел «Другое» будет перенесен в кнопку в верхнем левом углу Главного экрана. Продолжить?",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: Language.isEnglish ? "Cancel" : "Отмена", style: .cancel))
+                alert.addAction(UIAlertAction(title: Language.isEnglish ? "Hide" : "Скрыть", style: .destructive) { [weak self] _ in
+                    guard let self = self else { return }
+                    if let currentIndex = self.activeItems.firstIndex(of: .other) {
+                        self.activeItems.remove(at: currentIndex)
+                        self.hiddenItems.append(.other)
+                        self.saveChanges()
+                        self.tableView.reloadData()
+                    }
+                })
+                present(alert, animated: true)
+                return
+            }
 
             activeItems.remove(at: indexPath.row)
             hiddenItems.append(item)
             saveChanges()
-
             tableView.reloadData()
         } else if editingStyle == .insert && indexPath.section == 1 {
-            let item = hiddenItems[indexPath.row]
-            hiddenItems.remove(at: indexPath.row)
-
-            // Insert before .other if .other is last, or at the end
-            if let otherIndex = activeItems.firstIndex(of: .other) {
-                activeItems.insert(item, at: otherIndex)
-            } else {
-                activeItems.append(item)
-            }
-
+            let item = hiddenItems.remove(at: indexPath.row)
+            activeItems.append(item)
             saveChanges()
             tableView.reloadData()
         }
@@ -211,6 +227,7 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         guard sourceIndexPath.section == 0, destinationIndexPath.section == 0 else { return }
+        guard destinationIndexPath.row > 0 else { return }
         let movedItem = activeItems.remove(at: sourceIndexPath.row)
         activeItems.insert(movedItem, at: destinationIndexPath.row)
         saveChanges()
@@ -219,6 +236,9 @@ extension DockEditorViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath {
         if proposedDestinationIndexPath.section != 0 {
             return IndexPath(row: activeItems.count - 1, section: 0)
+        }
+        if proposedDestinationIndexPath.row == 0 {
+            return IndexPath(row: 1, section: 0)
         }
         return proposedDestinationIndexPath
     }

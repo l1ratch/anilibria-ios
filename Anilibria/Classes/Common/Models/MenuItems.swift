@@ -84,15 +84,10 @@ public final class MenuItemsFactory {
             }
             result.removeAll(where: { $0 == .feed || $0 == .collections })
 
-            if !result.contains(.feedV2) {
-                result.insert(.feedV2, at: 0)
-            }
-            if !result.contains(.collectionsV2) {
-                result.insert(.collectionsV2, at: max(0, result.count - 1))
-            }
-            if !result.contains(.other) {
-                result.append(.other)
-            }
+            // Always lock Main (feedV2) at index 0
+            result.removeAll(where: { $0 == .feedV2 })
+            result.insert(.feedV2, at: 0)
+
             var seen = Set<MenuItemType>()
             return result.filter { seen.insert($0).inserted }
         }
@@ -102,9 +97,10 @@ public final class MenuItemsFactory {
     public static func setActiveTypes(_ types: [MenuItemType], notify: Bool = true) {
         var finalTypes = types
         finalTypes.removeAll(where: { $0 == .feed || $0 == .collections })
-        if !finalTypes.contains(.other) {
-            finalTypes.append(.other)
-        }
+        // Always lock Main (feedV2) at index 0
+        finalTypes.removeAll(where: { $0 == .feedV2 })
+        finalTypes.insert(.feedV2, at: 0)
+
         let rawArray = finalTypes.map { $0.rawValue }
         UserDefaults.standard.set(rawArray, forKey: dockItemsKey)
         if notify {

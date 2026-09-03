@@ -31,6 +31,18 @@ extension ActionSheetRoute where Self: RouterProtocol {
     func openSheet(with source: any ActionSheetGroupSource) {
         source.fetchItems { [weak self] groups in
             guard let self else { return }
+            if groups.count > 1 {
+                let module = ActionSheetAssembly.createModule(source: source, parent: self as? Router)
+                PresentRouter(target: module,
+                              from: nil,
+                              use: BlurPresentationController.self,
+                              configure: {
+                                  $0.isBlured = true
+                                  $0.transformation = MoveUpTransformation()
+                }).set(level: .statusBar).move()
+                return
+            }
+
             let groupTitle = groups.first?.title
             let alert = UIAlertController(
                 title: (groupTitle?.isEmpty == false) ? groupTitle : nil,

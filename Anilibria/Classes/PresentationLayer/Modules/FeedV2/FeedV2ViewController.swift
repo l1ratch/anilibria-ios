@@ -40,6 +40,13 @@ final class FeedV2ViewController: BaseViewController {
         self?.handler.search()
     }
 
+    private lazy var otherMenuButton = BarButton(
+        image: UIImage(systemName: "line.3.horizontal", withConfiguration: UIImage.SymbolConfiguration(pointSize: 17, weight: .semibold)) ?? .System.dots,
+        imageEdge: inset(0, 5, 0, 5)
+    ) { [weak self] in
+        self?.openOtherScreen()
+    }
+
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -59,7 +66,38 @@ final class FeedV2ViewController: BaseViewController {
         setupContinueWatching()
         setupScheduleSection()
 
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDockItemsChanged),
+            name: NSNotification.Name("dockItemsChanged"),
+            object: nil
+        )
+
         handler.didLoad()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateOtherNavigationButton()
+    }
+
+    @objc private func handleDockItemsChanged() {
+        updateOtherNavigationButton()
+    }
+
+    private func updateOtherNavigationButton() {
+        let hasOtherInDock = MenuItemsFactory.getActiveTypes().contains(.other)
+        if !hasOtherInDock {
+            navigationItem.leftBarButtonItem = otherMenuButton
+        } else {
+            navigationItem.leftBarButtonItem = nil
+        }
+    }
+
+    private func openOtherScreen() {
+        let otherVC = OtherAssembly.createModule()
+        otherVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(otherVC, animated: true)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -94,6 +132,7 @@ final class FeedV2ViewController: BaseViewController {
         navigationItem.title = "AniLiberty"
         navigationItem.rightBarButtonItem = searchButton
         view.backgroundColor = .Surfaces.background
+        updateOtherNavigationButton()
     }
 
     private func setupScrollView() {
