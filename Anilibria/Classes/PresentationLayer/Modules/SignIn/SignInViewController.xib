@@ -171,11 +171,11 @@
                                 <constraint firstAttribute="trailing" secondItem="c34-iK-Qxa" secondAttribute="trailing" constant="24" id="6Os-U7-MYt"/>
                                 <constraint firstAttribute="width" priority="750" constant="414" id="6zd-Yk-4S1"/>
                                 <constraint firstAttribute="trailing" secondItem="Jtx-4U-UuI" secondAttribute="trailing" constant="24" id="77Z-zB-DEr"/>
-                                <constraint firstItem="Ltj-bN-iw0" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2IR-3p-WTg" secondAttribute="bottom" constant="40" id="HUi-PZ-0H5"/>
+                                <constraint firstItem="Ltj-bN-iw0" firstAttribute="top" secondItem="2IR-3p-WTg" secondAttribute="bottom" constant="28" id="HUi-PZ-0H5"/>
                                 <constraint firstItem="c34-iK-Qxa" firstAttribute="top" secondItem="p8P-EZ-udW" secondAttribute="bottom" constant="10" id="JEQ-gg-mEF"/>
                                 <constraint firstItem="Zwj-7C-vbw" firstAttribute="top" secondItem="Tef-iB-FmA" secondAttribute="top" constant="60" id="NCq-Mi-q8L"/>
                                 <constraint firstItem="2IR-3p-WTg" firstAttribute="top" secondItem="Jtx-4U-UuI" secondAttribute="bottom" constant="30" id="UnR-yB-zxz"/>
-                                <constraint firstAttribute="bottom" secondItem="Ltj-bN-iw0" secondAttribute="bottom" constant="20" id="X2Y-02-na3"/>
+                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Ltj-bN-iw0" secondAttribute="bottom" constant="34" id="X2Y-02-na3"/>
                                 <constraint firstItem="Zwj-7C-vbw" firstAttribute="centerX" secondItem="Tef-iB-FmA" secondAttribute="centerX" id="X2z-Xx-SmD"/>
                                 <constraint firstItem="2IR-3p-WTg" firstAttribute="centerX" secondItem="Tef-iB-FmA" secondAttribute="centerX" id="cOP-p9-F0h"/>
                                 <constraint firstItem="Ltj-bN-iw0" firstAttribute="centerX" secondItem="Tef-iB-FmA" secondAttribute="centerX" id="df0-tk-umR"/>
