@@ -13,6 +13,7 @@ import UIKit
 struct UserCollectionGroupSection {
     let key: UserCollectionKey
     var items: [Series]
+    var totalCount: Int? = nil
     var isLoading: Bool
 }
 

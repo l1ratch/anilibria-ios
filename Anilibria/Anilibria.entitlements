@@ -8,5 +8,11 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>webcredentials:anilibria.tv</string>
+		<string>webcredentials:anilibria.top</string>
+		<string>webcredentials:wwwnew.anilibria.tv</string>
+	</array>
 </dict>
 </plist>

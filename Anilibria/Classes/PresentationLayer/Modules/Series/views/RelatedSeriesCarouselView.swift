@@ -125,9 +125,8 @@ final class RelatedSeriesCardCell: UICollectionViewCell {
         containerView.backgroundColor = .Surfaces.content
         containerView.layer.cornerRadius = 14
         containerView.layer.cornerCurve = .continuous
-        containerView.layer.borderWidth = 1
-        containerView.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
         containerView.clipsToBounds = true
+        containerView.applyAdaptiveBorder()
         contentView.addSubview(containerView)
 
         posterImageView.translatesAutoresizingMaskIntoConstraints = false

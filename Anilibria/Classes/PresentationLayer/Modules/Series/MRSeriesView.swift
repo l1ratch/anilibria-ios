@@ -317,8 +317,7 @@ final class SeriesViewController: BaseViewController {
             badge.backgroundColor = .Surfaces.content
             badge.layer.cornerRadius = 6
             badge.layer.cornerCurve = .continuous
-            badge.layer.borderWidth = 0.5
-            badge.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+            badge.applyAdaptiveBorder(width: 0.5)
             badge.clipsToBounds = true
             badgesStackView.addArrangedSubview(badge)
         }
@@ -510,8 +509,7 @@ final class SeriesViewController: BaseViewController {
         creditsCard.backgroundColor = .Surfaces.content
         creditsCard.layer.cornerRadius = 14
         creditsCard.layer.cornerCurve = .continuous
-        creditsCard.layer.borderWidth = 1
-        creditsCard.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+        creditsCard.applyAdaptiveBorder()
 
         let stack = UIStackView()
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -574,6 +572,7 @@ final class SeriesViewController: BaseViewController {
         supportLabelContainer.translatesAutoresizingMaskIntoConstraints = false
         supportLabelContainer.smoothCorners(with: 14)
         supportLabelContainer.backgroundColor = .Surfaces.content
+        supportLabelContainer.applyAdaptiveBorder()
     }
 
     private func updateKeyboard(_ note: Notification) {
@@ -826,8 +825,7 @@ extension SeriesViewController: SeriesViewBehavior {
             chip.backgroundColor = .Surfaces.content
             chip.layer.cornerRadius = 14
             chip.layer.cornerCurve = .continuous
-            chip.layer.borderWidth = 1
-            chip.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+            chip.applyAdaptiveBorder()
             chip.contentEdgeInsets = UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
             chip.onSelect = { [weak self] in
                 self?.handler.select(genre: "\(genre.id)")

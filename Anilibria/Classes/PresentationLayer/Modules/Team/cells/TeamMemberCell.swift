@@ -28,12 +28,16 @@ public final class TeamMemberCell: UICollectionViewCell {
         contentView.backgroundColor = .Surfaces.content
         contentView.layer.cornerRadius = 14
         contentView.layer.cornerCurve = .continuous
-        contentView.layer.borderWidth = 1
-        contentView.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
         contentView.clipsToBounds = true
+        contentView.applyAdaptiveBorder()
 
         internView.titleLabel.text = L10n.Common.intern
         vacationView.titleLabel.text = L10n.Common.vacation
+    }
+
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        contentView.applyAdaptiveBorder()
     }
 
     func configure(_ item: TeamMember) {

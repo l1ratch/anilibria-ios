@@ -67,12 +67,22 @@ final class OtherViewController: BaseViewController {
         navigationController?.popViewController(animated: true)
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateCardsTheme()
+    }
+
+    private func updateCardsTheme() {
+        for card in [linkDeviceView?.superview?.superview, settingsTitleLabel?.superview?.superview, teamTitleLabel?.superview?.superview?.superview] {
+            card?.applyAdaptiveBorder()
+        }
+    }
+
     private func setupCards() {
         for card in [linkDeviceView?.superview?.superview, settingsTitleLabel?.superview?.superview, teamTitleLabel?.superview?.superview?.superview] {
             card?.smoothCorners(with: 16)
-            card?.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
-            card?.layer.borderWidth = 1
         }
+        updateCardsTheme()
 
         if let contentStackView = contentStackView {
             profileCardView.translatesAutoresizingMaskIntoConstraints = false

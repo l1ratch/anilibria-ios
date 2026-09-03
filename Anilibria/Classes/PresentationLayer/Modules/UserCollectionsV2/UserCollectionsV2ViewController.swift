@@ -194,7 +194,7 @@ extension UserCollectionsV2ViewController: UICollectionViewDataSource, UICollect
         }
 
         let sectionData = sections[indexPath.section]
-        header.configure(with: sectionData.key, count: sectionData.items.count)
+        header.configure(with: sectionData.key, count: sectionData.totalCount ?? sectionData.items.count)
         header.onSeeAllTap = { [weak self] in
             self?.handler.openDetail(for: sectionData.key)
         }

@@ -14,18 +14,22 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
 
     private let userCollectionsService: UserCollectionsService
     private let favoriteService: FavoriteService
+    private let backendRepository: BackendRepository
 
     private var sections: [UserCollectionGroupSection] = []
     private var allSections: [UserCollectionGroupSection] = []
+    private var collectionCounts: [UserCollectionKey: Int] = [:]
     private var currentQuery: String = ""
     private var bag = Set<AnyCancellable>()
 
     init(
         userCollectionsService: UserCollectionsService,
-        favoriteService: FavoriteService
+        favoriteService: FavoriteService,
+        backendRepository: BackendRepository
     ) {
         self.userCollectionsService = userCollectionsService
         self.favoriteService = favoriteService
+        self.backendRepository = backendRepository
     }
 
     func bind(view: UserCollectionsV2ViewBehavior, router: UserCollectionsV2Routable) {
@@ -72,6 +76,39 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
             .store(in: &bag)
     }
 
+    private func fetchTotalCounts(completion: @escaping () -> Void) {
+        let group = DispatchGroup()
+
+        group.enter()
+        backendRepository.request(FavoriteIDsRequest())
+            .sink(onNext: { [weak self] ids in
+                self?.collectionCounts[.favorites] = ids.count
+                group.leave()
+            }, onError: { _ in
+                group.leave()
+            })
+            .store(in: &bag)
+
+        group.enter()
+        backendRepository.request(GetUserCollectionDataRequest())
+            .sink(onNext: { [weak self] items in
+                guard let self = self else { group.leave(); return }
+                for key in UserCollectionKey.allCases {
+                    if let type = key.collectionType {
+                        self.collectionCounts[key] = items.filter { $0.collectionType == type }.count
+                    }
+                }
+                group.leave()
+            }, onError: { _ in
+                group.leave()
+            })
+            .store(in: &bag)
+
+        group.notify(queue: .main) {
+            completion()
+        }
+    }
+
     private func loadAllCollections() {
         let orderedKeys = UserCollectionsPreferences.getActiveKeys()
 
@@ -82,17 +119,27 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
             loadedSections = cached
         } else {
             loadedSections = orderedKeys.map {
-                UserCollectionGroupSection(key: $0, items: [], isLoading: true)
+                UserCollectionGroupSection(key: $0, items: [], totalCount: collectionCounts[$0], isLoading: true)
             }
             self.sections = loadedSections
             self.allSections = loadedSections
             self.view.set(sections: loadedSections)
         }
 
+        fetchTotalCounts { [weak self] in
+            guard let self = self else { return }
+            self.fetchCarousels(orderedKeys: orderedKeys, initialSections: loadedSections)
+        }
+    }
+
+    private func fetchCarousels(orderedKeys: [UserCollectionKey], initialSections: [UserCollectionGroupSection]) {
+        var loadedSections = initialSections
         let dispatchGroup = DispatchGroup()
 
         for (index, key) in orderedKeys.enumerated() {
             dispatchGroup.enter()
+
+            let total = self.collectionCounts[key]
 
             if let collectionType = key.collectionType {
                 userCollectionsService.fetchSeries(
@@ -103,12 +150,13 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
                 )
                 .sink(onNext: { [weak self] series in
                     guard let self = self else { return }
-                    loadedSections[index] = UserCollectionGroupSection(key: key, items: series, isLoading: false)
+                    let sectionTotal = total ?? series.count
+                    loadedSections[index] = UserCollectionGroupSection(key: key, items: series, totalCount: sectionTotal, isLoading: false)
                     self.view.update(section: loadedSections[index], at: index)
                     dispatchGroup.leave()
                 }, onError: { [weak self] _ in
                     guard let self = self else { return }
-                    loadedSections[index] = UserCollectionGroupSection(key: key, items: [], isLoading: false)
+                    loadedSections[index] = UserCollectionGroupSection(key: key, items: [], totalCount: total ?? 0, isLoading: false)
                     self.view.update(section: loadedSections[index], at: index)
                     dispatchGroup.leave()
                 })
@@ -122,12 +170,13 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
                 )
                 .sink(onNext: { [weak self] series in
                     guard let self = self else { return }
-                    loadedSections[index] = UserCollectionGroupSection(key: key, items: series, isLoading: false)
+                    let sectionTotal = total ?? series.count
+                    loadedSections[index] = UserCollectionGroupSection(key: key, items: series, totalCount: sectionTotal, isLoading: false)
                     self.view.update(section: loadedSections[index], at: index)
                     dispatchGroup.leave()
                 }, onError: { [weak self] _ in
                     guard let self = self else { return }
-                    loadedSections[index] = UserCollectionGroupSection(key: key, items: [], isLoading: false)
+                    loadedSections[index] = UserCollectionGroupSection(key: key, items: [], totalCount: total ?? 0, isLoading: false)
                     self.view.update(section: loadedSections[index], at: index)
                     dispatchGroup.leave()
                 })

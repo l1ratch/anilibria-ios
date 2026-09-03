@@ -28,8 +28,7 @@ final class EpisodesView: UIView {
         btn.backgroundColor = .Surfaces.content
         btn.layer.cornerRadius = 16
         btn.layer.cornerCurve = .continuous
-        btn.layer.borderWidth = 1
-        btn.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+        btn.applyAdaptiveBorder()
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -42,8 +41,7 @@ final class EpisodesView: UIView {
         btn.backgroundColor = .Surfaces.content
         btn.layer.cornerRadius = 16
         btn.layer.cornerCurve = .continuous
-        btn.layer.borderWidth = 1
-        btn.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+        btn.applyAdaptiveBorder()
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()

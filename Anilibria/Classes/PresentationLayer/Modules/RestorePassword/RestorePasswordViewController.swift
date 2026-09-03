@@ -35,23 +35,39 @@ final class RestorePasswordViewController: BaseViewController {
 
     override func setupStrings() {
         super.setupStrings()
+        scrollView.alwaysBounceVertical = false
+        scrollView.bounces = false
+        scrollView.isScrollEnabled = false
+
         navigationItem.title = L10n.Screen.RestorePassword.title
+
         emailField.placeholder = L10n.Screen.RestorePassword.email
         emailField.placeHolderColor = .Text.secondary
+        emailField.keyboardType = .asciiCapable
+        emailField.textContentType = .emailAddress
+        emailField.autocorrectionType = .no
+        emailField.spellCheckingType = .no
+        emailField.autocapitalizationType = .none
 
         tokenField.placeholder = L10n.Screen.RestorePassword.token
         tokenField.placeHolderColor = .Text.secondary
+        tokenField.keyboardType = .asciiCapable
+        tokenField.autocorrectionType = .no
 
         passwordField.placeholder = L10n.Screen.RestorePassword.newPassword
         passwordField.placeHolderColor = .Text.secondary
+        passwordField.keyboardType = .asciiCapable
+        passwordField.textContentType = .newPassword
 
         repeatPasswordField.placeholder = L10n.Screen.RestorePassword.repeatPassword
         repeatPasswordField.placeHolderColor = .Text.secondary
+        repeatPasswordField.keyboardType = .asciiCapable
+        repeatPasswordField.textContentType = .newPassword
 
         continueButton.setTitle(L10n.Buttons.continue, for: .normal)
         continueButton.enabledColor = .Buttons.selected
         continueButton.disabledColor = .Buttons.unselected
-        continueButton.cornerRadius = 6
+        continueButton.cornerRadius = 14
 
         changeModeButton.setTitle(L10n.Buttons.signUp, for: .normal)
         apply(mode: viewModel.mode.value)
@@ -123,11 +139,14 @@ final class RestorePasswordViewController: BaseViewController {
     }
 
     override func keyBoardWillShow(keyboardHeight: CGFloat) {
+        self.scrollView.isScrollEnabled = true
         self.scrollView.contentInset.bottom = keyboardHeight
     }
 
     override func keyBoardWillHide() {
+        self.scrollView.isScrollEnabled = false
         self.scrollView.contentInset.bottom = 0
+        self.scrollView.setContentOffset(.zero, animated: true)
     }
 
     // MARK: - Actions

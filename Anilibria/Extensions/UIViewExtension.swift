@@ -112,6 +112,14 @@ extension UIView {
             layer.maskedCorners = maskedCorners
         }
     }
+
+    func applyAdaptiveBorder(width: CGFloat = 1, alphaDark: CGFloat = 0.08, alphaLight: CGFloat = 0.08) {
+        layer.borderWidth = width
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        layer.borderColor = isDark
+            ? UIColor.white.withAlphaComponent(alphaDark).cgColor
+            : UIColor.black.withAlphaComponent(alphaLight).cgColor
+    }
 }
 
 public extension CACornerMask {
