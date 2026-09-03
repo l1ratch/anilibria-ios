@@ -85,6 +85,9 @@ extension BaseNavigationController: UIGestureRecognizerDelegate {
         _ gestureRecognizer: UIGestureRecognizer,
         shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
+        if gestureRecognizer == self.interactivePopGestureRecognizer {
+            return true
+        }
         return false
     }
 

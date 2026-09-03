@@ -10,6 +10,7 @@ final class MainContainerViewController: BaseViewController {
 
     var handler: MainContainerEventHandler!
     private var pages: [MenuControllerData] = []
+    private let dockBlurView = UIVisualEffectView()
 
     // MARK: - Life cycle
 
@@ -30,22 +31,38 @@ final class MainContainerViewController: BaseViewController {
 
     private func setupFloatingDock() {
         shadowView.shadowColor = .black
-        shadowView.shadowOpacity = 0.4
+        shadowView.shadowOpacity = 0.25
         shadowView.shadowRadius = 16
         shadowView.shadowY = 6
         shadowView.clipsToBounds = false
 
-        tabBarContainer.backgroundColor = UIColor(white: 0.12, alpha: 0.8)
         tabBarContainer.smoothCorners(with: 27)
-        tabBarContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.14).cgColor
-        tabBarContainer.layer.borderWidth = 1
         tabBarContainer.clipsToBounds = true
 
-        let blurEffect = UIBlurEffect(style: .systemMaterialDark)
-        let blurView = UIVisualEffectView(effect: blurEffect)
-        blurView.frame = tabBarContainer.bounds
-        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        tabBarContainer.insertSubview(blurView, at: 0)
+        dockBlurView.frame = tabBarContainer.bounds
+        dockBlurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        tabBarContainer.insertSubview(dockBlurView, at: 0)
+
+        updateDockAppearance()
+    }
+
+    private func updateDockAppearance() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        tabBarContainer.backgroundColor = isDark
+            ? UIColor(white: 0.12, alpha: 0.75)
+            : UIColor(white: 0.98, alpha: 0.82)
+        tabBarContainer.layer.borderColor = isDark
+            ? UIColor.white.withAlphaComponent(0.14).cgColor
+            : UIColor.black.withAlphaComponent(0.08).cgColor
+        tabBarContainer.layer.borderWidth = 1
+        dockBlurView.effect = UIBlurEffect(style: isDark ? .systemMaterialDark : .systemMaterialLight)
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            updateDockAppearance()
+        }
     }
 
     @objc private func handleBottomBarToggle(_ notification: Notification) {

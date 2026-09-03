@@ -19,9 +19,9 @@ public enum MenuItemType: String, CaseIterable {
         case .news:
             return "YouTube"
         case .collections:
-            return Language.isEnglish ? "Collections" : "Коллекции"
+            return Language.isEnglish ? "Collections (Backup)" : "Коллекции (резерв)"
         case .collectionsV2:
-            return Language.isEnglish ? "Lists (v2)" : "Списки (v2)"
+            return Language.isEnglish ? "Lists" : "Списки"
         case .other:
             return Language.isEnglish ? "Other" : "Другое"
         }
@@ -70,39 +70,38 @@ public final class MenuItem: NSObject {
 public final class MenuListItem: ListItem<[MenuItem]> {}
 
 public final class MenuItemsFactory {
-    public static let defaultActiveTypes: [MenuItemType] = [.feedV2, .catalog, .news, .collections, .collectionsV2, .other]
+    public static let defaultActiveTypes: [MenuItemType] = [.feedV2, .catalog, .news, .collectionsV2, .other]
     private static let dockItemsKey = "dock_active_item_types"
 
     public static func getActiveTypes() -> [MenuItemType] {
         if let rawArray = UserDefaults.standard.stringArray(forKey: dockItemsKey) {
             var result = rawArray.compactMap { MenuItemType(rawValue: $0) }
-            if result.contains(.feed) && result.contains(.feedV2) {
-                result.removeAll(where: { $0 == .feed })
-            } else if result.contains(.feed) && !result.contains(.feedV2) {
-                if let idx = result.firstIndex(of: .feed) {
-                    result[idx] = .feedV2
-                }
+            if let idx = result.firstIndex(of: .feed) {
+                result[idx] = .feedV2
             }
-            if !result.contains(.feedV2) && !result.contains(.feed) {
+            if let idx = result.firstIndex(of: .collections) {
+                result[idx] = .collectionsV2
+            }
+            result.removeAll(where: { $0 == .feed || $0 == .collections })
+
+            if !result.contains(.feedV2) {
                 result.insert(.feedV2, at: 0)
             }
-            if !result.contains(.collectionsV2) && !rawArray.contains("collectionsV2") {
-                if let collectionsIndex = result.firstIndex(of: .collections) {
-                    result.insert(.collectionsV2, at: collectionsIndex + 1)
-                } else {
-                    result.insert(.collectionsV2, at: max(0, result.count - 1))
-                }
+            if !result.contains(.collectionsV2) {
+                result.insert(.collectionsV2, at: max(0, result.count - 1))
             }
             if !result.contains(.other) {
                 result.append(.other)
             }
-            return result
+            var seen = Set<MenuItemType>()
+            return result.filter { seen.insert($0).inserted }
         }
         return defaultActiveTypes
     }
 
     public static func setActiveTypes(_ types: [MenuItemType], notify: Bool = true) {
         var finalTypes = types
+        finalTypes.removeAll(where: { $0 == .feed || $0 == .collections })
         if !finalTypes.contains(.other) {
             finalTypes.append(.other)
         }
@@ -115,7 +114,7 @@ public final class MenuItemsFactory {
 
     public static func getHiddenTypes() -> [MenuItemType] {
         let active = Set(getActiveTypes())
-        return MenuItemType.allCases.filter { !active.contains($0) }
+        return MenuItemType.allCases.filter { !active.contains($0) && $0 != .feed && $0 != .collections }
     }
 
     public static func create() -> [MenuItem] {

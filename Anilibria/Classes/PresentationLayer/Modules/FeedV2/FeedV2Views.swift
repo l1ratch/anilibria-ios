@@ -9,12 +9,16 @@ import UIKit
 
 // MARK: - Hero Showcase Cell
 
+final class FeedGradientView: UIView {
+    override class var layerClass: AnyClass { CAGradientLayer.self }
+    var gradientLayer: CAGradientLayer { layer as! CAGradientLayer }
+}
+
 final class FeedV2HeroCell: UICollectionViewCell {
     static let reuseIdentifier = "FeedV2HeroCell"
 
     private let imageView = UIImageView()
-    private let gradientView = UIView()
-    private let gradientLayer = CAGradientLayer()
+    private let gradientView = FeedGradientView()
     private let badgeLabel = UILabel()
     private let badgeContainer = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
     private let titleLabel = UILabel()
@@ -36,18 +40,13 @@ final class FeedV2HeroCell: UICollectionViewCell {
         setupViews()
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        gradientLayer.frame = gradientView.bounds
-    }
-
     private func setupViews() {
         contentView.clipsToBounds = true
         contentView.layer.cornerRadius = 18
         contentView.layer.cornerCurve = .continuous
         contentView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
         contentView.layer.borderWidth = 1
-        contentView.backgroundColor = .Surfaces.content
+        contentView.backgroundColor = UIColor(white: 0.14, alpha: 1.0)
 
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -58,13 +57,12 @@ final class FeedV2HeroCell: UICollectionViewCell {
         gradientView.isUserInteractionEnabled = false
         contentView.addSubview(gradientView)
 
-        gradientLayer.colors = [
+        gradientView.gradientLayer.colors = [
             UIColor.clear.cgColor,
             UIColor.black.withAlphaComponent(0.55).cgColor,
             UIColor.black.withAlphaComponent(0.94).cgColor
         ]
-        gradientLayer.locations = [0.0, 0.35, 1.0]
-        gradientView.layer.addSublayer(gradientLayer)
+        gradientView.gradientLayer.locations = [0.0, 0.35, 1.0]
 
         badgeContainer.clipsToBounds = true
         badgeContainer.layer.cornerRadius = 10
@@ -146,7 +144,13 @@ final class FeedV2HeroCell: UICollectionViewCell {
     }
 
     func configure(with item: PromoItem) {
-        imageView.setImage(from: item.image, placeholder: DefaultPlaceholder())
+        if let img = item.image {
+            imageView.setImage(from: img, placeholder: DefaultPlaceholder())
+            imageView.backgroundColor = .clear
+        } else {
+            imageView.image = nil
+            imageView.backgroundColor = UIColor(white: 0.16, alpha: 1.0)
+        }
 
         switch item.content {
         case .release(let series):
@@ -236,6 +240,7 @@ final class FeedV2QuickActionsView: UIView {
     var onCatalogTap: (() -> Void)?
 
     private let stackView = UIStackView()
+    private var actionButtons: [UIButton] = []
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -245,6 +250,26 @@ final class FeedV2QuickActionsView: UIView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupViews()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateBorders()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateBorders()
+    }
+
+    private func updateBorders() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        let color = isDark
+            ? UIColor.white.withAlphaComponent(0.12).cgColor
+            : UIColor.black.withAlphaComponent(0.08).cgColor
+        for btn in actionButtons {
+            btn.layer.borderColor = color
+        }
     }
 
     private func setupViews() {
@@ -288,10 +313,13 @@ final class FeedV2QuickActionsView: UIView {
 
     private func makeButton(title: String, icon: String, tint: UIColor, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
-        button.backgroundColor = .Surfaces.content
+        button.backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor(white: 0.20, alpha: 0.6)
+                : UIColor(white: 0.94, alpha: 0.95)
+        }
         button.layer.cornerRadius = 14
         button.layer.cornerCurve = .continuous
-        button.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
         button.layer.borderWidth = 1
         button.clipsToBounds = true
 
@@ -303,6 +331,7 @@ final class FeedV2QuickActionsView: UIView {
         button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
         button.addTarget(self, action: action, for: .touchUpInside)
 
+        actionButtons.append(button)
         return button
     }
 
@@ -344,11 +373,31 @@ final class FeedV2ContinueWatchingView: UIView {
         setupViews()
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateCardAppearance()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateCardAppearance()
+    }
+
+    private func updateCardAppearance() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        container.layer.borderColor = isDark
+            ? UIColor.white.withAlphaComponent(0.10).cgColor
+            : UIColor.black.withAlphaComponent(0.08).cgColor
+    }
+
     private func setupViews() {
-        container.backgroundColor = .Surfaces.content
+        container.backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? .Surfaces.content
+                : UIColor(white: 0.96, alpha: 0.95)
+        }
         container.layer.cornerRadius = 16
         container.layer.cornerCurve = .continuous
-        container.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
         container.layer.borderWidth = 1
         container.clipsToBounds = true
         container.translatesAutoresizingMaskIntoConstraints = false

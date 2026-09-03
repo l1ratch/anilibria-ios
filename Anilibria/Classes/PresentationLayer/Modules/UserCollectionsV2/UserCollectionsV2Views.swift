@@ -237,12 +237,32 @@ final class UserCollectionEmptyCell: UICollectionViewCell {
         setupViews()
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateBorders()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateBorders()
+    }
+
+    private func updateBorders() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        container.layer.borderColor = isDark
+            ? UIColor.white.withAlphaComponent(0.08).cgColor
+            : UIColor.black.withAlphaComponent(0.08).cgColor
+    }
+
     private func setupViews() {
         container.translatesAutoresizingMaskIntoConstraints = false
-        container.backgroundColor = UIColor(white: 0.15, alpha: 0.4)
+        container.backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor(white: 0.15, alpha: 0.4)
+                : UIColor(white: 0.94, alpha: 0.8)
+        }
         container.layer.cornerRadius = 14
         container.layer.cornerCurve = .continuous
-        container.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
         container.layer.borderWidth = 1
         contentView.addSubview(container)
 

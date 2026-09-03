@@ -23,15 +23,17 @@ public struct MainTheme: AppTheme {
         let navbar = UINavigationBar.appearance()
         navbar.tintColor = .Tint.main
         let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .Surfaces.background
         appearance.titleTextAttributes = [
             .foregroundColor: UIColor.Text.main,
-            .font: UIFont.font(ofSize: 17, weight: .medium)
+            .font: UIFont.font(ofSize: 17, weight: .semibold)
         ]
         appearance.shadowColor = .clear
 
         navbar.standardAppearance = appearance
         navbar.scrollEdgeAppearance = appearance
+        navbar.compactAppearance = appearance
     }
 
     func configureTextView() {

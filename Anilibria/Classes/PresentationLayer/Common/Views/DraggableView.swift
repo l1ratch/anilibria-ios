@@ -251,7 +251,12 @@ extension DraggableView: UIGestureRecognizerDelegate {
         if gestureRecognizer == panRecognizer {
             let view = panRecognizer.view
             let translation = panRecognizer.translation(in: view)
-            return abs(translation.y) <= abs(translation.x)
+            guard abs(translation.y) <= abs(translation.x) else { return false }
+            // If cell is closed, rightward swipe is an interactive pop gesture; do not intercept it
+            if !isOpen && translation.x > 0 {
+                return false
+            }
+            return true
         }
 
         return true

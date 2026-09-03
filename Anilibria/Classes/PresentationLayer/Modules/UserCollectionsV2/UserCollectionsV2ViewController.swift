@@ -47,17 +47,6 @@ final class UserCollectionsV2ViewController: BaseViewController {
         navigationItem.title = Language.isEnglish ? "Lists" : "Списки"
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.setRightBarButtonItems([searchButton], animated: false)
-
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithDefaultBackground()
-        appearance.backgroundEffect = UIBlurEffect(style: .systemMaterialDark)
-        appearance.backgroundColor = UIColor.black.withAlphaComponent(0.3)
-        appearance.titleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.systemFont(ofSize: 18, weight: .bold)
-        ]
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
 
     // MARK: - Setup Collection View

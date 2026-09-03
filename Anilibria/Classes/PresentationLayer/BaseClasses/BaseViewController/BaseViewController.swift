@@ -30,7 +30,7 @@ class BaseViewController: UIViewController, WaitingBehavior, Loggable {
         super.viewDidLoad()
         self.setupBackButton()
         self.setupStrings()
-        view.backgroundColor = .Surfaces.base
+        view.backgroundColor = .Surfaces.background
     }
 
     public override func viewWillLayoutSubviews() {
