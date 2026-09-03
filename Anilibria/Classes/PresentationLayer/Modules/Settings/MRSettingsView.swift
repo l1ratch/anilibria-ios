@@ -16,6 +16,8 @@ final class SettingsViewController: BaseViewController {
     @IBOutlet var aboutTitleLabel: UILabel!
     @IBOutlet var appNameLabel: UILabel!
     @IBOutlet var appVersionLabel: UILabel!
+    @IBOutlet var modificationTitleLabel: UILabel!
+    @IBOutlet var modificationAuthorLabel: UILabel!
 
     var handler: SettingsEventHandler!
 
@@ -47,6 +49,8 @@ final class SettingsViewController: BaseViewController {
         self.playerTitleLabel?.text = "Плеер"
         self.customizationTitleLabel?.text = "Кастомизация"
         self.aboutTitleLabel.text = L10n.Screen.Settings.aboutApp
+        self.modificationTitleLabel?.text = Language.isEnglish ? "Modification" : "Модификация"
+        self.modificationAuthorLabel?.text = "l1ratch"
     }
 }
 

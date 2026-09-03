@@ -306,7 +306,12 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             guard !heroItems.isEmpty else { return }
             let actualIndex = indexPath.item % heroItems.count
             let item = heroItems[actualIndex]
-            handler.selectPromoDetails(promo: item)
+            switch item.content {
+            case .release:
+                return
+            default:
+                handler.selectPromoDetails(promo: item)
+            }
         } else {
             guard indexPath.item < scheduleItems.count else { return }
             let item = scheduleItems[indexPath.item]

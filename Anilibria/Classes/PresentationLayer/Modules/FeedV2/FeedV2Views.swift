@@ -28,6 +28,9 @@ final class FeedV2HeroCell: UICollectionViewCell {
     private var subtitleTrailingToButton: NSLayoutConstraint!
     private var subtitleTrailingToContent: NSLayoutConstraint!
 
+    private let readMoreHintLabel = UILabel()
+    private var actionButtonWidthConstraint: NSLayoutConstraint!
+
     var onActionTap: (() -> Void)?
 
     override init(frame: CGRect) {
@@ -101,8 +104,15 @@ final class FeedV2HeroCell: UICollectionViewCell {
         actionButton.addTarget(self, action: #selector(didTapAction), for: .touchUpInside)
         contentView.addSubview(actionButton)
 
+        readMoreHintLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        readMoreHintLabel.textColor = UIColor.white.withAlphaComponent(0.7)
+        readMoreHintLabel.translatesAutoresizingMaskIntoConstraints = false
+        readMoreHintLabel.isHidden = true
+        contentView.addSubview(readMoreHintLabel)
+
         subtitleTrailingToButton = subtitleLabel.trailingAnchor.constraint(equalTo: actionButton.leadingAnchor, constant: -10)
         subtitleTrailingToContent = subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -14)
+        actionButtonWidthConstraint = actionButton.widthAnchor.constraint(equalToConstant: 110)
 
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -127,7 +137,10 @@ final class FeedV2HeroCell: UICollectionViewCell {
             actionButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -14),
             actionButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),
             actionButton.heightAnchor.constraint(equalToConstant: 32),
-            actionButton.widthAnchor.constraint(equalToConstant: 110),
+            actionButtonWidthConstraint,
+
+            readMoreHintLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -14),
+            readMoreHintLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),
 
             subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 14),
             subtitleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),
@@ -162,11 +175,13 @@ final class FeedV2HeroCell: UICollectionViewCell {
             subtitleLabel.text = genres.isEmpty ? (series.season?.description ?? defaultAnime) : genres
             subtitleLabel.numberOfLines = 1
             actionButton.isHidden = false
+            actionButtonWidthConstraint.constant = 110
             actionButton.setTitle(Language.isEnglish ? "  Watch" : "  Смотреть", for: .normal)
             actionButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
             actionButton.backgroundColor = UIColor(white: 1.0, alpha: 0.22)
             actionButton.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
             actionButton.layer.borderWidth = 1
+            readMoreHintLabel.isHidden = true
             subtitleTrailingToContent.isActive = false
             subtitleTrailingToButton.isActive = true
 
@@ -175,12 +190,14 @@ final class FeedV2HeroCell: UICollectionViewCell {
             titleLabel.text = ad.title
             titleLabel.numberOfLines = 2
             subtitleLabel.text = ad.info
-            subtitleLabel.numberOfLines = 2
+            subtitleLabel.numberOfLines = 3
             actionButton.isHidden = false
+            actionButtonWidthConstraint.constant = 88
             actionButton.setTitle(Language.isEnglish ? "  Open" : "  Перейти", for: .normal)
             actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
             actionButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
             actionButton.layer.borderWidth = 0
+            readMoreHintLabel.isHidden = true
             subtitleTrailingToContent.isActive = false
             subtitleTrailingToButton.isActive = true
 
@@ -192,42 +209,43 @@ final class FeedV2HeroCell: UICollectionViewCell {
             } else {
                 titleLabel.text = Language.isEnglish ? "Announcement" : "Анонс"
             }
-            titleLabel.numberOfLines = 2
-            subtitleLabel.text = item.info
-            subtitleLabel.numberOfLines = 4
+            titleLabel.numberOfLines = 1
 
-            actionButton.isHidden = false
             if promo.url != nil {
-                actionButton.setTitle(Language.isEnglish ? "  Details" : "  Подробнее", for: .normal)
+                subtitleLabel.text = item.info
+                subtitleLabel.numberOfLines = 3
+                actionButton.isHidden = false
+                actionButtonWidthConstraint.constant = 88
+                actionButton.setTitle(Language.isEnglish ? "  Open" : "  Перейти", for: .normal)
                 actionButton.setImage(UIImage(systemName: "arrow.up.right"), for: .normal)
                 actionButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
                 actionButton.layer.borderWidth = 0
+                readMoreHintLabel.isHidden = true
                 subtitleTrailingToContent.isActive = false
                 subtitleTrailingToButton.isActive = true
             } else {
-                actionButton.setTitle(Language.isEnglish ? "  Read" : "  Читать", for: .normal)
-                actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
-                actionButton.backgroundColor = UIColor(white: 1.0, alpha: 0.22)
-                actionButton.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
-                actionButton.layer.borderWidth = 1
-                subtitleTrailingToContent.isActive = false
-                subtitleTrailingToButton.isActive = true
+                // Pure text post: maximize space for text, no bulky button
+                subtitleLabel.text = item.info
+                subtitleLabel.numberOfLines = 5
+                actionButton.isHidden = true
+                readMoreHintLabel.text = Language.isEnglish ? "Details ›" : "Подробнее ›"
+                readMoreHintLabel.isHidden = false
+                subtitleTrailingToButton.isActive = false
+                subtitleTrailingToContent.isActive = true
             }
 
         case nil:
+            // Pure text post: maximize space for text, no bulky button
             badgeLabel.text = Language.isEnglish ? "📢 NEWS" : "📢 НОВОСТЬ"
             titleLabel.text = Language.isEnglish ? "Information" : "Информация"
             titleLabel.numberOfLines = 1
             subtitleLabel.text = item.info
-            subtitleLabel.numberOfLines = 4
-            actionButton.isHidden = false
-            actionButton.setTitle(Language.isEnglish ? "  Read" : "  Читать", for: .normal)
-            actionButton.setImage(UIImage(systemName: "doc.text.fill"), for: .normal)
-            actionButton.backgroundColor = UIColor(white: 1.0, alpha: 0.22)
-            actionButton.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
-            actionButton.layer.borderWidth = 1
-            subtitleTrailingToContent.isActive = false
-            subtitleTrailingToButton.isActive = true
+            subtitleLabel.numberOfLines = 5
+            actionButton.isHidden = true
+            readMoreHintLabel.text = Language.isEnglish ? "Details ›" : "Подробнее ›"
+            readMoreHintLabel.isHidden = false
+            subtitleTrailingToButton.isActive = false
+            subtitleTrailingToContent.isActive = true
         }
     }
 }
