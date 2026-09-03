@@ -13,6 +13,7 @@ final class UserCollectionsV2ViewController: BaseViewController {
 
     private var sections: [UserCollectionGroupSection] = []
     private var collectionView: UICollectionView!
+    private var loadingActivity: ActivityDisposable?
 
     private lazy var searchButton = BarButton(
         image: .System.search,
@@ -222,8 +223,6 @@ extension UserCollectionsV2ViewController: UserCollectionsV2ViewBehavior {
             self.collectionView.reloadSections(IndexSet(integer: index))
         }
     }
-
-    private var loadingActivity: ActivityDisposable?
 
     func showLoading(_ show: Bool) {
         if show {
