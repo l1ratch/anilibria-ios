@@ -12,33 +12,41 @@ import Combine
 final class EpisodesView: UIView {
     private static let actionsViewHeight: CGFloat = 44
 
-    private var actionTopConstraint: NSLayoutConstraint?
-    private var actionBottomConstraint: NSLayoutConstraint?
-
-    private let actionsContainer: UIView = {
-        let view = UIView()
-        view.backgroundColor = .Buttons.unselected
-        view.smoothCorners(with: EpisodesView.actionsViewHeight / 2)
-        return view
-    }()
+    private let headerContainer = UIView()
+    private let titleLabel = UILabel()
+    private let countBadge = UILabel()
 
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout())
 
     public lazy var adapter = CollectionViewAdapter(collectionView: collectionView)
 
-    private let searchView: SearchView = SearchView(
-        frame: CGRect(origin: .zero, size: .init(width: 320, height: 40))
-    )
+    private lazy var reverseButton: UIButton = {
+        let btn = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
+        btn.setImage(UIImage(systemName: "arrow.up.arrow.down", withConfiguration: config), for: .normal)
+        btn.tintColor = .Text.main
+        btn.backgroundColor = .Surfaces.content
+        btn.layer.cornerRadius = 16
+        btn.layer.cornerCurve = .continuous
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
 
-    private lazy var reverseButton = BarRippleButton.make(
-        image: .System.upDownArrows,
-        imageEdge: inset(5, 5, 5, 5)
-    )
-
-    private lazy var optionsButton = BarRippleButton.make(
-        image: .System.pencil,
-        imageEdge: inset(5, 5, 5, 5)
-    )
+    private lazy var optionsButton: UIButton = {
+        let btn = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
+        btn.setImage(UIImage(systemName: "checkmark.circle", withConfiguration: config), for: .normal)
+        btn.tintColor = .Text.main
+        btn.backgroundColor = .Surfaces.content
+        btn.layer.cornerRadius = 16
+        btn.layer.cornerCurve = .continuous
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
 
     private let stubView: StubView? = StubView.fromNib()?.apply {
         $0.set(image: .System.play, color: .Text.secondary)
@@ -54,15 +62,12 @@ final class EpisodesView: UIView {
 
     private lazy var episodesHandler = EpisodeCellAdapterHandler(
         select: { [weak self] item in
-            self?.searchView.resignFirstResponder()
             self?.viewModel?.play(item: item)
         }
     )
 
     var isCompact: Bool = true {
         didSet {
-            actionTopConstraint?.isActive = !isCompact
-            actionBottomConstraint?.isActive = isCompact
             sectionAdapter.isCompact = isCompact
             stubView?.isHorizontal = isCompact
 
@@ -76,7 +81,7 @@ final class EpisodesView: UIView {
                 )
                 stubView?.messageLinesLimit = 3
             } else {
-                collectionView.contentInset.top = 16 + Self.actionsViewHeight
+                collectionView.contentInset.top = 8
                 self.adapter.setLayout(
                     type: UICollectionViewCompositionalLayout.self
                 )
@@ -97,23 +102,81 @@ final class EpisodesView: UIView {
     }
 
     private func setup() {
+        setupHeader()
+
         addSubview(collectionView)
-        collectionView.constraintEdgesToSuperview()
-        addSubview(actionsContainer)
-        actionsContainer.translatesAutoresizingMaskIntoConstraints = false
-        actionBottomConstraint = actionsContainer.bottomAnchor.constraint(equalTo: bottomAnchor)
-        actionTopConstraint = actionsContainer.topAnchor.constraint(equalTo: topAnchor, constant: 8)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            actionsContainer.heightAnchor.constraint(equalToConstant: Self.actionsViewHeight),
-            actionsContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            actionsContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            collectionView.topAnchor.constraint(equalTo: headerContainer.bottomAnchor, constant: 10),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+
         isCompact = true
 
-        self.setupSearchView()
-        self.addKeyboardObservers()
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = .clear
+    }
+
+    private func setupHeader() {
+        headerContainer.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(headerContainer)
+
+        titleLabel.text = Language.isEnglish ? "Episodes" : "Серии"
+        titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        titleLabel.textColor = .Text.main
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        countBadge.font = .systemFont(ofSize: 12, weight: .medium)
+        countBadge.textColor = .Text.secondary
+        countBadge.translatesAutoresizingMaskIntoConstraints = false
+
+        let leftStack = UIStackView(arrangedSubviews: [titleLabel, countBadge])
+        leftStack.axis = .horizontal
+        leftStack.spacing = 8
+        leftStack.alignment = .firstBaseline
+        leftStack.translatesAutoresizingMaskIntoConstraints = false
+        headerContainer.addSubview(leftStack)
+
+        let rightStack = UIStackView(arrangedSubviews: [reverseButton, optionsButton])
+        rightStack.axis = .horizontal
+        rightStack.spacing = 8
+        rightStack.alignment = .center
+        rightStack.translatesAutoresizingMaskIntoConstraints = false
+        headerContainer.addSubview(rightStack)
+
+        NSLayoutConstraint.activate([
+            headerContainer.topAnchor.constraint(equalTo: topAnchor),
+            headerContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            headerContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            headerContainer.heightAnchor.constraint(equalToConstant: 34),
+
+            leftStack.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor),
+            leftStack.centerYAnchor.constraint(equalTo: headerContainer.centerYAnchor),
+
+            rightStack.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor),
+            rightStack.centerYAnchor.constraint(equalTo: headerContainer.centerYAnchor),
+
+            reverseButton.widthAnchor.constraint(equalToConstant: 32),
+            reverseButton.heightAnchor.constraint(equalToConstant: 32),
+
+            optionsButton.widthAnchor.constraint(equalToConstant: 32),
+            optionsButton.heightAnchor.constraint(equalToConstant: 32)
+        ])
+
+        reverseButton.addTarget(self, action: #selector(didTapReverse), for: .touchUpInside)
+        optionsButton.addTarget(self, action: #selector(didTapOptions), for: .touchUpInside)
+    }
+
+    @objc private func didTapReverse() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        viewModel?.toggleDirection()
+    }
+
+    @objc private func didTapOptions() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        viewModel?.showOptions()
     }
 
     func invalidateLayout() {
@@ -125,6 +188,7 @@ final class EpisodesView: UIView {
         itemsSubscribers.removeAll()
         viewModel.items.removeDuplicates().sink { [weak self] items in
             self?.set(items: items)
+            self?.updateCountBadge(items: items)
         }.store(in: &itemsSubscribers)
 
         viewModel.$isEmpty.removeDuplicates().sink { [weak self] empty in
@@ -134,60 +198,19 @@ final class EpisodesView: UIView {
         }.store(in: &itemsSubscribers)
     }
 
-    private func addKeyboardObservers() {
-        NotificationCenter.default
-            .publisher(for: UIApplication.keyboardWillChangeFrameNotification)
-            .sink { [weak self] notification in
-                self?.updateKeyboard(notification)
-            }
-            .store(in: &subscribers)
-    }
-
-    private func updateKeyboard(_ note: Notification) {
-        guard
-            !isCompact,
-            let info = note.userInfo,
-            let endFrameScreen = info[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
-        else { return }
-
-        let endFrameInView = convert(endFrameScreen, from: nil)
-        let overlap = bounds.intersection(endFrameInView).height
-
-        collectionView.contentInset.bottom = max(0, overlap - safeAreaInsets.bottom)
-    }
-
-    private func setupSearchView() {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        actionsContainer.addSubview(stackView)
-        stackView.constraintEdgesToSuperview(.init(right: 8))
-        stackView.addArrangedSubview(searchView)
-        stackView.addArrangedSubview(reverseButton)
-        stackView.addArrangedSubview(optionsButton)
-        optionsButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        reverseButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-
-        searchView.querySequence()
-            .sink(onNext: { [weak self] text in
-                self?.viewModel?.search(query: text)
-                if text.isEmpty {
-                    self?.stubView?.message = L10n.Stub.noEpisodes
-                } else {
-                    self?.stubView?.message = L10n.Stub.messageNotFound(text)
-                }
-            })
-            .store(in: &subscribers)
-
-        optionsButton.publisher(for: .touchUpInside).sink { [weak self] in
-            self?.viewModel?.showOptions()
+    private func updateCountBadge(items: [EpisodeViewModel]?) {
+        guard let items, !items.isEmpty else {
+            countBadge.text = ""
+            return
         }
-        .store(in: &subscribers)
-
-        reverseButton.publisher(for: .touchUpInside).sink { [weak self] in
-            self?.viewModel?.toggleDirection()
+        let total = items.count
+        let watched = items.filter { $0.timecode.isWatched }.count
+        if watched > 0 {
+            countBadge.text = "\(watched)/\(total)"
+        } else {
+            let epWord = Language.isEnglish ? "episodes" : "эпизодов"
+            countBadge.text = "\(total) \(epWord)"
         }
-        .store(in: &subscribers)
     }
 }
 

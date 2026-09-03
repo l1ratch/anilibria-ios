@@ -34,7 +34,6 @@ final class SeriesViewController: BaseViewController {
     @IBOutlet var compactEpisodesContainer: UIView!
 
     private let episodesView = EpisodesView()
-
     private var bag = Set<AnyCancellable>()
 
     private var episodesContainreHidden: Bool = true {
@@ -49,20 +48,44 @@ final class SeriesViewController: BaseViewController {
 
     var handler: SeriesEventHandler!
 
-    private var playButtonInset: CGFloat = 0 {
-        didSet { updateInsets() }
-    }
     private var keyboardInset: CGFloat = 0 {
         didSet { updateInsets() }
     }
 
-    private let boldTextBuilder = AttributeStringBuilder()
-        .set(color: .Text.secondary)
-        .set(font: UIFont.font(ofSize: 16, weight: .bold))
+    // MARK: - Modern UI Components
 
-    private let regularTextBuilder = AttributeStringBuilder()
-        .set(color: .Text.main)
-        .set(font: UIFont.font(ofSize: 16, weight: .regular))
+    private let modernHeaderView = UIView()
+    private let posterWrapper = UIView()
+    private let metaStackView = UIStackView()
+    private let badgesScrollView = UIScrollView()
+    private let badgesStackView = UIStackView()
+    private let typeBadge = BadgeLabel()
+    private let yearBadge = BadgeLabel()
+    private let seasonBadge = BadgeLabel()
+    private let episodesBadge = BadgeLabel()
+    private let modernAnonceContainer = UIView()
+    private let modernAnonceLabel = UILabel()
+
+    private let modernWatchButton = UIButton(type: .system)
+    private let modernWatchLabel = UILabel()
+    private let modernWatchIcon = UIImageView()
+
+    private let actionsContainerView = UIView()
+
+    private let genresScrollView = UIScrollView()
+    private let genresStackView = UIStackView()
+
+    private let synopsisContainer = UIView()
+    private let synopsisTitleLabel = UILabel()
+    private let synopsisLabel = UILabel()
+    private let expandSynopsisButton = UIButton(type: .system)
+    private var isSynopsisExpanded = false
+
+    private let creditsCard = UIView()
+    private let creditsTitleLabel = UILabel()
+    private let creditsStackView = UIStackView()
+
+    private let relatedCarouselView = RelatedSeriesCarouselView()
 
     // MARK: - Life cycle
 
@@ -71,31 +94,10 @@ final class SeriesViewController: BaseViewController {
         super.viewDidLoad()
         self.setupNavigationButtons()
         addRefreshControl(scrollView: scrollView)
-        seriesImageView.smoothCorners(with: 14)
         updateEpisodesUI()
+        setupModernLayout()
 
-        let action: Action<URL> = { [weak self] url in
-            if url.isAttributeLink {
-                if let genre = url.attributeLinkValue {
-                    self?.handler.select(genre: genre)
-                }
-                return
-            }
-            self?.handler.select(url: url)
-        }
-
-        infoTextView.setTapLink(handler: action)
-
-        let color = UIColor.Tint.active
-        infoTextView.linkTextAttributes = [
-            .foregroundColor: color,
-            .underlineColor: color
-        ]
-
-        infoTextView.textContainerInset = .zero
-        infoTextView.font = .font(ofSize: 16, weight: .regular)
-        infoTextView.textColor = .Text.main
-        supportLabelContainer.cornerRadius = 6
+        supportLabelContainer.cornerRadius = 14
 
         relatedShimmerView.smoothCorners(with: 14)
         relatedShimmerView.backgroundColor = .Tint.shimmer
@@ -109,21 +111,400 @@ final class SeriesViewController: BaseViewController {
             $0.run()
         }
 
-        seriesImageView.publisher(for: \.center).removeDuplicates().sink { [weak self] _ in
-            guard let self else { return }
-            infoTextView.textContainer.exclusionPaths = [
-                UIBezierPath(rect: seriesImageView.frame.inset(
-                    by: UIEdgeInsets(top: 0, left: -8, bottom: 8, right: 0)
-                ))
-            ]
-        }.store(in: &bag)
-
         NotificationCenter.default
             .publisher(for: UIApplication.keyboardWillChangeFrameNotification)
             .sink { [weak self] notification in
                 self?.updateKeyboard(notification)
             }
             .store(in: &bag)
+    }
+
+    private func setupModernLayout() {
+        guard let mainStack = titleLabel.superview?.superview as? UIStackView else { return }
+
+        // 1. Hide the old floating play button container
+        playButtonContainer.superview?.isHidden = true
+        playButtonContainer.isHidden = true
+
+        // 2. Hide old newspaper-layout container and old labels
+        infoTextView.isHidden = true
+        infoTextView.superview?.isHidden = true
+        anonceLabel.isHidden = true
+        titleLabel.superview?.isHidden = true
+
+        // 3. Configure mainStack
+        mainStack.axis = .vertical
+        mainStack.spacing = 16
+        mainStack.alignment = .fill
+        mainStack.isLayoutMarginsRelativeArrangement = true
+        mainStack.layoutMargins = UIEdgeInsets(top: 8, left: 16, bottom: 32, right: 16)
+
+        // Clear existing arranged subviews
+        let oldSubviews = mainStack.arrangedSubviews
+        oldSubviews.forEach { mainStack.removeArrangedSubview($0) }
+
+        // Setup individual sections
+        setupHeaderSection()
+        setupWatchButton()
+        setupSecondaryActions()
+        setupGenresSection()
+        setupSynopsisSection()
+        setupCreditsSection()
+        setupEpisodesSection()
+        setupRelatedSection()
+        setupSupportSection()
+
+        // Assemble into mainStack
+        mainStack.addArrangedSubview(modernHeaderView)
+        mainStack.addArrangedSubview(modernWatchButton)
+        mainStack.addArrangedSubview(actionsContainerView)
+        mainStack.addArrangedSubview(genresScrollView)
+        mainStack.addArrangedSubview(synopsisContainer)
+        mainStack.addArrangedSubview(creditsCard)
+        mainStack.addArrangedSubview(compactEpisodesContainer)
+        mainStack.addArrangedSubview(relatedView)
+        mainStack.addArrangedSubview(supportLabelContainer)
+        #if targetEnvironment(macCatalyst)
+        mainStack.addArrangedSubview(torrentsStackView)
+        #endif
+    }
+
+    private func setupHeaderSection() {
+        modernHeaderView.translatesAutoresizingMaskIntoConstraints = false
+
+        let headerStack = UIStackView()
+        headerStack.translatesAutoresizingMaskIntoConstraints = false
+        headerStack.axis = .horizontal
+        headerStack.spacing = 14
+        headerStack.alignment = .top
+        modernHeaderView.addSubview(headerStack)
+
+        NSLayoutConstraint.activate([
+            headerStack.topAnchor.constraint(equalTo: modernHeaderView.topAnchor),
+            headerStack.leadingAnchor.constraint(equalTo: modernHeaderView.leadingAnchor),
+            headerStack.trailingAnchor.constraint(equalTo: modernHeaderView.trailingAnchor),
+            headerStack.bottomAnchor.constraint(equalTo: modernHeaderView.bottomAnchor)
+        ])
+
+        // Poster
+        posterWrapper.translatesAutoresizingMaskIntoConstraints = false
+        posterWrapper.layer.cornerRadius = 14
+        posterWrapper.layer.cornerCurve = .continuous
+        posterWrapper.clipsToBounds = true
+
+        seriesImageView.translatesAutoresizingMaskIntoConstraints = false
+        seriesImageView.removeConstraints(seriesImageView.constraints)
+        seriesImageView.contentMode = .scaleAspectFill
+        seriesImageView.layer.cornerRadius = 14
+        seriesImageView.layer.cornerCurve = .continuous
+        seriesImageView.layer.borderWidth = 1
+        seriesImageView.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        seriesImageView.clipsToBounds = true
+        posterWrapper.addSubview(seriesImageView)
+
+        weekDayView.translatesAutoresizingMaskIntoConstraints = false
+        weekDayView.constraints.forEach {
+            if $0.firstAttribute == .width || $0.firstAttribute == .height {
+                weekDayView.removeConstraint($0)
+            }
+        }
+        posterWrapper.addSubview(weekDayView)
+
+        NSLayoutConstraint.activate([
+            posterWrapper.widthAnchor.constraint(equalToConstant: 114),
+            posterWrapper.heightAnchor.constraint(equalToConstant: 164),
+
+            seriesImageView.topAnchor.constraint(equalTo: posterWrapper.topAnchor),
+            seriesImageView.leadingAnchor.constraint(equalTo: posterWrapper.leadingAnchor),
+            seriesImageView.trailingAnchor.constraint(equalTo: posterWrapper.trailingAnchor),
+            seriesImageView.bottomAnchor.constraint(equalTo: posterWrapper.bottomAnchor),
+
+            weekDayView.topAnchor.constraint(equalTo: posterWrapper.topAnchor, constant: 6),
+            weekDayView.leadingAnchor.constraint(equalTo: posterWrapper.leadingAnchor, constant: 6),
+            weekDayView.widthAnchor.constraint(equalToConstant: 32),
+            weekDayView.heightAnchor.constraint(equalToConstant: 32)
+        ])
+
+        headerStack.addArrangedSubview(posterWrapper)
+
+        // Meta Column
+        metaStackView.translatesAutoresizingMaskIntoConstraints = false
+        metaStackView.axis = .vertical
+        metaStackView.spacing = 5
+        metaStackView.alignment = .leading
+
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.font = .systemFont(ofSize: 19, weight: .bold)
+        titleLabel.textColor = .Text.main
+        titleLabel.numberOfLines = 3
+        metaStackView.addArrangedSubview(titleLabel)
+
+        secondTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        secondTitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        secondTitleLabel.textColor = .Text.secondary
+        secondTitleLabel.numberOfLines = 2
+        metaStackView.addArrangedSubview(secondTitleLabel)
+
+        // Badges
+        badgesStackView.translatesAutoresizingMaskIntoConstraints = false
+        badgesStackView.axis = .horizontal
+        badgesStackView.spacing = 6
+        badgesStackView.alignment = .center
+
+        [typeBadge, yearBadge, seasonBadge, episodesBadge].forEach { badge in
+            badge.font = .systemFont(ofSize: 11, weight: .medium)
+            badge.textColor = .Text.secondary
+            badge.backgroundColor = .Surfaces.content
+            badge.layer.cornerRadius = 6
+            badge.layer.cornerCurve = .continuous
+            badge.layer.borderWidth = 0.5
+            badge.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+            badge.clipsToBounds = true
+            badgesStackView.addArrangedSubview(badge)
+        }
+
+        badgesScrollView.translatesAutoresizingMaskIntoConstraints = false
+        badgesScrollView.showsHorizontalScrollIndicator = false
+        badgesScrollView.addSubview(badgesStackView)
+        NSLayoutConstraint.activate([
+            badgesStackView.topAnchor.constraint(equalTo: badgesScrollView.topAnchor),
+            badgesStackView.leadingAnchor.constraint(equalTo: badgesScrollView.leadingAnchor),
+            badgesStackView.trailingAnchor.constraint(equalTo: badgesScrollView.trailingAnchor),
+            badgesStackView.bottomAnchor.constraint(equalTo: badgesScrollView.bottomAnchor),
+            badgesStackView.heightAnchor.constraint(equalTo: badgesScrollView.heightAnchor),
+            badgesScrollView.heightAnchor.constraint(equalToConstant: 24)
+        ])
+        metaStackView.addArrangedSubview(badgesScrollView)
+
+        // Anonce badge
+        modernAnonceContainer.translatesAutoresizingMaskIntoConstraints = false
+        modernAnonceContainer.backgroundColor = (UIColor(named: "buttons/selected") ?? .systemRed).withAlphaComponent(0.12)
+        modernAnonceContainer.layer.cornerRadius = 8
+        modernAnonceContainer.layer.cornerCurve = .continuous
+        modernAnonceContainer.layer.borderWidth = 0.5
+        modernAnonceContainer.layer.borderColor = (UIColor(named: "buttons/selected") ?? .systemRed).withAlphaComponent(0.3).cgColor
+        modernAnonceContainer.isHidden = true
+
+        modernAnonceLabel.translatesAutoresizingMaskIntoConstraints = false
+        modernAnonceLabel.font = .systemFont(ofSize: 11, weight: .medium)
+        modernAnonceLabel.textColor = UIColor(named: "buttons/selected") ?? .systemRed
+        modernAnonceLabel.numberOfLines = 2
+        modernAnonceContainer.addSubview(modernAnonceLabel)
+
+        NSLayoutConstraint.activate([
+            modernAnonceLabel.topAnchor.constraint(equalTo: modernAnonceContainer.topAnchor, constant: 4),
+            modernAnonceLabel.bottomAnchor.constraint(equalTo: modernAnonceContainer.bottomAnchor, constant: -4),
+            modernAnonceLabel.leadingAnchor.constraint(equalTo: modernAnonceContainer.leadingAnchor, constant: 8),
+            modernAnonceLabel.trailingAnchor.constraint(equalTo: modernAnonceContainer.trailingAnchor, constant: -8)
+        ])
+        metaStackView.addArrangedSubview(modernAnonceContainer)
+
+        headerStack.addArrangedSubview(metaStackView)
+    }
+
+    private func setupWatchButton() {
+        modernWatchButton.translatesAutoresizingMaskIntoConstraints = false
+        modernWatchButton.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
+        modernWatchButton.layer.cornerRadius = 14
+        modernWatchButton.layer.cornerCurve = .continuous
+        modernWatchButton.clipsToBounds = true
+
+        let contentStack = UIStackView()
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        contentStack.axis = .horizontal
+        contentStack.spacing = 8
+        contentStack.alignment = .center
+        contentStack.isUserInteractionEnabled = false
+        modernWatchButton.addSubview(contentStack)
+
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .bold)
+        modernWatchIcon.image = UIImage(systemName: "play.fill", withConfiguration: config)
+        modernWatchIcon.tintColor = .white
+        modernWatchIcon.contentMode = .scaleAspectFit
+        contentStack.addArrangedSubview(modernWatchIcon)
+
+        modernWatchLabel.font = .systemFont(ofSize: 16, weight: .bold)
+        modernWatchLabel.textColor = .white
+        modernWatchLabel.text = Language.isEnglish ? "Watch Episode 1" : "Смотреть 1 эпизод"
+        contentStack.addArrangedSubview(modernWatchLabel)
+
+        NSLayoutConstraint.activate([
+            modernWatchButton.heightAnchor.constraint(equalToConstant: 48),
+
+            contentStack.centerXAnchor.constraint(equalTo: modernWatchButton.centerXAnchor),
+            contentStack.centerYAnchor.constraint(equalTo: modernWatchButton.centerYAnchor)
+        ])
+
+        modernWatchButton.addTarget(self, action: #selector(didTapModernWatch), for: .touchUpInside)
+    }
+
+    @objc private func didTapModernWatch() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        handler.play()
+    }
+
+    private func setupSecondaryActions() {
+        actionsContainerView.translatesAutoresizingMaskIntoConstraints = false
+
+        let verticalStack = UIStackView()
+        verticalStack.translatesAutoresizingMaskIntoConstraints = false
+        verticalStack.axis = .vertical
+        verticalStack.spacing = 10
+        actionsContainerView.addSubview(verticalStack)
+
+        let buttonsRow = UIStackView()
+        buttonsRow.axis = .horizontal
+        buttonsRow.spacing = 8
+        buttonsRow.alignment = .center
+
+        buttonsRow.addArrangedSubview(favoriteView)
+        buttonsRow.addArrangedSubview(typeView)
+
+        let spacer = UIView()
+        buttonsRow.addArrangedSubview(spacer)
+
+        buttonsRow.addArrangedSubview(donateButton)
+        donateButton.layer.cornerRadius = 10
+        donateButton.layer.cornerCurve = .continuous
+
+        verticalStack.addArrangedSubview(buttonsRow)
+        verticalStack.addArrangedSubview(tagsView)
+
+        NSLayoutConstraint.activate([
+            verticalStack.topAnchor.constraint(equalTo: actionsContainerView.topAnchor),
+            verticalStack.leadingAnchor.constraint(equalTo: actionsContainerView.leadingAnchor),
+            verticalStack.trailingAnchor.constraint(equalTo: actionsContainerView.trailingAnchor),
+            verticalStack.bottomAnchor.constraint(equalTo: actionsContainerView.bottomAnchor)
+        ])
+    }
+
+    private func setupGenresSection() {
+        genresScrollView.translatesAutoresizingMaskIntoConstraints = false
+        genresScrollView.showsHorizontalScrollIndicator = false
+
+        genresStackView.translatesAutoresizingMaskIntoConstraints = false
+        genresStackView.axis = .horizontal
+        genresStackView.spacing = 8
+        genresStackView.alignment = .center
+        genresScrollView.addSubview(genresStackView)
+
+        NSLayoutConstraint.activate([
+            genresStackView.topAnchor.constraint(equalTo: genresScrollView.topAnchor),
+            genresStackView.leadingAnchor.constraint(equalTo: genresScrollView.leadingAnchor),
+            genresStackView.trailingAnchor.constraint(equalTo: genresScrollView.trailingAnchor),
+            genresStackView.bottomAnchor.constraint(equalTo: genresScrollView.bottomAnchor),
+            genresStackView.heightAnchor.constraint(equalTo: genresScrollView.heightAnchor),
+            genresScrollView.heightAnchor.constraint(equalToConstant: 32)
+        ])
+    }
+
+    private func setupSynopsisSection() {
+        synopsisContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = 6
+        stack.alignment = .leading
+        synopsisContainer.addSubview(stack)
+
+        synopsisTitleLabel.text = Language.isEnglish ? "Synopsis" : "Описание"
+        synopsisTitleLabel.font = .systemFont(ofSize: 16, weight: .bold)
+        synopsisTitleLabel.textColor = .Text.main
+        stack.addArrangedSubview(synopsisTitleLabel)
+
+        synopsisLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        synopsisLabel.textColor = .Text.main
+        synopsisLabel.numberOfLines = 4
+        stack.addArrangedSubview(synopsisLabel)
+
+        expandSynopsisButton.setTitle(Language.isEnglish ? "Show more ▾" : "Подробнее ▾", for: .normal)
+        expandSynopsisButton.setTitleColor(UIColor(named: "buttons/selected") ?? .systemRed, for: .normal)
+        expandSynopsisButton.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+        expandSynopsisButton.addTarget(self, action: #selector(didTapExpandSynopsis), for: .touchUpInside)
+        stack.addArrangedSubview(expandSynopsisButton)
+
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: synopsisContainer.topAnchor),
+            stack.leadingAnchor.constraint(equalTo: synopsisContainer.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: synopsisContainer.trailingAnchor),
+            stack.bottomAnchor.constraint(equalTo: synopsisContainer.bottomAnchor)
+        ])
+    }
+
+    @objc private func didTapExpandSynopsis() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        isSynopsisExpanded.toggle()
+        UIView.animate(withDuration: 0.25) {
+            self.synopsisLabel.numberOfLines = self.isSynopsisExpanded ? 0 : 4
+            let title = self.isSynopsisExpanded
+                ? (Language.isEnglish ? "Show less ▴" : "Свернуть ▴")
+                : (Language.isEnglish ? "Show more ▾" : "Подробнее ▾")
+            self.expandSynopsisButton.setTitle(title, for: .normal)
+            self.view.layoutIfNeeded()
+        }
+    }
+
+    private func setupCreditsSection() {
+        creditsCard.translatesAutoresizingMaskIntoConstraints = false
+        creditsCard.backgroundColor = .Surfaces.content
+        creditsCard.layer.cornerRadius = 14
+        creditsCard.layer.cornerCurve = .continuous
+        creditsCard.layer.borderWidth = 1
+        creditsCard.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = 8
+        stack.alignment = .fill
+        creditsCard.addSubview(stack)
+
+        creditsTitleLabel.text = Language.isEnglish ? "Dubbing & Details" : "Команда озвучки и детали"
+        creditsTitleLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        creditsTitleLabel.textColor = .Text.main
+        stack.addArrangedSubview(creditsTitleLabel)
+
+        creditsStackView.axis = .vertical
+        creditsStackView.spacing = 6
+        creditsStackView.alignment = .fill
+        stack.addArrangedSubview(creditsStackView)
+
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: creditsCard.topAnchor, constant: 12),
+            stack.bottomAnchor.constraint(equalTo: creditsCard.bottomAnchor, constant: -12),
+            stack.leadingAnchor.constraint(equalTo: creditsCard.leadingAnchor, constant: 14),
+            stack.trailingAnchor.constraint(equalTo: creditsCard.trailingAnchor, constant: -14)
+        ])
+    }
+
+    private func setupEpisodesSection() {
+        compactEpisodesContainer.translatesAutoresizingMaskIntoConstraints = false
+        compactEpisodesContainer.constraints.first { $0.firstAttribute == .height }?.constant = 214
+    }
+
+    private func setupRelatedSection() {
+        relatedView.translatesAutoresizingMaskIntoConstraints = false
+        relatedTitleLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        relatedTitleLabel.textColor = .Text.main
+
+        relatedStackView.isHidden = true
+        relatedCarouselView.translatesAutoresizingMaskIntoConstraints = false
+        relatedView.addSubview(relatedCarouselView)
+
+        NSLayoutConstraint.activate([
+            relatedCarouselView.topAnchor.constraint(equalTo: relatedTitleLabel.bottomAnchor, constant: 10),
+            relatedCarouselView.leadingAnchor.constraint(equalTo: relatedView.leadingAnchor),
+            relatedCarouselView.trailingAnchor.constraint(equalTo: relatedView.trailingAnchor),
+            relatedCarouselView.bottomAnchor.constraint(equalTo: relatedView.bottomAnchor),
+            relatedCarouselView.heightAnchor.constraint(equalToConstant: 78)
+        ])
+    }
+
+    private func setupSupportSection() {
+        supportLabelContainer.translatesAutoresizingMaskIntoConstraints = false
+        supportLabelContainer.smoothCorners(with: 14)
+        supportLabelContainer.backgroundColor = .Surfaces.content
     }
 
     private func updateKeyboard(_ note: Notification) {
@@ -141,7 +522,6 @@ final class SeriesViewController: BaseViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         episodesContainreHidden = view.bounds.width < 640
-        playButtonInset = playButtonContainer.frame.height + 30
     }
 
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -150,7 +530,7 @@ final class SeriesViewController: BaseViewController {
     }
 
     private func updateInsets() {
-        scrollView.contentInset.bottom = max(keyboardInset, playButtonInset)
+        scrollView.contentInset.bottom = max(keyboardInset, 24)
     }
 
     override func setupStrings() {
@@ -237,11 +617,13 @@ extension SeriesViewController: SeriesViewBehavior {
     }
 
     func set(playInfo: String?) {
+        playButtonContainer.superview?.isHidden = true
+        playButtonContainer.isHidden = true
         if let playInfo {
-            playButtonContainer.isHidden = false
-            playButtonLabel.text = playInfo
+            modernWatchButton.isHidden = false
+            modernWatchLabel.text = playInfo
         } else {
-            playButtonContainer.isHidden = true
+            modernWatchButton.isHidden = true
         }
     }
 
@@ -268,18 +650,12 @@ extension SeriesViewController: SeriesViewBehavior {
         self.set(name: series.name)
         self.setParams(from: series)
 
-        self.anonceLabel.text = series.notification
-
         if let publishDay = series.publishDay, series.isOngoing {
             weekDayView.configure(publishDay.value)
             weekDayView.isSelected = true
             weekDayView.isHidden = false
         } else {
             weekDayView.isHidden = true
-        }
-
-        if series.notification.isEmpty {
-            self.anonceLabel.isHidden = true
         }
 
         tagsView.set(tags: series.tags)
@@ -298,15 +674,9 @@ extension SeriesViewController: SeriesViewBehavior {
             return
         }
         relatedView.isHidden = false
-        series.enumerated().forEach { index, item in
-            guard let view = RelatedSeriesView.fromNib() else {
-                return
-            }
-            view.configure(index: index, series: item, selected: item.id == current.id)
-            view.setTap { [weak self] in
-                self?.handler.select(series: $0)
-            }
-            relatedStackView.addArrangedSubview(view)
+        relatedStackView.isHidden = true
+        relatedCarouselView.configure(series: series, current: current) { [weak self] selected in
+            self?.handler.select(series: selected)
         }
         relatedView.fadeTransition()
     }
@@ -341,88 +711,135 @@ extension SeriesViewController: SeriesViewBehavior {
     }
 
     private func setParams(from series: Series) {
-        let strings = L10n.Screen.Series.self
-        var result: NSMutableAttributedString = .init()
-
-        if let type = series.type {
-            let title = self.boldTextBuilder.build(strings.type.withColon())
-            let value = self.regularTextBuilder.build("\(type.description)\n")
-            result = result + title + value
+        // 1. Badges
+        if let type = series.type?.description {
+            typeBadge.text = type
+            typeBadge.isHidden = false
+        } else {
+            typeBadge.isHidden = true
         }
 
         if let year = series.year {
-            let title = self.boldTextBuilder.build(strings.year.withColon())
-            let value = self.regularTextBuilder.build("\(year)\n")
-            result = result + title + value
+            yearBadge.text = "\(year)"
+            yearBadge.isHidden = false
+        } else {
+            yearBadge.isHidden = true
         }
 
-        if let season = series.season {
-            let title = self.boldTextBuilder.build(strings.season.withColon())
-            let value = self.regularTextBuilder.build("\(season.description)\n")
-            result = result + title + value
-        }
-
-        if let duration = series.averageDurationOfEpisode {
-            let title = self.boldTextBuilder.build(strings.duration.withColon())
-            let time = L10n.Screen.Series.approximalMinutes("\(duration)")
-            let value = self.regularTextBuilder.build("\(time)\n")
-            result = result + title + value
+        if let season = series.season?.description {
+            seasonBadge.text = season
+            seasonBadge.isHidden = false
+        } else {
+            seasonBadge.isHidden = true
         }
 
         let availableCount = series.playlist.count
-        let title = self.boldTextBuilder.build(strings.episodes.withColon())
-        let episodes = series.episodesTotal.map { "\($0)"} ?? "?"
-        let value = self.regularTextBuilder.build("\(availableCount)/\(episodes)\n")
-        result = result + title + value
+        let totalCount = series.episodesTotal.map { "\($0)" } ?? "?"
+        let epSuffix = Language.isEnglish ? "ep." : "эп."
+        episodesBadge.text = "\(availableCount)/\(totalCount) \(epSuffix)"
+        episodesBadge.isHidden = false
 
-        if series.genres.isEmpty == false {
-            var data = self.boldTextBuilder.build(strings.genres.withColon())
-            let linkBuilder = self.regularTextBuilder.copy()
-
-            let last = series.genres.last
-
-            for genre in series.genres {
-                if let url = URL(attributeLinkValue: "\(genre.id)") {
-                    linkBuilder.set(link: url)
-                    data = data + linkBuilder.build(genre.name)
-                    if genre == last {
-                        data = data + self.regularTextBuilder.build("\n")
-                    } else {
-                        data = data + self.regularTextBuilder.build(", ")
-                    }
-                }
-            }
-
-            result = result + data
+        // 2. Anonce
+        if !series.notification.isEmpty {
+            modernAnonceLabel.text = series.notification
+            modernAnonceContainer.isHidden = false
+        } else {
+            modernAnonceContainer.isHidden = true
         }
 
-        if series.members.isEmpty == false {
+        // 3. Genre Chips
+        genresStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        for genre in series.genres {
+            let chip = UIButton(type: .system)
+            chip.setTitle(genre.name, for: .normal)
+            chip.setTitleColor(.Text.main, for: .normal)
+            chip.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
+            chip.backgroundColor = .Surfaces.content
+            chip.layer.cornerRadius = 14
+            chip.layer.cornerCurve = .continuous
+            chip.layer.borderWidth = 1
+            chip.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
+            chip.contentEdgeInsets = UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
+            chip.addAction(UIAction { [weak self] _ in
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                self?.handler.select(genre: "\(genre.id)")
+            }, for: .touchUpInside)
+            genresStackView.addArrangedSubview(chip)
+        }
+        genresScrollView.isHidden = series.genres.isEmpty
+
+        // 4. Synopsis
+        if let desc = series.desc, !desc.string.isEmpty {
+            let mutableDesc = NSMutableAttributedString(attributedString: desc)
+            mutableDesc.addAttribute(.foregroundColor, value: UIColor.Text.main, range: NSRange(location: 0, length: mutableDesc.length))
+            mutableDesc.addAttribute(.font, value: UIFont.systemFont(ofSize: 14, weight: .regular), range: NSRange(location: 0, length: mutableDesc.length))
+            synopsisLabel.attributedText = mutableDesc
+            synopsisContainer.isHidden = false
+            expandSynopsisButton.isHidden = desc.string.count < 140
+        } else {
+            synopsisContainer.isHidden = true
+        }
+
+        // 5. Credits
+        creditsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        if let duration = series.averageDurationOfEpisode {
+            let durationTitle = Language.isEnglish ? "Duration" : "Длительность"
+            let durationValue = Language.isEnglish ? "~ \(duration) min" : "~ \(duration) мин"
+            addCreditRow(title: durationTitle, value: durationValue)
+        }
+
+        if !series.members.isEmpty {
             let items = Dictionary(grouping: series.members, by: { $0.role })
             let roles = items.compactMap { $0.key }.sorted(by: { $0.value < $1.value })
             roles.forEach { role in
-                var data = self.boldTextBuilder.build(role.description.withColon())
                 let members = items[role] ?? []
-                let last = members.last
-                for member in members {
-                    data = data + regularTextBuilder.build(member.name)
-                    if member == last {
-                        data = data + self.regularTextBuilder.build("\n")
-                    } else {
-                        data = data + self.regularTextBuilder.build(", ")
-                    }
-                }
-                result = result + data
+                let names = members.map { $0.name }.joined(separator: ", ")
+                addCreditRow(title: role.description, value: names)
             }
         }
+        creditsCard.isHidden = creditsStackView.arrangedSubviews.isEmpty
+    }
 
-        result = result + regularTextBuilder.build("\n")
-        if let desc = series.desc {
-            result = result + regularTextBuilder.build(desc)
-        }
-        self.infoTextView.attributedText = result
+    private func addCreditRow(title: String, value: String) {
+        let row = UIStackView()
+        row.axis = .horizontal
+        row.spacing = 8
+        row.alignment = .top
+
+        let titleLbl = UILabel()
+        titleLbl.translatesAutoresizingMaskIntoConstraints = false
+        titleLbl.font = .systemFont(ofSize: 12, weight: .semibold)
+        titleLbl.textColor = .Text.secondary
+        titleLbl.text = "\(title):"
+        titleLbl.widthAnchor.constraint(equalToConstant: 105).isActive = true
+        row.addArrangedSubview(titleLbl)
+
+        let valueLbl = UILabel()
+        valueLbl.translatesAutoresizingMaskIntoConstraints = false
+        valueLbl.font = .systemFont(ofSize: 13, weight: .regular)
+        valueLbl.textColor = .Text.main
+        valueLbl.numberOfLines = 0
+        valueLbl.text = value
+        row.addArrangedSubview(valueLbl)
+
+        creditsStackView.addArrangedSubview(row)
     }
 }
 
+final class BadgeLabel: UILabel {
+    var insets = UIEdgeInsets(top: 3, left: 6, bottom: 3, right: 6)
+
+    override func drawText(in rect: CGRect) {
+        super.drawText(in: rect.inset(by: insets))
+    }
+
+    override var intrinsicContentSize: CGSize {
+        let size = super.intrinsicContentSize
+        return CGSize(width: size.width + insets.left + insets.right,
+                      height: size.height + insets.top + insets.bottom)
+    }
+}
 
 private extension Series {
     var tags: [TagsView.Tag] {
