@@ -428,10 +428,10 @@ final class FeedV2QuickActionsView: UIView {
     }
 }
 
-// MARK: - Continue Watching View
+//// MARK: - Continue Watching Cells
 
-final class FeedV2ContinueWatchingView: UIView {
-    var onTap: (() -> Void)?
+final class FeedV2ContinueWatchingCell: UICollectionViewCell {
+    static let reuseIdentifier = "FeedV2ContinueWatchingCell"
 
     private let container = UIView()
     private let posterImageView = UIImageView()
@@ -468,6 +468,8 @@ final class FeedV2ContinueWatchingView: UIView {
     }
 
     private func setupViews() {
+        contentView.backgroundColor = .clear
+
         container.backgroundColor = UIColor { trait in
             trait.userInterfaceStyle == .dark
                 ? .Surfaces.content
@@ -478,11 +480,7 @@ final class FeedV2ContinueWatchingView: UIView {
         container.layer.borderWidth = 1
         container.clipsToBounds = true
         container.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(container)
-
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapCard))
-        container.addGestureRecognizer(tapGesture)
-        container.isUserInteractionEnabled = true
+        contentView.addSubview(container)
 
         posterImageView.contentMode = .scaleAspectFill
         posterImageView.clipsToBounds = true
@@ -514,11 +512,10 @@ final class FeedV2ContinueWatchingView: UIView {
         container.addSubview(playImageView)
 
         NSLayoutConstraint.activate([
-            container.topAnchor.constraint(equalTo: topAnchor),
-            container.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            container.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            container.bottomAnchor.constraint(equalTo: bottomAnchor),
-            container.heightAnchor.constraint(equalToConstant: 76),
+            container.topAnchor.constraint(equalTo: contentView.topAnchor),
+            container.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            container.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
 
             posterImageView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 10),
             posterImageView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
@@ -544,11 +541,6 @@ final class FeedV2ContinueWatchingView: UIView {
         ])
     }
 
-    @objc private func didTapCard() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        onTap?()
-    }
-
     func configure(with series: Series, episodeID: String?) {
         posterImageView.setImage(from: series.poster, placeholder: DefaultPlaceholder())
         titleLabel.text = series.name?.main ?? series.alias
@@ -558,6 +550,120 @@ final class FeedV2ContinueWatchingView: UIView {
         } else {
             episodeLabel.text = Language.isEnglish ? "Tap to play" : "Нажмите для воспроизведения"
         }
+    }
+}
+
+final class FeedV2ContinueHistoryCell: UICollectionViewCell {
+    static let reuseIdentifier = "FeedV2ContinueHistoryCell"
+
+    private let container = UIView()
+    private let iconCircle = UIView()
+    private let iconImageView = UIImageView()
+    private let titleLabel = UILabel()
+    private let subtitleLabel = UILabel()
+    private let chevronImageView = UIImageView()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupViews()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateCardAppearance()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateCardAppearance()
+    }
+
+    private func updateCardAppearance() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        container.layer.borderColor = isDark
+            ? UIColor.white.withAlphaComponent(0.10).cgColor
+            : UIColor.black.withAlphaComponent(0.08).cgColor
+    }
+
+    private func setupViews() {
+        contentView.backgroundColor = .clear
+
+        container.backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? .Surfaces.content
+                : UIColor(white: 0.96, alpha: 0.95)
+        }
+        container.layer.cornerRadius = 16
+        container.layer.cornerCurve = .continuous
+        container.layer.borderWidth = 1
+        container.clipsToBounds = true
+        container.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(container)
+
+        iconCircle.backgroundColor = (UIColor(named: "buttons/selected") ?? .systemRed).withAlphaComponent(0.12)
+        iconCircle.layer.cornerRadius = 19
+        iconCircle.layer.cornerCurve = .continuous
+        iconCircle.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(iconCircle)
+
+        let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .semibold)
+        iconImageView.image = UIImage(systemName: "clock.arrow.circlepath", withConfiguration: config)
+        iconImageView.tintColor = UIColor(named: "buttons/selected") ?? .systemRed
+        iconImageView.contentMode = .scaleAspectFit
+        iconImageView.translatesAutoresizingMaskIntoConstraints = false
+        iconCircle.addSubview(iconImageView)
+
+        titleLabel.text = Language.isEnglish ? "All History" : "Вся история"
+        titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        titleLabel.textColor = .Text.main
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(titleLabel)
+
+        subtitleLabel.text = Language.isEnglish ? "View all series" : "Смотреть всё"
+        subtitleLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        subtitleLabel.textColor = .Text.secondary
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(subtitleLabel)
+
+        let chevConfig = UIImage.SymbolConfiguration(pointSize: 13, weight: .semibold)
+        chevronImageView.image = UIImage(systemName: "chevron.right", withConfiguration: chevConfig)
+        chevronImageView.tintColor = .Text.secondary
+        chevronImageView.contentMode = .scaleAspectFit
+        chevronImageView.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(chevronImageView)
+
+        NSLayoutConstraint.activate([
+            container.topAnchor.constraint(equalTo: contentView.topAnchor),
+            container.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            container.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+
+            iconCircle.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
+            iconCircle.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            iconCircle.widthAnchor.constraint(equalToConstant: 38),
+            iconCircle.heightAnchor.constraint(equalToConstant: 38),
+
+            iconImageView.centerXAnchor.constraint(equalTo: iconCircle.centerXAnchor),
+            iconImageView.centerYAnchor.constraint(equalTo: iconCircle.centerYAnchor),
+
+            titleLabel.topAnchor.constraint(equalTo: iconCircle.topAnchor, constant: 1),
+            titleLabel.leadingAnchor.constraint(equalTo: iconCircle.trailingAnchor, constant: 12),
+            titleLabel.trailingAnchor.constraint(equalTo: chevronImageView.leadingAnchor, constant: -8),
+
+            subtitleLabel.bottomAnchor.constraint(equalTo: iconCircle.bottomAnchor, constant: -1),
+            subtitleLabel.leadingAnchor.constraint(equalTo: iconCircle.trailingAnchor, constant: 12),
+            subtitleLabel.trailingAnchor.constraint(equalTo: chevronImageView.leadingAnchor, constant: -8),
+
+            chevronImageView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
+            chevronImageView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            chevronImageView.widthAnchor.constraint(equalToConstant: 12),
+            chevronImageView.heightAnchor.constraint(equalToConstant: 14)
+        ])
     }
 }
 

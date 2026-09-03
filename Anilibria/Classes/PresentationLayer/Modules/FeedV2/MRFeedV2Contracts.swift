@@ -7,11 +7,16 @@
 
 import UIKit
 
+public enum ContinueWatchingItem: Hashable {
+    case series(series: Series, episodeID: String?)
+    case allHistory
+}
+
 // MARK: - View Behavior
 
 protocol FeedV2ViewBehavior: WaitingBehavior, RefreshBehavior {
     func set(heroItems: [PromoItem])
-    func set(continueWatching: Series?, episodeID: String?)
+    func set(continueWatching items: [ContinueWatchingItem])
     func set(schedule: ShortSchedule)
 }
 
@@ -26,7 +31,8 @@ protocol FeedV2EventHandler: ViewControllerEventHandler, RefreshEventHandler {
     func selectRandom()
     func allSchedule()
     func openCatalog()
-    func continueWatching(series: Series)
+    func continueWatching(series: Series, episodeID: String?)
+    func openHistory()
     func search()
     func refreshIfNeeded()
 }

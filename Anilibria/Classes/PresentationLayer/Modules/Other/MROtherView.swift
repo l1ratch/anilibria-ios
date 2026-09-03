@@ -32,6 +32,39 @@ final class OtherViewController: BaseViewController {
             historyView.isHidden = true
         }
         setupCards()
+        setupBackButtonIfNeeded()
+    }
+
+    private func setupBackButtonIfNeeded() {
+        guard let navigationController, navigationController.viewControllers.first != self else { return }
+        guard let headerView = userNameLabel.superview else { return }
+
+        if let logo = headerView.subviews.first(where: { $0 is UIImageView }) {
+            for c in headerView.constraints where (c.firstItem as? UIView == logo && c.firstAttribute == .leading) || (c.secondItem as? UIView == logo && c.secondAttribute == .leading) {
+                c.isActive = false
+            }
+            logo.translatesAutoresizingMaskIntoConstraints = false
+            logo.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -16).isActive = true
+        }
+
+        let backButton = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .semibold)
+        backButton.setImage(UIImage(systemName: "chevron.backward", withConfiguration: config), for: .normal)
+        backButton.tintColor = .Tint.active
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
+
+        headerView.addSubview(backButton)
+        NSLayoutConstraint.activate([
+            backButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16),
+            backButton.centerYAnchor.constraint(equalTo: userNameLabel.centerYAnchor),
+            backButton.widthAnchor.constraint(equalToConstant: 36),
+            backButton.heightAnchor.constraint(equalToConstant: 36)
+        ])
+    }
+
+    @objc private func didTapBackButton() {
+        navigationController?.popViewController(animated: true)
     }
 
     private func setupCards() {

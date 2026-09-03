@@ -25,8 +25,8 @@ final class FeedV2ViewController: BaseViewController {
     private let quickActionsView = FeedV2QuickActionsView()
 
     // 3. Continue Watching
-    private let continueWatchingView = FeedV2ContinueWatchingView()
-    private var continueSeries: Series?
+    private var continueItems: [ContinueWatchingItem] = []
+    private var continueCollectionView: UICollectionView!
 
     // 4. Today's Schedule
     private var scheduleItems: [ScheduleItem] = []
@@ -119,8 +119,8 @@ final class FeedV2ViewController: BaseViewController {
         let screenWidth = min(view.bounds.width, view.bounds.height)
         if screenWidth > 0, let layout = heroCollectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
             let expectedWidth = screenWidth - 32
-            if layout.itemSize.width != expectedWidth {
-                layout.itemSize = CGSize(width: expectedWidth, height: 220)
+            if layout.itemSize.width != expectedWidth || layout.itemSize.height != 206 {
+                layout.itemSize = CGSize(width: expectedWidth, height: 206)
                 layout.invalidateLayout()
             }
         }
@@ -170,7 +170,7 @@ final class FeedV2ViewController: BaseViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        layout.itemSize = CGSize(width: screenWidth - 32, height: 220)
+        layout.itemSize = CGSize(width: screenWidth - 32, height: 206)
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
@@ -206,7 +206,7 @@ final class FeedV2ViewController: BaseViewController {
         contentStackView.addArrangedSubview(heroContainer)
 
         NSLayoutConstraint.activate([
-            heroCollectionView.heightAnchor.constraint(equalToConstant: 220),
+            heroCollectionView.heightAnchor.constraint(equalToConstant: 206),
             pageControl.heightAnchor.constraint(equalToConstant: 16)
         ])
     }
@@ -230,12 +230,27 @@ final class FeedV2ViewController: BaseViewController {
     // MARK: - Continue Watching
 
     private func setupContinueWatching() {
-        continueWatchingView.isHidden = true
-        continueWatchingView.onTap = { [weak self] in
-            guard let self = self, let series = self.continueSeries else { return }
-            self.handler.continueWatching(series: series)
-        }
-        contentStackView.addArrangedSubview(continueWatchingView)
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 10
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+
+        continueCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        continueCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        continueCollectionView.backgroundColor = .clear
+        continueCollectionView.showsHorizontalScrollIndicator = false
+        continueCollectionView.decelerationRate = .fast
+        continueCollectionView.delegate = self
+        continueCollectionView.dataSource = self
+        continueCollectionView.register(FeedV2ContinueWatchingCell.self, forCellWithReuseIdentifier: FeedV2ContinueWatchingCell.reuseIdentifier)
+        continueCollectionView.register(FeedV2ContinueHistoryCell.self, forCellWithReuseIdentifier: FeedV2ContinueHistoryCell.reuseIdentifier)
+        continueCollectionView.isHidden = true
+
+        contentStackView.addArrangedSubview(continueCollectionView)
+
+        NSLayoutConstraint.activate([
+            continueCollectionView.heightAnchor.constraint(equalToConstant: 76)
+        ])
     }
 
     // MARK: - Today's Schedule
@@ -314,11 +329,13 @@ final class FeedV2ViewController: BaseViewController {
 
 // MARK: - UICollectionViewDataSource & Delegate
 
-extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == heroCollectionView {
             guard !heroItems.isEmpty else { return 0 }
             return heroItems.count > 1 ? heroItems.count * heroMultiplier : 1
+        } else if collectionView == continueCollectionView {
+            return continueItems.count
         } else {
             return scheduleItems.count
         }
@@ -340,11 +357,47 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
                 }
             }
             return cell
+        } else if collectionView == continueCollectionView {
+            guard indexPath.item < continueItems.count else {
+                return collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ContinueWatchingCell.reuseIdentifier, for: indexPath)
+            }
+            let item = continueItems[indexPath.item]
+            switch item {
+            case .series(let series, let episodeID):
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ContinueWatchingCell.reuseIdentifier, for: indexPath) as! FeedV2ContinueWatchingCell
+                cell.configure(with: series, episodeID: episodeID)
+                return cell
+            case .allHistory:
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ContinueHistoryCell.reuseIdentifier, for: indexPath) as! FeedV2ContinueHistoryCell
+                return cell
+            }
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ScheduleCell.reuseIdentifier, for: indexPath) as! FeedV2ScheduleCell
             let item = scheduleItems[indexPath.item]
             cell.configure(with: item)
             return cell
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let screenWidth = min(view.bounds.width, view.bounds.height)
+        if collectionView == heroCollectionView {
+            return CGSize(width: max(0, screenWidth - 32), height: 206)
+        } else if collectionView == continueCollectionView {
+            if continueItems.count == 1 {
+                return CGSize(width: max(0, screenWidth - 32), height: 76)
+            }
+            guard indexPath.item < continueItems.count else { return CGSize(width: 300, height: 76) }
+            let item = continueItems[indexPath.item]
+            switch item {
+            case .series:
+                let cardWidth = min(max(240, screenWidth - 56), 310)
+                return CGSize(width: cardWidth, height: 76)
+            case .allHistory:
+                return CGSize(width: 190, height: 76)
+            }
+        } else {
+            return CGSize(width: 114, height: 206)
         }
     }
 
@@ -357,6 +410,16 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
                 return
             default:
                 handler.selectPromoDetails(promo: item)
+            }
+        } else if collectionView == continueCollectionView {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            guard indexPath.item < continueItems.count else { return }
+            let item = continueItems[indexPath.item]
+            switch item {
+            case .series(let series, let episodeID):
+                handler.continueWatching(series: series, episodeID: episodeID)
+            case .allHistory:
+                handler.openHistory()
             }
         } else {
             guard indexPath.item < scheduleItems.count else { return }
@@ -488,14 +551,10 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
         startAutoScroll()
     }
 
-    func set(continueWatching: Series?, episodeID: String?) {
-        self.continueSeries = continueWatching
-        if let series = continueWatching {
-            self.continueWatchingView.isHidden = false
-            self.continueWatchingView.configure(with: series, episodeID: episodeID)
-        } else {
-            self.continueWatchingView.isHidden = true
-        }
+    func set(continueWatching items: [ContinueWatchingItem]) {
+        self.continueItems = items
+        self.continueCollectionView.isHidden = items.isEmpty
+        self.continueCollectionView.reloadData()
     }
 
     func set(schedule: ShortSchedule) {

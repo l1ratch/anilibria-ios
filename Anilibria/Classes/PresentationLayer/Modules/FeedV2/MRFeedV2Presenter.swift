@@ -134,12 +134,22 @@ extension FeedV2Presenter: FeedV2EventHandler {
         playerService.fetchSeriesHistory()
             .sink(onNext: { [weak self] history in
                 guard let self = self else { return }
-                if let latest = history.first {
-                    let episodeID = self.playerService.getActiveEpisodeID(for: latest)
-                    self.view.set(continueWatching: latest, episodeID: episodeID)
-                } else {
-                    self.view.set(continueWatching: nil, episodeID: nil)
+                guard !history.isEmpty else {
+                    self.view.set(continueWatching: [])
+                    return
                 }
+
+                let topSeries = Array(history.prefix(4))
+                var items: [ContinueWatchingItem] = topSeries.map { series in
+                    let episodeID = self.playerService.getActiveEpisodeID(for: series)
+                    return .series(series: series, episodeID: episodeID)
+                }
+
+                if history.count >= 2 {
+                    items.append(.allHistory)
+                }
+
+                self.view.set(continueWatching: items)
             })
             .store(in: &bag)
     }
@@ -148,8 +158,12 @@ extension FeedV2Presenter: FeedV2EventHandler {
         self.router.open(series: series)
     }
 
-    func continueWatching(series: Series) {
-        self.router.open(series: series)
+    func continueWatching(series: Series, episodeID: String?) {
+        self.router.openSeriesWithPlayer(series: series, episodeID: episodeID)
+    }
+
+    func openHistory() {
+        self.router.openHistory()
     }
 
     func select(promo: PromoItem) {
