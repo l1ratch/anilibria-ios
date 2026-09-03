@@ -222,9 +222,7 @@ final class OtherProfileCardView: UIView {
         infoStack.addArrangedSubview(subtitleLabel)
         authStack.addArrangedSubview(infoStack)
 
-        var logoutConfig = UIButton.Configuration.plain()
-        logoutConfig.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
-        logoutButton.configuration = logoutConfig
+        logoutButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: 10, bottom: 6, right: 10)
         logoutButton.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
         logoutButton.setTitle(Language.isEnglish ? "Sign Out" : "Выйти", for: .normal)
         logoutButton.setImage(UIImage(systemName: "rectangle.portrait.and.arrow.right"), for: .normal)
