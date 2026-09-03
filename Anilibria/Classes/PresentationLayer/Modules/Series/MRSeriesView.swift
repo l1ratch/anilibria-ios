@@ -750,7 +750,7 @@ extension SeriesViewController: SeriesViewBehavior {
         // 3. Genre Chips
         genresStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for genre in series.genres {
-            let chip = UIButton(type: .system)
+            let chip = GenreChipButton(type: .system)
             chip.setTitle(genre.name, for: .normal)
             chip.setTitleColor(.Text.main, for: .normal)
             chip.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
@@ -760,10 +760,9 @@ extension SeriesViewController: SeriesViewBehavior {
             chip.layer.borderWidth = 1
             chip.layer.borderColor = UIColor.white.withAlphaComponent(0.08).cgColor
             chip.contentEdgeInsets = UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
-            chip.addAction(UIAction { [weak self] _ in
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            chip.onSelect = { [weak self] in
                 self?.handler.select(genre: "\(genre.id)")
-            }, for: .touchUpInside)
+            }
             genresStackView.addArrangedSubview(chip)
         }
         genresScrollView.isHidden = series.genres.isEmpty
@@ -838,6 +837,25 @@ final class BadgeLabel: UILabel {
         let size = super.intrinsicContentSize
         return CGSize(width: size.width + insets.left + insets.right,
                       height: size.height + insets.top + insets.bottom)
+    }
+}
+
+final class GenreChipButton: UIButton {
+    var onSelect: (() -> Void)?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addTarget(self, action: #selector(didTap), for: .touchUpInside)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        addTarget(self, action: #selector(didTap), for: .touchUpInside)
+    }
+
+    @objc private func didTap() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        onSelect?()
     }
 }
 
