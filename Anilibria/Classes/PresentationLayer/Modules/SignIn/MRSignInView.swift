@@ -36,12 +36,19 @@ final class SignInViewController: BaseViewController {
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        view.backgroundColor = .Surfaces.base
         loginField.superview?.applyAdaptiveBorder()
         passwordField.superview?.applyAdaptiveBorder()
         authProvidersView.arrangedSubviews.forEach { $0.applyAdaptiveBorder() }
     }
 
     private func setupModernUI() {
+        view.backgroundColor = .Surfaces.base
+        scrollView.backgroundColor = .clear
+        if let contentView = scrollView.subviews.first {
+            contentView.backgroundColor = .clear
+        }
+
         scrollView.alwaysBounceVertical = false
         scrollView.bounces = false
         scrollView.isScrollEnabled = false
@@ -98,9 +105,16 @@ final class SignInViewController: BaseViewController {
         logInButton.layer.cornerRadius = 14
         logInButton.layer.cornerCurve = .continuous
         logInButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        logInButton.setTitleColor(.white, for: .normal)
+        logInButton.setTitleColor(UIColor { trait in
+            trait.userInterfaceStyle == .dark ? UIColor(white: 0.45, alpha: 1) : UIColor(white: 0.55, alpha: 1)
+        }, for: .disabled)
 
-        // Close button: subtle circular background
+        // Close button: modern 36x36 circular button
         if let closeCircle = closeButton.superview {
+            closeCircle.translatesAutoresizingMaskIntoConstraints = false
+            closeCircle.layer.cornerRadius = 20
+            closeCircle.clipsToBounds = true
             closeCircle.backgroundColor = UIColor { trait in
                 trait.userInterfaceStyle == .dark
                     ? UIColor.white.withAlphaComponent(0.12)

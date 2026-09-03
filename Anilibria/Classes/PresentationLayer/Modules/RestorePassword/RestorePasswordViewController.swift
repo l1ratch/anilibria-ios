@@ -35,6 +35,8 @@ final class RestorePasswordViewController: BaseViewController {
 
     override func setupStrings() {
         super.setupStrings()
+        view.backgroundColor = .Surfaces.base
+        scrollView.backgroundColor = .clear
         scrollView.alwaysBounceVertical = false
         scrollView.bounces = false
         scrollView.isScrollEnabled = false
