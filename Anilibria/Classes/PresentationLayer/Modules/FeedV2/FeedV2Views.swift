@@ -269,7 +269,7 @@ final class FeedV2HeroCell: UICollectionViewCell {
                 actionButtonTopConstraint.isActive = false
                 actionButtonBottomConstraint.isActive = false
 
-                let text = (item.info ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let text = item.info.trimmingCharacters(in: .whitespacesAndNewlines)
                 subtitleLabel.text = text.isEmpty ? nil : text
                 let isLong = text.count > 100
 
@@ -293,7 +293,7 @@ final class FeedV2HeroCell: UICollectionViewCell {
             actionButtonTopConstraint.isActive = false
             actionButtonBottomConstraint.isActive = false
 
-            let text = (item.info ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let text = item.info.trimmingCharacters(in: .whitespacesAndNewlines)
             subtitleLabel.text = text.isEmpty ? nil : text
             let isLong = text.count > 100
 

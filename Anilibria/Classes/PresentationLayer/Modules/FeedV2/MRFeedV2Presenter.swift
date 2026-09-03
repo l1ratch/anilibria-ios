@@ -69,13 +69,13 @@ extension FeedV2Presenter: FeedV2EventHandler {
     }
 
     private static var cachedPromo: [PromoItem]?
-    private static var cachedSchedule: [ScheduleItem]?
+    private static var cachedSchedule: ShortSchedule?
 
     func didLoad() {
         if let promo = Self.cachedPromo, !promo.isEmpty {
             self.view.set(heroItems: promo)
         }
-        if let schedule = Self.cachedSchedule, !schedule.isEmpty {
+        if let schedule = Self.cachedSchedule {
             self.view.set(schedule: schedule)
         }
         self.load()
