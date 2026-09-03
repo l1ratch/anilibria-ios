@@ -618,13 +618,13 @@ final class FeedV2ContinueHistoryCell: UICollectionViewCell {
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         iconCircle.addSubview(iconImageView)
 
-        titleLabel.text = Language.isEnglish ? "All History" : "Вся история"
+        titleLabel.text = Language.isEnglish ? "Watch History" : "История просмотров"
         titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
         titleLabel.textColor = .Text.main
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(titleLabel)
 
-        subtitleLabel.text = Language.isEnglish ? "View all series" : "Смотреть всё"
+        subtitleLabel.text = Language.isEnglish ? "Browse all watched anime" : "Смотреть все начатые релизы"
         subtitleLabel.font = .systemFont(ofSize: 12, weight: .regular)
         subtitleLabel.textColor = .Text.secondary
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
