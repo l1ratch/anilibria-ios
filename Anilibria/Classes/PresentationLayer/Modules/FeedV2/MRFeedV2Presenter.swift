@@ -78,6 +78,7 @@ extension FeedV2Presenter: FeedV2EventHandler {
         if let schedule = Self.cachedSchedule {
             self.view.set(schedule: schedule)
         }
+        self.activity = self.view.showLoading(fullscreen: false)
         self.load()
     }
 
@@ -96,13 +97,24 @@ extension FeedV2Presenter: FeedV2EventHandler {
     }
 
     private func load() {
+        var promoFinished = false
+        var scheduleFinished = false
+
+        let checkFinished: () -> Void = { [weak self] in
+            if promoFinished && scheduleFinished {
+                self?.activity = nil
+            }
+        }
+
         mainService.fetchPromo()
             .sink(onNext: { [weak self] promo in
                 Self.cachedPromo = promo
                 self?.view.set(heroItems: promo)
-                self?.activity = nil
-            }, onError: { [weak self] _ in
-                self?.activity = nil
+                promoFinished = true
+                checkFinished()
+            }, onError: { _ in
+                promoFinished = true
+                checkFinished()
             })
             .store(in: &bag)
 
@@ -110,10 +122,12 @@ extension FeedV2Presenter: FeedV2EventHandler {
             .sink(onNext: { [weak self] schedule in
                 Self.cachedSchedule = schedule
                 self?.view.set(schedule: schedule)
-                self?.activity = nil
                 self?.lastRefreshDate = Date()
-            }, onError: { [weak self] _ in
-                self?.activity = nil
+                scheduleFinished = true
+                checkFinished()
+            }, onError: { _ in
+                scheduleFinished = true
+                checkFinished()
             })
             .store(in: &bag)
 

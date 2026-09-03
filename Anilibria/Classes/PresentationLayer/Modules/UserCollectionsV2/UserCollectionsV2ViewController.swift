@@ -223,8 +223,15 @@ extension UserCollectionsV2ViewController: UserCollectionsV2ViewBehavior {
         }
     }
 
+    private var loadingActivity: ActivityDisposable?
+
     func showLoading(_ show: Bool) {
-        if !show {
+        if show {
+            if loadingActivity == nil {
+                loadingActivity = showLoading(fullscreen: false)
+            }
+        } else {
+            loadingActivity = nil
             self.refreshControl?.endRefreshing()
         }
     }

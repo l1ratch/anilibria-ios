@@ -265,6 +265,8 @@ final class FeedV2ViewController: BaseViewController {
         handler.refresh()
     }
 
+    private let heroMultiplier = 100
+
     @objc private func didTapAllSchedule() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         handler.allSchedule()
@@ -276,7 +278,8 @@ final class FeedV2ViewController: BaseViewController {
 extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == heroCollectionView {
-            return heroItems.count
+            guard !heroItems.isEmpty else { return 0 }
+            return heroItems.count > 1 ? heroItems.count * heroMultiplier : 1
         } else {
             return scheduleItems.count
         }
@@ -285,7 +288,7 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == heroCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2HeroCell.reuseIdentifier, for: indexPath) as! FeedV2HeroCell
-            let item = heroItems[indexPath.item]
+            let item = heroItems[indexPath.item % heroItems.count]
             cell.configure(with: item)
             cell.onActionTap = { [weak self] in
                 switch item.content {
@@ -308,8 +311,8 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == heroCollectionView {
-            guard indexPath.item < heroItems.count else { return }
-            let item = heroItems[indexPath.item]
+            guard !heroItems.isEmpty else { return }
+            let item = heroItems[indexPath.item % heroItems.count]
             switch item.content {
             case .release:
                 return
@@ -335,6 +338,20 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
         }
     }
 
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if scrollView == heroCollectionView, heroItems.count > 1 {
+            let screenWidth = min(view.bounds.width, view.bounds.height)
+            let itemWidth = (screenWidth - 32) + 12
+            guard itemWidth > 0 else { return }
+            let rawIndex = Int(round(scrollView.contentOffset.x / itemWidth))
+            if rawIndex < (heroMultiplier / 4) * heroItems.count || rawIndex > (3 * heroMultiplier / 4) * heroItems.count {
+                let currentItem = ((rawIndex % heroItems.count) + heroItems.count) % heroItems.count
+                let resetIndex = (heroMultiplier / 2) * heroItems.count + currentItem
+                heroCollectionView.scrollToItem(at: IndexPath(item: resetIndex, section: 0), at: .centeredHorizontally, animated: false)
+            }
+        }
+    }
+
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         if scrollView == heroCollectionView {
             let screenWidth = min(view.bounds.width, view.bounds.height)
@@ -351,7 +368,8 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             } else {
                 index = round(rawTarget / itemWidth)
             }
-            let clampedIndex = max(0, min(CGFloat(heroItems.count - 1), index))
+            let maxIndex = CGFloat(heroItems.count * heroMultiplier - 1)
+            let clampedIndex = max(0, min(maxIndex, index))
             targetContentOffset.pointee = CGPoint(x: clampedIndex * itemWidth, y: targetContentOffset.pointee.y)
         }
     }
@@ -362,7 +380,7 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             let itemWidth = (screenWidth - 32) + 12
             if itemWidth > 0 {
                 let rawIndex = Int(round(scrollView.contentOffset.x / itemWidth))
-                let page = max(0, min(heroItems.count - 1, rawIndex))
+                let page = ((rawIndex % heroItems.count) + heroItems.count) % heroItems.count
                 pageControl.currentPage = page
             }
         }
@@ -394,10 +412,16 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
         let itemWidth = (screenWidth - 32) + 12
         guard itemWidth > 0 else { return }
         let currentRawIndex = Int(round(cv.contentOffset.x / itemWidth))
-        let nextIndex = (currentRawIndex + 1) % heroItems.count
+        let nextRawIndex = currentRawIndex + 1
+        guard nextRawIndex < heroItems.count * heroMultiplier else {
+            let middleIndex = (heroMultiplier / 2) * heroItems.count
+            cv.scrollToItem(at: IndexPath(item: middleIndex, section: 0), at: .centeredHorizontally, animated: false)
+            return
+        }
 
-        cv.scrollToItem(at: IndexPath(item: nextIndex, section: 0), at: .centeredHorizontally, animated: true)
-        pageControl.currentPage = nextIndex
+        cv.scrollToItem(at: IndexPath(item: nextRawIndex, section: 0), at: .centeredHorizontally, animated: true)
+        let page = ((nextRawIndex % heroItems.count) + heroItems.count) % heroItems.count
+        pageControl.currentPage = page
     }
 }
 
@@ -410,6 +434,18 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
         self.pageControl.currentPage = 0
         self.heroCollectionView.reloadData()
         self.heroCollectionView.superview?.isHidden = heroItems.isEmpty
+
+        if heroItems.count > 1 {
+            let middleIndex = (heroMultiplier / 2) * heroItems.count
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.heroCollectionView.scrollToItem(
+                    at: IndexPath(item: middleIndex, section: 0),
+                    at: .centeredHorizontally,
+                    animated: false
+                )
+            }
+        }
         startAutoScroll()
     }
 

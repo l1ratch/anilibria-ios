@@ -76,11 +76,12 @@ final class UserCollectionsV2Presenter: UserCollectionsV2EventHandler {
             .watched
         ]
 
+        view.showLoading(true)
+
         var loadedSections: [UserCollectionGroupSection]
         if let cached = Self.cachedSections, cached.count == orderedKeys.count {
             loadedSections = cached
         } else {
-            view.showLoading(true)
             loadedSections = orderedKeys.map {
                 UserCollectionGroupSection(key: $0, items: [], isLoading: true)
             }
