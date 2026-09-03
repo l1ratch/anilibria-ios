@@ -35,6 +35,10 @@ final class FeedV2ViewController: BaseViewController {
     private let scheduleAllButton = UIButton(type: .system)
     private var scheduleCollectionView: UICollectionView!
 
+    // Skeletons
+    private let heroSkeletonView = ShimmerView()
+    private let scheduleSkeletonContainer = UIStackView()
+
     private lazy var searchButton = BarButton(image: .System.search,
                                               imageEdge: inset(0, 5, 0, 5)) { [weak self] in
         self?.handler.search()
@@ -155,12 +159,26 @@ final class FeedV2ViewController: BaseViewController {
         heroContainer.addArrangedSubview(heroCollectionView)
         heroContainer.addArrangedSubview(pageControl)
 
+        heroSkeletonView.translatesAutoresizingMaskIntoConstraints = false
+        heroSkeletonView.layer.cornerRadius = 18
+        heroSkeletonView.layer.cornerCurve = .continuous
+        heroSkeletonView.backgroundColor = .Surfaces.content
+        heroSkeletonView.shimmerColor = UIColor.white.withAlphaComponent(0.08)
+        heroContainer.addSubview(heroSkeletonView)
+
         contentStackView.addArrangedSubview(heroContainer)
 
         NSLayoutConstraint.activate([
             heroCollectionView.heightAnchor.constraint(equalToConstant: 220),
-            pageControl.heightAnchor.constraint(equalToConstant: 16)
+            pageControl.heightAnchor.constraint(equalToConstant: 16),
+
+            heroSkeletonView.topAnchor.constraint(equalTo: heroCollectionView.topAnchor),
+            heroSkeletonView.bottomAnchor.constraint(equalTo: heroCollectionView.bottomAnchor),
+            heroSkeletonView.leadingAnchor.constraint(equalTo: heroContainer.leadingAnchor, constant: 16),
+            heroSkeletonView.trailingAnchor.constraint(equalTo: heroContainer.trailingAnchor, constant: -16)
         ])
+
+        heroSkeletonView.run()
     }
 
     // MARK: - Quick Actions
@@ -244,11 +262,34 @@ final class FeedV2ViewController: BaseViewController {
         scheduleCollectionView.dataSource = self
         scheduleCollectionView.register(FeedV2ScheduleCell.self, forCellWithReuseIdentifier: FeedV2ScheduleCell.reuseIdentifier)
 
+        scheduleSkeletonContainer.axis = .horizontal
+        scheduleSkeletonContainer.spacing = 12
+        scheduleSkeletonContainer.alignment = .fill
+        scheduleSkeletonContainer.distribution = .fillEqually
+        scheduleSkeletonContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        for _ in 0..<3 {
+            let card = ShimmerView()
+            card.layer.cornerRadius = 14
+            card.layer.cornerCurve = .continuous
+            card.backgroundColor = .Surfaces.content
+            card.shimmerColor = UIColor.white.withAlphaComponent(0.08)
+            card.translatesAutoresizingMaskIntoConstraints = false
+            scheduleSkeletonContainer.addArrangedSubview(card)
+            card.run()
+        }
+
+        contentStackView.addArrangedSubview(scheduleSkeletonContainer)
         contentStackView.addArrangedSubview(scheduleCollectionView)
 
         NSLayoutConstraint.activate([
-            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 206)
+            scheduleCollectionView.heightAnchor.constraint(equalToConstant: 206),
+            scheduleSkeletonContainer.heightAnchor.constraint(equalToConstant: 206),
+            scheduleSkeletonContainer.leadingAnchor.constraint(equalTo: contentStackView.leadingAnchor, constant: 16),
+            scheduleSkeletonContainer.trailingAnchor.constraint(equalTo: contentStackView.trailingAnchor, constant: -16)
         ])
+
+        scheduleCollectionView.isHidden = true
     }
 
     override func refresh() {
@@ -410,7 +451,19 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
         self.pageControl.numberOfPages = heroItems.count
         self.pageControl.currentPage = 0
         self.heroCollectionView.reloadData()
-        self.heroCollectionView.superview?.isHidden = heroItems.isEmpty
+
+        let hasData = !heroItems.isEmpty
+        if hasData {
+            heroSkeletonView.stop()
+            heroSkeletonView.isHidden = true
+            heroCollectionView.isHidden = false
+            pageControl.isHidden = false
+        } else {
+            heroSkeletonView.run()
+            heroSkeletonView.isHidden = false
+            heroCollectionView.isHidden = true
+            pageControl.isHidden = true
+        }
 
         if heroItems.count > 1 {
             let middleIndex = (heroMultiplier / 2) * heroItems.count
@@ -436,8 +489,16 @@ extension FeedV2ViewController: FeedV2ViewBehavior {
     }
 
     func set(schedule: ShortSchedule) {
-        self.scheduleItems = schedule.items[.today] ?? []
+        let items = schedule.items[.today] ?? []
+        self.scheduleItems = items
         self.scheduleCollectionView.reloadData()
         self.refreshControl?.endRefreshing()
+
+        let hasData = !items.isEmpty
+        scheduleSkeletonContainer.arrangedSubviews.compactMap { $0 as? ShimmerView }.forEach {
+            if hasData { $0.stop() } else { $0.run() }
+        }
+        scheduleSkeletonContainer.isHidden = hasData
+        scheduleCollectionView.isHidden = !hasData
     }
 }

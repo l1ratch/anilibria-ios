@@ -373,9 +373,9 @@
                                         <constraint firstAttribute="width" constant="28" id="dVh-71-kdT"/>
                                     </constraints>
                                 </imageView>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AniLiberty" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OuO-Q2-EIi">
-                                    <rect key="frame" x="54" y="16.5" width="344" height="27"/>
-                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AniLiberty" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OuO-Q2-EIi">
+                                    <rect key="frame" x="168.5" y="19.5" width="77" height="21"/>
+                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                                     <color key="textColor" name="text/main"/>
                                     <nil key="highlightedColor"/>
                                 </label>
@@ -398,12 +398,11 @@
                             <color key="backgroundColor" name="surfaces/background"/>
                             <constraints>
                                 <constraint firstAttribute="bottom" secondItem="IPX-KG-Lfj" secondAttribute="bottom" constant="8" id="Fxe-6M-8Bq"/>
-                                <constraint firstItem="OuO-Q2-EIi" firstAttribute="leading" secondItem="IPX-KG-Lfj" secondAttribute="trailing" constant="10" id="Rnv-Ls-P3W"/>
+                                <constraint firstItem="OuO-Q2-EIi" firstAttribute="centerX" secondItem="FNO-cS-reU" secondAttribute="centerX" id="cen-OuO-X"/>
                                 <constraint firstItem="OuO-Q2-EIi" firstAttribute="centerY" secondItem="FNO-cS-reU" secondAttribute="centerY" id="WBc-G5-jso"/>
                                 <constraint firstItem="IPX-KG-Lfj" firstAttribute="leading" secondItem="FNO-cS-reU" secondAttribute="leading" constant="16" id="gqB-f8-BGD"/>
                                 <constraint firstItem="IPX-KG-Lfj" firstAttribute="top" secondItem="FNO-cS-reU" secondAttribute="top" constant="8" id="j2i-bd-Hle"/>
                                 <constraint firstAttribute="height" constant="60" id="jEH-EX-mBq"/>
-                                <constraint firstAttribute="trailing" secondItem="OuO-Q2-EIi" secondAttribute="trailing" constant="16" id="OuO-tr-cst"/>
                                 <constraint firstItem="Xdv-mt-B69" firstAttribute="centerY" secondItem="FNO-cS-reU" secondAttribute="centerY" id="ohi-YT-BlM"/>
                                 <constraint firstAttribute="trailing" secondItem="Xdv-mt-B69" secondAttribute="trailing" constant="13" id="vfs-Jt-Szs"/>
                             </constraints>

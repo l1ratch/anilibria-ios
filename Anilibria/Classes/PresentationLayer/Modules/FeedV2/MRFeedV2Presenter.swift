@@ -68,8 +68,16 @@ extension FeedV2Presenter: FeedV2EventHandler {
         self.router.responder = self
     }
 
+    private static var cachedPromo: [PromoItem]?
+    private static var cachedSchedule: [ScheduleItem]?
+
     func didLoad() {
-        self.activity = self.view.showLoading(fullscreen: false)
+        if let promo = Self.cachedPromo, !promo.isEmpty {
+            self.view.set(heroItems: promo)
+        }
+        if let schedule = Self.cachedSchedule, !schedule.isEmpty {
+            self.view.set(schedule: schedule)
+        }
         self.load()
     }
 
@@ -88,31 +96,38 @@ extension FeedV2Presenter: FeedV2EventHandler {
     }
 
     private func load() {
-        Publishers.Zip3(
-            mainService.fetchPromo(),
-            mainService.fetchTodaySchedule(),
-            playerService.fetchSeriesHistory().setFailureType(to: Error.self)
-        )
-        .sink(onNext: { [weak self] promo, schedule, history in
-            guard let self = self else { return }
+        mainService.fetchPromo()
+            .sink(onNext: { [weak self] promo in
+                Self.cachedPromo = promo
+                self?.view.set(heroItems: promo)
+                self?.activity = nil
+            }, onError: { [weak self] _ in
+                self?.activity = nil
+            })
+            .store(in: &bag)
 
-            self.view.set(heroItems: promo)
-            self.view.set(schedule: schedule)
+        mainService.fetchTodaySchedule()
+            .sink(onNext: { [weak self] schedule in
+                Self.cachedSchedule = schedule
+                self?.view.set(schedule: schedule)
+                self?.activity = nil
+                self?.lastRefreshDate = Date()
+            }, onError: { [weak self] _ in
+                self?.activity = nil
+            })
+            .store(in: &bag)
 
-            if let latest = history.first {
-                let episodeID = self.playerService.getActiveEpisodeID(for: latest)
-                self.view.set(continueWatching: latest, episodeID: episodeID)
-            } else {
-                self.view.set(continueWatching: nil, episodeID: nil)
-            }
-
-            self.activity = nil
-            self.lastRefreshDate = Date()
-        }, onError: { [weak self] error in
-            self?.router.show(error: error)
-            self?.activity = nil
-        })
-        .store(in: &bag)
+        playerService.fetchSeriesHistory()
+            .sink(onNext: { [weak self] history in
+                guard let self = self else { return }
+                if let latest = history.first {
+                    let episodeID = self.playerService.getActiveEpisodeID(for: latest)
+                    self.view.set(continueWatching: latest, episodeID: episodeID)
+                } else {
+                    self.view.set(continueWatching: nil, episodeID: nil)
+                }
+            })
+            .store(in: &bag)
     }
 
     func select(series: Series) {

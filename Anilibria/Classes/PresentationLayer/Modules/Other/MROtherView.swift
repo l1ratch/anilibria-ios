@@ -43,12 +43,7 @@ final class OtherViewController: BaseViewController {
 
         if let contentStackView = contentStackView {
             profileCardView.translatesAutoresizingMaskIntoConstraints = false
-            if let socialLinksCard = linksStackView?.superview?.superview,
-               let idx = contentStackView.arrangedSubviews.firstIndex(of: socialLinksCard) {
-                contentStackView.insertArrangedSubview(profileCardView, at: idx)
-            } else {
-                contentStackView.addArrangedSubview(profileCardView)
-            }
+            contentStackView.insertArrangedSubview(profileCardView, at: 0)
             NSLayoutConstraint.activate([
                 profileCardView.leadingAnchor.constraint(equalTo: contentStackView.leadingAnchor, constant: 16),
                 profileCardView.trailingAnchor.constraint(equalTo: contentStackView.trailingAnchor, constant: -16)
@@ -59,12 +54,17 @@ final class OtherViewController: BaseViewController {
             profileCardView.onLogoutTap = { [weak self] in
                 self?.handler.loginOrLogout()
             }
+            if let cachedUser = UserRepositoryImp().getUser() {
+                profileCardView.configure(with: cachedUser)
+            }
         }
     }
     
     override func setupStrings() {
         super.setupStrings()
         handler.didLoad()
+        userNameLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        userNameLabel.textAlignment = .center
         userNameLabel.text = "AniLiberty"
         authButton.isHidden = true
         linkDeviceLabel.text = L10n.Screen.LinkDevice.title
