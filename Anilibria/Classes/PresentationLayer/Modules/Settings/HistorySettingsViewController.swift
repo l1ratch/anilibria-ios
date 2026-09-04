@@ -74,8 +74,19 @@ extension HistorySettingsViewController: UITableViewDataSource, UITableViewDeleg
         cell.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
         cell.textLabel?.textColor = .Text.main
 
-        cell.accessoryView = promoSwitch
+        promoSwitch.removeFromSuperview()
+        promoSwitch.translatesAutoresizingMaskIntoConstraints = false
+        cell.contentView.addSubview(promoSwitch)
+        NSLayoutConstraint.activate([
+            promoSwitch.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
+            promoSwitch.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -16)
+        ])
         return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        promoSwitch.setOn(!promoSwitch.isOn, animated: true)
+        promoSwitchChanged(promoSwitch)
     }
 
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
