@@ -15,7 +15,7 @@ final class HistoryPart: DIPart {
 final class HistoryPresenter {
     private weak var view: HistoryViewBehavior!
     private var router: HistoryRoutable!
-    private var items: [Series] = []
+    private var rawSeries: [Series] = []
     private var query: String = ""
     private var bag = Set<AnyCancellable>()
 
@@ -45,18 +45,17 @@ extension HistoryPresenter: HistoryEventHandler {
                     remove(series: series)
                 case .added(let series):
                     remove(series: series)
-                    items.insert(series, at: 0)
+                    rawSeries.insert(series, at: 0)
                 }
                 showItems()
             }
             .store(in: &bag)
 
-
         self.playerService
             .fetchSeriesHistory()
             .manageActivity(self.view.showLoading(fullscreen: false))
             .sink(onNext: { [weak self] items in
-                self?.items = items
+                self?.rawSeries = items
                 self?.showItems()
             }, onError: { [weak self] error in
                 self?.router.show(error: error)
@@ -65,17 +64,21 @@ extension HistoryPresenter: HistoryEventHandler {
     }
 
     private func remove(series: Series) {
-        if let index = items.firstIndex(where: { $0.id == series.id }) {
-            items.remove(at: index)
+        if let index = rawSeries.firstIndex(where: { $0.id == series.id }) {
+            rawSeries.remove(at: index)
         }
     }
 
-    func delete(series: Series) {
-        self.playerService.removeHistory(for: series)
+    func delete(item: HistoryItemModel) {
+        self.playerService.removeHistory(for: item.series)
     }
 
-    func select(series: Series) {
-        router.open(series: series)
+    func select(item: HistoryItemModel) {
+        router.open(series: item.series)
+    }
+
+    func continueWatching(item: HistoryItemModel) {
+        router.openSeriesWithPlayer(series: item.series, episodeID: item.episodeID)
     }
 
     func search(query: String) {
@@ -83,20 +86,38 @@ extension HistoryPresenter: HistoryEventHandler {
         self.showItems()
     }
 
-    private func showItems() {
-        DispatchQueue.global().async { [weak self] in
-            guard var result = self?.items, let query = self?.query else {
-                return
-            }
+    private func buildItemModel(for series: Series, userID: Int?) -> HistoryItemModel {
+        let episodeID = self.playerService.getActiveEpisodeID(for: series)
+        let item = series.playlist.first(where: { $0.id == episodeID }) ?? series.playlist.first
+        let activeID = episodeID ?? item?.id
+        let timeCode = activeID.flatMap { self.playerService.getTimeCode(userID: userID, episodeID: $0) }
+        return HistoryItemModel(
+            series: series,
+            episodeID: activeID,
+            playlistItem: item,
+            timeCode: timeCode
+        )
+    }
 
-            if query.isEmpty == false {
-                result = result.filter {
-                    ($0.name?.main ?? "").contains(where: { $0.lowercased().contains(query) })
+    private func showItems() {
+        let currentSeries = self.rawSeries
+        let currentQuery = self.query
+        let userID = UserRepositoryImp().getUser()?.id
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            var filtered = currentSeries
+            if !currentQuery.isEmpty {
+                filtered = filtered.filter { s in
+                    (s.name?.main?.lowercased().contains(currentQuery) ?? false) ||
+                    (s.name?.english?.lowercased().contains(currentQuery) ?? false) ||
+                    s.alias.lowercased().contains(currentQuery)
                 }
             }
 
-            DispatchQueue.main.async { [weak self] in
-                self?.view.set(items: result)
+            let models = filtered.map { self.buildItemModel(for: $0, userID: userID) }
+            DispatchQueue.main.async {
+                self.view.set(items: models)
             }
         }
     }

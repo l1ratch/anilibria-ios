@@ -435,6 +435,10 @@ final class FeedV2ContinueWatchingCell: UICollectionViewCell {
 
     private let container = UIView()
     private let posterImageView = UIImageView()
+    private let progressTrackView = UIView()
+    private let progressFillView = UIView()
+    private var progressWidthConstraint: NSLayoutConstraint?
+
     private let sectionLabel = UILabel()
     private let titleLabel = UILabel()
     private let episodeLabel = UILabel()
@@ -448,6 +452,14 @@ final class FeedV2ContinueWatchingCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupViews()
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        posterImageView.image = nil
+        progressTrackView.isHidden = true
+        titleLabel.text = nil
+        episodeLabel.text = nil
     }
 
     override func layoutSubviews() {
@@ -488,6 +500,31 @@ final class FeedV2ContinueWatchingCell: UICollectionViewCell {
         posterImageView.layer.cornerCurve = .continuous
         posterImageView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(posterImageView)
+
+        // Progress bar on poster
+        progressTrackView.translatesAutoresizingMaskIntoConstraints = false
+        progressTrackView.backgroundColor = UIColor.black.withAlphaComponent(0.45)
+        progressTrackView.clipsToBounds = true
+        posterImageView.addSubview(progressTrackView)
+
+        progressFillView.translatesAutoresizingMaskIntoConstraints = false
+        progressFillView.backgroundColor = UIColor(named: "buttons/selected") ?? .systemRed
+        progressTrackView.addSubview(progressFillView)
+
+        let initialWidth = progressFillView.widthAnchor.constraint(equalTo: progressTrackView.widthAnchor, multiplier: 0)
+        self.progressWidthConstraint = initialWidth
+
+        NSLayoutConstraint.activate([
+            progressTrackView.leadingAnchor.constraint(equalTo: posterImageView.leadingAnchor),
+            progressTrackView.trailingAnchor.constraint(equalTo: posterImageView.trailingAnchor),
+            progressTrackView.bottomAnchor.constraint(equalTo: posterImageView.bottomAnchor),
+            progressTrackView.heightAnchor.constraint(equalToConstant: 3),
+
+            progressFillView.leadingAnchor.constraint(equalTo: progressTrackView.leadingAnchor),
+            progressFillView.topAnchor.constraint(equalTo: progressTrackView.topAnchor),
+            progressFillView.bottomAnchor.constraint(equalTo: progressTrackView.bottomAnchor),
+            initialWidth
+        ])
 
         sectionLabel.text = Language.isEnglish ? "CONTINUE WATCHING" : "ПРОДОЛЖИТЬ ПРОСМОТР"
         sectionLabel.font = .systemFont(ofSize: 10, weight: .bold)
@@ -541,14 +578,28 @@ final class FeedV2ContinueWatchingCell: UICollectionViewCell {
         ])
     }
 
-    func configure(with series: Series, episodeID: String?) {
+    func configure(with series: Series, episodeID: String?, timeCode: TimeCodeData?) {
         posterImageView.setImage(from: series.poster, placeholder: DefaultPlaceholder())
         titleLabel.text = series.name?.main ?? series.alias
 
-        if let ep = episodeID, !ep.isEmpty {
-            episodeLabel.text = Language.isEnglish ? "Episode \(ep)" : "Серия \(ep)"
+        let playlistItem = series.playlist.first(where: { $0.id == episodeID })
+        let result = HistoryTimecodeHelper.formatEpisodeAndDuration(
+            playlistItem: playlistItem,
+            timeCode: timeCode,
+            totalDuration: playlistItem?.duration
+        )
+
+        episodeLabel.text = result.text
+
+        if result.progress > 0 {
+            progressTrackView.isHidden = false
+            progressWidthConstraint?.isActive = false
+            let safeProgress = CGFloat(min(max(result.progress, 0.0), 1.0))
+            let newWidth = progressFillView.widthAnchor.constraint(equalTo: progressTrackView.widthAnchor, multiplier: safeProgress)
+            newWidth.isActive = true
+            progressWidthConstraint = newWidth
         } else {
-            episodeLabel.text = Language.isEnglish ? "Tap to play" : "Нажмите для воспроизведения"
+            progressTrackView.isHidden = true
         }
     }
 }

@@ -361,9 +361,9 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             }
             let item = continueItems[indexPath.item]
             switch item {
-            case .series(let series, let episodeID):
+            case .series(let series, let episodeID, let timeCode):
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ContinueWatchingCell.reuseIdentifier, for: indexPath) as! FeedV2ContinueWatchingCell
-                cell.configure(with: series, episodeID: episodeID)
+                cell.configure(with: series, episodeID: episodeID, timeCode: timeCode)
                 return cell
             case .allHistory:
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ContinueHistoryCell.reuseIdentifier, for: indexPath) as! FeedV2ContinueHistoryCell
@@ -407,7 +407,7 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             guard indexPath.item < continueItems.count else { return }
             let item = continueItems[indexPath.item]
             switch item {
-            case .series(let series, let episodeID):
+            case .series(let series, let episodeID, _):
                 handler.continueWatching(series: series, episodeID: episodeID)
             case .allHistory:
                 handler.openHistory()

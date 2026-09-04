@@ -140,9 +140,11 @@ extension FeedV2Presenter: FeedV2EventHandler {
                 }
 
                 let topSeries = Array(history.prefix(4))
+                let userID = UserRepositoryImp().getUser()?.id
                 var items: [ContinueWatchingItem] = topSeries.map { series in
                     let episodeID = self.playerService.getActiveEpisodeID(for: series)
-                    return .series(series: series, episodeID: episodeID)
+                    let timeCode = episodeID.flatMap { self.playerService.getTimeCode(userID: userID, episodeID: $0) }
+                    return .series(series: series, episodeID: episodeID, timeCode: timeCode)
                 }
 
                 if history.count >= 2 {
