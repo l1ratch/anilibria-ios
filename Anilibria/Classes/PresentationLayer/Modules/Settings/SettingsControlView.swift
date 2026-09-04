@@ -69,6 +69,9 @@ final class SettingsControlView: LoadableView {
         } else if title.contains("Док") || title.contains("Dock") || title.contains("панел") {
             symbolName = "dock.rectangle"
             tint = .systemPurple
+        } else if title.contains("Истори") || title.contains("History") {
+            symbolName = "clock.arrow.circlepath"
+            tint = .systemIndigo
         } else {
             symbolName = "gearshape.fill"
             tint = .Tint.active

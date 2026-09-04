@@ -37,6 +37,13 @@ final class FeedV2Presenter {
                 self?.refreshIfNeeded()
             }
             .store(in: &bag)
+
+        NotificationCenter.default
+            .publisher(for: NSNotification.Name("feedSettingsChanged"))
+            .sink { [weak self] _ in
+                self?.refresh()
+            }
+            .store(in: &bag)
     }
 }
 
@@ -135,7 +142,12 @@ extension FeedV2Presenter: FeedV2EventHandler {
             .sink(onNext: { [weak self] history in
                 guard let self = self else { return }
                 guard !history.isEmpty else {
-                    self.view.set(continueWatching: [])
+                    let showPromo = UserDefaults.standard.object(forKey: "showEmptyHistoryPromo") as? Bool ?? true
+                    if showPromo {
+                        self.view.set(continueWatching: [.emptyPromo])
+                    } else {
+                        self.view.set(continueWatching: [])
+                    }
                     return
                 }
 
@@ -226,7 +238,12 @@ extension FeedV2Presenter: FeedV2EventHandler {
     }
 
     func openCatalog() {
-        self.menuService.setMenuItem(type: .catalog)
+        let hasCatalog = MenuItemsFactory.getActiveTypes().contains(.catalog)
+        if hasCatalog {
+            self.menuService.setMenuItem(type: .catalog)
+        } else {
+            self.router.openCatalog(data: SeriesSearchData())
+        }
     }
 
     func search() {

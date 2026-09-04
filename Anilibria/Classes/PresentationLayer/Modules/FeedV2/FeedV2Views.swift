@@ -718,6 +718,130 @@ final class FeedV2ContinueHistoryCell: UICollectionViewCell {
     }
 }
 
+// MARK: - Empty History Promo Cell
+
+final class FeedV2EmptyHistoryCell: UICollectionViewCell {
+    static let reuseIdentifier = "FeedV2EmptyHistoryCell"
+
+    private let container = UIView()
+    private let iconCircle = UIView()
+    private let iconImageView = UIImageView()
+    private let titleLabel = UILabel()
+    private let subtitleLabel = UILabel()
+    private let chevronImageView = UIImageView()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupViews()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateCardAppearance()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateCardAppearance()
+    }
+
+    private func updateCardAppearance() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        container.layer.borderColor = isDark
+            ? UIColor.white.withAlphaComponent(0.10).cgColor
+            : UIColor.black.withAlphaComponent(0.08).cgColor
+    }
+
+    private func setupViews() {
+        contentView.backgroundColor = .clear
+
+        container.backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? .Surfaces.content
+                : UIColor(white: 0.96, alpha: 0.95)
+        }
+        container.layer.cornerRadius = 14
+        container.layer.cornerCurve = .continuous
+        container.layer.borderWidth = 1
+        container.clipsToBounds = true
+        container.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(container)
+        updateCardAppearance()
+
+        iconCircle.backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor.systemIndigo.withAlphaComponent(0.20)
+                : UIColor.systemIndigo.withAlphaComponent(0.12)
+        }
+        iconCircle.layer.cornerRadius = 12
+        iconCircle.layer.cornerCurve = .continuous
+        iconCircle.clipsToBounds = true
+        iconCircle.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(iconCircle)
+
+        let iconConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .semibold)
+        iconImageView.image = UIImage(systemName: "sparkles.tv", withConfiguration: iconConfig)
+        iconImageView.tintColor = .systemIndigo
+        iconImageView.contentMode = .scaleAspectFit
+        iconImageView.translatesAutoresizingMaskIntoConstraints = false
+        iconCircle.addSubview(iconImageView)
+
+        titleLabel.text = Language.isEnglish ? "History is empty? Time to start!" : "История пуста? Время начать!"
+        titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        titleLabel.textColor = .Text.main
+        titleLabel.numberOfLines = 1
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(titleLabel)
+
+        subtitleLabel.text = Language.isEnglish ? "Thousands of anime are waiting in the catalog →" : "Тысячи аниме уже ждут тебя в каталоге →"
+        subtitleLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        subtitleLabel.textColor = .Text.secondary
+        subtitleLabel.numberOfLines = 1
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(subtitleLabel)
+
+        let chevConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
+        chevronImageView.image = UIImage(systemName: "chevron.right", withConfiguration: chevConfig)
+        chevronImageView.tintColor = .systemIndigo
+        chevronImageView.contentMode = .scaleAspectFit
+        chevronImageView.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(chevronImageView)
+
+        NSLayoutConstraint.activate([
+            container.topAnchor.constraint(equalTo: contentView.topAnchor),
+            container.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            container.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+
+            iconCircle.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
+            iconCircle.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            iconCircle.widthAnchor.constraint(equalToConstant: 42),
+            iconCircle.heightAnchor.constraint(equalToConstant: 42),
+
+            iconImageView.centerXAnchor.constraint(equalTo: iconCircle.centerXAnchor),
+            iconImageView.centerYAnchor.constraint(equalTo: iconCircle.centerYAnchor),
+
+            titleLabel.topAnchor.constraint(equalTo: iconCircle.topAnchor, constant: 2),
+            titleLabel.leadingAnchor.constraint(equalTo: iconCircle.trailingAnchor, constant: 12),
+            titleLabel.trailingAnchor.constraint(equalTo: chevronImageView.leadingAnchor, constant: -8),
+
+            subtitleLabel.bottomAnchor.constraint(equalTo: iconCircle.bottomAnchor, constant: -2),
+            subtitleLabel.leadingAnchor.constraint(equalTo: iconCircle.trailingAnchor, constant: 12),
+            subtitleLabel.trailingAnchor.constraint(equalTo: chevronImageView.leadingAnchor, constant: -8),
+
+            chevronImageView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
+            chevronImageView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            chevronImageView.widthAnchor.constraint(equalToConstant: 12),
+            chevronImageView.heightAnchor.constraint(equalToConstant: 16)
+        ])
+    }
+}
+
 // MARK: - Schedule Card Cell
 
 final class FeedV2ScheduleCell: UICollectionViewCell {

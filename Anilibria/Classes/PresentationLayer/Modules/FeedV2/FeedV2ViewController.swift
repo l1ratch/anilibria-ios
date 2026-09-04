@@ -72,6 +72,12 @@ final class FeedV2ViewController: BaseViewController {
             name: NSNotification.Name("dockItemsChanged"),
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleFeedSettingsChanged),
+            name: NSNotification.Name("feedSettingsChanged"),
+            object: nil
+        )
 
         handler.didLoad()
     }
@@ -83,6 +89,10 @@ final class FeedV2ViewController: BaseViewController {
 
     @objc private func handleDockItemsChanged() {
         updateOtherNavigationButton()
+    }
+
+    @objc private func handleFeedSettingsChanged() {
+        handler.refreshIfNeeded()
     }
 
     private func updateOtherNavigationButton() {
@@ -242,6 +252,7 @@ final class FeedV2ViewController: BaseViewController {
         continueCollectionView.dataSource = self
         continueCollectionView.register(FeedV2ContinueWatchingCell.self, forCellWithReuseIdentifier: FeedV2ContinueWatchingCell.reuseIdentifier)
         continueCollectionView.register(FeedV2ContinueHistoryCell.self, forCellWithReuseIdentifier: FeedV2ContinueHistoryCell.reuseIdentifier)
+        continueCollectionView.register(FeedV2EmptyHistoryCell.self, forCellWithReuseIdentifier: FeedV2EmptyHistoryCell.reuseIdentifier)
         continueCollectionView.isHidden = true
 
         contentStackView.addArrangedSubview(continueCollectionView)
@@ -368,6 +379,9 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
             case .allHistory:
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ContinueHistoryCell.reuseIdentifier, for: indexPath) as! FeedV2ContinueHistoryCell
                 return cell
+            case .emptyPromo:
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2EmptyHistoryCell.reuseIdentifier, for: indexPath) as! FeedV2EmptyHistoryCell
+                return cell
             }
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedV2ScheduleCell.reuseIdentifier, for: indexPath) as! FeedV2ScheduleCell
@@ -411,6 +425,8 @@ extension FeedV2ViewController: UICollectionViewDataSource, UICollectionViewDele
                 handler.continueWatching(series: series, episodeID: episodeID)
             case .allHistory:
                 handler.openHistory()
+            case .emptyPromo:
+                handler.openCatalog()
             }
         } else {
             guard indexPath.item < scheduleItems.count else { return }

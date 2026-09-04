@@ -130,6 +130,13 @@ extension SettingsPresenter: SettingsEventHandler {
         )
         customItems.append(collectionsEditorItem)
 
+        let historySettingsItem = SettingsControlItem(
+            title: Language.isEnglish ? "History Settings" : "Настройки истории",
+            value: "",
+            action: { [weak self] _ in self?.router.openHistorySettings() }
+        )
+        customItems.append(historySettingsItem)
+
         self.view.set(customization: customItems)
     }
 

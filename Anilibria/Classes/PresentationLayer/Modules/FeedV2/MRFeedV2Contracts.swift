@@ -10,6 +10,7 @@ import UIKit
 public enum ContinueWatchingItem: Hashable {
     case series(series: Series, episodeID: String?, timeCode: TimeCodeData?)
     case allHistory
+    case emptyPromo
 }
 
 // MARK: - View Behavior

@@ -5,6 +5,7 @@ import UIKit
 protocol SettingsRoutable: BaseRoutable, ActionSheetRoute, PermissionRoute {
     func openDockEditor()
     func openCollectionsEditor()
+    func openHistorySettings()
     func presentAlert(_ alert: UIAlertController)
 }
 
@@ -16,6 +17,11 @@ final class SettingsRouter: BaseRouter, SettingsRoutable {
 
     func openCollectionsEditor() {
         let editor = UserCollectionsEditorViewController()
+        self.controller.navigationController?.pushViewController(editor, animated: true)
+    }
+
+    func openHistorySettings() {
+        let editor = HistorySettingsViewController()
         self.controller.navigationController?.pushViewController(editor, animated: true)
     }
 
