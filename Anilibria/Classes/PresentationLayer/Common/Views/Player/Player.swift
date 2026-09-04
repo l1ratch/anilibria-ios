@@ -14,6 +14,7 @@ public protocol Player: UIView {
     var playerLayer: AVPlayerLayer? { get }
     var duration: Double? { get }
     var isPlaying: Bool { get }
+    var volume: Float { get set }
     func setVideo(url: URL) -> AnyPublisher<Double?, Error>
     func set(time: Double)
     func set(rate: Double)

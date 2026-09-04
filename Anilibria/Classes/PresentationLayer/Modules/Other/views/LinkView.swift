@@ -27,7 +27,7 @@ public final class LinkView: UIView {
 
     func configure(_ data: LinkData) {
         self.data = data
-        self.iconImageView.image = data.linkType.icon?
+        self.iconImageView.image = data.linkType.icon
             .withRenderingMode(.alwaysTemplate)
     }
 

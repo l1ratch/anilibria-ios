@@ -15,18 +15,20 @@ protocol AppConfigurationRepository: AnyObject {
     func fetchBaseImageUrl() -> AnyPublisher<URL, any Error>
     func fetchBaseUrl() -> AnyPublisher<URL, Error>
     func updateBaseUrl(_ baseUrl: URL?) -> AnyPublisher<URL, Error>
+
+    func fetchLinks() -> AnyPublisher<AniLinks?, any Error>
 }
 
 final class AppConfigurationRepositoryImp: AppConfigurationRepository {
-    private let baseUrlProvider: BaseUrlProvider
+    private let provider: AniConfigProvider
 
     init(configRepository: ConfigRepository) {
-        baseUrlProvider = BaseUrlProvider(configRepository: configRepository)
+        provider = AniConfigProvider(configRepository: configRepository)
     }
 
     func fetchBaseImageUrl() -> AnyPublisher<URL, any Error> {
         return AnyPublisher.create(asyncFunc: { [unowned self] in
-            return await baseUrlProvider.baseImageUrl
+            return await provider.baseImageUrl
         })
         .flatMap { [unowned self] url -> AnyPublisher<URL, any Error> in
             if let url {
@@ -41,7 +43,7 @@ final class AppConfigurationRepositoryImp: AppConfigurationRepository {
 
     func fetchBaseUrl() -> AnyPublisher<URL, any Error> {
         return AnyPublisher.create(asyncFunc: { [unowned self] in
-            let value = await baseUrlProvider.baseUrl
+            let value = await provider.baseUrl
             return value
         })
         .flatMap { [unowned self] url -> AnyPublisher<URL, any Error> in
@@ -57,14 +59,22 @@ final class AppConfigurationRepositoryImp: AppConfigurationRepository {
 
     func updateBaseUrl(_ baseUrl: URL?) -> AnyPublisher<URL, any Error> {
         AnyPublisher.create { [unowned self] in
-            return try await baseUrlProvider.next(for: baseUrl)
+            return try await provider.next(for: baseUrl)
+        }
+        .receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
+    }
+
+    func fetchLinks() -> AnyPublisher<AniLinks?, any Error> {
+        AnyPublisher.create { [unowned self] in
+            return await provider.getLinks()
         }
         .receive(on: DispatchQueue.main)
         .eraseToAnyPublisher()
     }
 }
 
-actor BaseUrlProvider {
+private actor AniConfigProvider {
     private var activeTask: Task<URL, Error>?
     private let configRepository: ConfigRepository
 
@@ -99,17 +109,20 @@ actor BaseUrlProvider {
         return try await task.value
     }
 
+    func getLinks() async -> AniLinks? {
+        if isOutdated {
+            try? await update()
+        }
+        return currentConfigData.config?.urls
+    }
+
     private func fetch(with url: URL?) async throws -> URL {
         if let baseUrl, url != baseUrl {
             return baseUrl
         }
         if isOutdated {
             do {
-                let (data, _) = try await URLSession.shared.data(from: URLS.config)
-                let config = try JSONDecoder().decode(AniConfig.self, from: data)
-                currentConfigData.update(with: config)
-                configRepository.set(config: currentConfigData)
-                infoItem = currentConfigData.topPriorityItem()
+                try await update()
             } catch {
                 try extractAlternative()
             }
@@ -120,6 +133,14 @@ actor BaseUrlProvider {
             return url
         }
         throw AppError.error(code: MRKitErrorCode.noBaseUrl)
+    }
+
+    private func update() async throws {
+        let (data, _) = try await URLSession.shared.data(from: URLS.config)
+        let config = try JSONDecoder().decode(AniConfig.self, from: data)
+        currentConfigData.update(with: config)
+        configRepository.set(config: currentConfigData)
+        infoItem = currentConfigData.topPriorityItem()
     }
 
     private func extractAlternative() throws {

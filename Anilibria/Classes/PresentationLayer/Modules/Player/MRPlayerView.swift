@@ -33,6 +33,12 @@ final class PlayerViewController: BaseViewController {
     private var needsClose = false
     private let userInteractionSubject = PassthroughSubject<Void, Never>()
 
+    #if targetEnvironment(macCatalyst)
+    private var cursorHidingController: Any?
+    private let volumeIndicatorView = VolumeIndicatorView()
+    private var volumeIndicatorHideSubscriber: AnyCancellable?
+    #endif
+
     private var orientation: UIInterfaceOrientationMask = .all
 
     let viewModel: PlayerViewModel
@@ -41,11 +47,11 @@ final class PlayerViewController: BaseViewController {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Life cycle
 
     override func viewDidLoad() {
@@ -55,6 +61,9 @@ final class PlayerViewController: BaseViewController {
         self.setupPlayer()
         self.setupAirPlay()
         self.setupPictureInPicture()
+        #if targetEnvironment(macCatalyst)
+        self.setupVolumeIndicator()
+        #endif
 
         let font: UIFont = UIFont.monospacedDigitSystemFont(ofSize: 12, weight: .regular)
         self.timeLeftLabel.font = font
@@ -76,6 +85,10 @@ final class PlayerViewController: BaseViewController {
         panRecognizer.delegate = self
         view.addGestureRecognizer(tapRecognizer)
         view.addGestureRecognizer(panRecognizer)
+
+        #if targetEnvironment(macCatalyst)
+        self.setupCursorHiding()
+        #endif
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -109,7 +122,36 @@ final class PlayerViewController: BaseViewController {
             forward.wantsPriorityOverSystemBehavior = true
         }
 
-        return [playPause, back, forward]
+        var commands = [playPause, back, forward]
+
+        #if targetEnvironment(macCatalyst)
+        let volumeUp = UIKeyCommand(
+            input: UIKeyCommand.inputUpArrow,
+            modifierFlags: [],
+            action: #selector(self.volumeUpAction)
+        )
+
+        let volumeDown = UIKeyCommand(
+            input: UIKeyCommand.inputDownArrow,
+            modifierFlags: [],
+            action: #selector(self.volumeDownAction)
+        )
+
+        let muteToggle = UIKeyCommand(
+            input: "m",
+            modifierFlags: [],
+            action: #selector(self.muteToggleAction)
+        )
+
+        if #available(iOS 15.0, macCatalyst 15.0, *) {
+            volumeUp.wantsPriorityOverSystemBehavior = true
+            volumeDown.wantsPriorityOverSystemBehavior = true
+        }
+
+        commands.append(contentsOf: [volumeUp, volumeDown, muteToggle])
+        #endif
+
+        return commands
     }
 
     private func setup() {
@@ -141,6 +183,15 @@ final class PlayerViewController: BaseViewController {
             .sink { [weak self] rate in
                 self?.playerView.set(rate: rate)
             }.store(in: &subscribers)
+
+        #if targetEnvironment(macCatalyst)
+        Publishers.CombineLatest(viewModel.$volume, viewModel.$isMuted)
+            .sink { [weak self] volume, isMuted in
+                guard let self else { return }
+                playerView.volume = isMuted ? 0 : volume
+                volumeIndicatorView.set(volume: volume, isMuted: isMuted)
+            }.store(in: &subscribers)
+        #endif
 
         NotificationCenter.default
             .publisher(for: UIApplication.willResignActiveNotification)
@@ -193,6 +244,18 @@ final class PlayerViewController: BaseViewController {
             }
         }.store(in: &subscribers)
 
+        #if targetEnvironment(macCatalyst)
+        playerView.getPlayChanges()
+            .sink { [weak self] isPlaying in
+                if isPlaying {
+                    self?.resetCursorIdleTimer()
+                } else {
+                    self?.stopCursorIdleTimer()
+                }
+            }
+            .store(in: &subscribers)
+        #endif
+
         self.playerView.getStatusSequence()
             .sink(onNext: { [weak self] value in
                 switch value {
@@ -229,6 +292,28 @@ final class PlayerViewController: BaseViewController {
     private func stopAutoHiddingUI() {
         hideUISubscriber?.cancel()
     }
+
+    #if targetEnvironment(macCatalyst)
+    private func setupCursorHiding() {
+        if #available(macCatalyst 13.4, *) {
+            cursorHidingController = CursorHidingController(view: view) { [weak self] isVisible in
+                self?.playerContainer.uiIsVisible = isVisible
+            }
+        }
+    }
+
+    private func resetCursorIdleTimer() {
+        if #available(macCatalyst 13.4, *) {
+            (cursorHidingController as? CursorHidingController)?.resetIdleTimer()
+        }
+    }
+
+    private func stopCursorIdleTimer() {
+        if #available(macCatalyst 13.4, *) {
+            (cursorHidingController as? CursorHidingController)?.stopIdleTimer()
+        }
+    }
+    #endif
 
     func setupPictureInPicture() {
         if let layer = playerView.playerLayer,
@@ -274,6 +359,48 @@ final class PlayerViewController: BaseViewController {
         container.addSubview(airplayView)
         airplayView.constraintEdgesToSuperview()
     }
+
+    #if targetEnvironment(macCatalyst)
+    private func setupVolumeIndicator() {
+        volumeIndicatorView.alpha = 0
+        volumeIndicatorView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(volumeIndicatorView)
+        NSLayoutConstraint.activate([
+            volumeIndicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            volumeIndicatorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16)
+        ])
+    }
+
+    private func showVolumeIndicator() {
+        volumeIndicatorHideSubscriber?.cancel()
+        UIView.animate(withDuration: 0.2) {
+            self.volumeIndicatorView.alpha = 1
+        }
+        volumeIndicatorHideSubscriber = Timer.publish(every: 1.2, on: .main, in: .common)
+            .autoconnect()
+            .first()
+            .sink(receiveValue: { [weak self] _ in
+                UIView.animate(withDuration: 0.3) {
+                    self?.volumeIndicatorView.alpha = 0
+                }
+            })
+    }
+
+    @objc private func volumeUpAction() {
+        viewModel.changeVolume(by: 0.1)
+        showVolumeIndicator()
+    }
+
+    @objc private func volumeDownAction() {
+        viewModel.changeVolume(by: -0.1)
+        showVolumeIndicator()
+    }
+
+    @objc private func muteToggleAction() {
+        viewModel.toggleMute()
+        showVolumeIndicator()
+    }
+    #endif
 
     private func updateLabels(progress: Double, duration: Double) {
         if duration == 0 {

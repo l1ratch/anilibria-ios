@@ -3,7 +3,7 @@ import UIKit
 
 class BaseViewController: UIViewController, WaitingBehavior, Loggable {
     var defaultLoggingTag: LogTag { .view }
-    
+
     var subscribers = Set<AnyCancellable>()
 
     public private(set) var refreshControl: RefreshIndicator?
@@ -46,7 +46,7 @@ class BaseViewController: UIViewController, WaitingBehavior, Loggable {
     }
 
     func setupStrings() {}
-    
+
     func languageDidChanged() {}
 
     override var preferredStatusBarStyle: UIStatusBarStyle {

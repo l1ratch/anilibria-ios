@@ -2,6 +2,21 @@ import Foundation
 
 struct AniConfig: Codable, Hashable {
     let addresses: [AniAddress]
+    let urls: AniLinks?
+
+    init(
+        addresses: [AniAddress],
+        urls: AniLinks? = nil
+    ) {
+        self.addresses = addresses
+        self.urls = urls
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.addresses = try container.decode(required: .addresses)
+        self.urls = container.decode(.urls)
+    }
 }
 
 struct AniAddress: Codable, Hashable {
@@ -9,15 +24,38 @@ struct AniAddress: Codable, Hashable {
     let baseImagesUrl: URL
 }
 
+struct AniLinks: Codable, Hashable {
+    let donateUrl: URL
+    let signUpUrl: URL
+    let links: [LinkData]
+}
+
 extension AniConfig {
     static var `default`: AniConfig = {
         let url = URL(string: "https://www.anilibria.top")!
-        return AniConfig(addresses: [
-            AniAddress(
-                baseUrl: url,
-                baseImagesUrl: url
+        let donateUrl = URL(string: "https://anilibria.top/support")!
+        let signUpUrl = URL(string: "https://anilibria.top/app/auth/registration/newRegistration")!
+        let defaultLinks: [LinkData] = [
+            LinkData(linkType: .telegram, url: URL(string: "https://t.me/anilibria")),
+            LinkData(linkType: .discord, url: URL(string: "https://discord.gg/M6yCGeGN9B")),
+            LinkData(linkType: .vk, url: URL(string: "https://vk.com/anilibria")),
+            LinkData(linkType: .youtube, url: URL(string: "https://www.youtube.com/user/anilibriatv")),
+            LinkData(linkType: .patreon, url: URL(string: "https://www.patreon.com/anilibria")),
+            LinkData(linkType: .boosty, url: URL(string: "https://boosty.to/anilibriatv"))
+        ]
+        return AniConfig(
+            addresses: [
+                AniAddress(
+                    baseUrl: url,
+                    baseImagesUrl: url
+                )
+            ],
+            urls: AniLinks(
+                donateUrl: donateUrl,
+                signUpUrl: signUpUrl,
+                links: defaultLinks
             )
-        ])
+        )
     }()
 }
 

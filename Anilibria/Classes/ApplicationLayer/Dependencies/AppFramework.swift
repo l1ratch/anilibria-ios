@@ -21,7 +21,6 @@ private class RepositoriesPart: DIPart {
         PlayerSettingsRepositoryPart.self,
         UserRepositoryPart.self,
         TokenRepositoryPart.self,
-        LinksRepositoryPart.self,
         BackendRepositoryPart.self
     ]
 

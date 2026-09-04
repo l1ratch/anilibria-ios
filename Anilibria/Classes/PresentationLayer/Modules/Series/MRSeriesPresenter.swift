@@ -23,6 +23,7 @@ final class SeriesPresenter {
     private let favoriteService: FavoriteService
     private let collectionsService: UserCollectionsService
     private let downloadService: DownloadService
+    private let linksService: LinksService
 
     private var favoriteState: Bool?
     private var collectionType: UserCollectionType?
@@ -41,7 +42,8 @@ final class SeriesPresenter {
          playerService: PlayerService,
          favoriteService: FavoriteService,
          downloadService: DownloadService,
-         collectionsService: UserCollectionsService) {
+         collectionsService: UserCollectionsService,
+         linksService: LinksService) {
         self.mainService = mainService
         self.sessionService = sessionService
         self.playerService = playerService
@@ -49,6 +51,7 @@ final class SeriesPresenter {
         self.downloadService = downloadService
         self.collectionsService = collectionsService
         self.episodesModel = EpisodesViewModel(playerService: playerService)
+        self.linksService = linksService
 
         episodesModel.playHandler = { [weak self] episode in
             guard let self else { return }
@@ -208,7 +211,15 @@ extension SeriesPresenter: SeriesEventHandler {
     }
 
     func donate() {
-        self.router.open(url: .web(URLS.donate))
+        self.linksService
+            .fetchDonateLink()
+            .manageActivity(self.view.showLoading(fullscreen: false))
+            .sink(onNext: { [weak self] url in
+                self?.router.open(url: .web(url))
+            }, onError: { [weak self] error in
+                self?.router.show(error: error)
+            })
+            .store(in: &requestBag)
     }
 
     private func load(_ activity: (any ActivityDisposable)? = nil) {
