@@ -109,8 +109,8 @@ extension HistoryPresenter: HistoryEventHandler {
             var filtered = currentSeries
             if !currentQuery.isEmpty {
                 filtered = filtered.filter { s in
-                    (s.name?.main?.lowercased().contains(currentQuery) ?? false) ||
-                    (s.name?.english?.lowercased().contains(currentQuery) ?? false) ||
+                    (s.name?.main.lowercased().contains(currentQuery) ?? false) ||
+                    (s.name?.english.lowercased().contains(currentQuery) ?? false) ||
                     s.alias.lowercased().contains(currentQuery)
                 }
             }
