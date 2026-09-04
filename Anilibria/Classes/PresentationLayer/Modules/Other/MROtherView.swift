@@ -16,12 +16,21 @@ final class OtherViewController: BaseViewController {
     @IBOutlet var teamTitleLabel: UILabel!
     @IBOutlet var donateTitleLabel: UILabel!
     @IBOutlet var settingsTitleLabel: UILabel!
+    @IBOutlet var aboutTitleLabel: UILabel!
 
     private let profileCardView = OtherProfileCardView()
 
     var handler: OtherEventHandler!
 
     override var isNavigationBarVisible: Bool { false }
+
+    private var allCards: [UIView] {
+        return [
+            linkDeviceView?.superview?.superview,
+            settingsTitleLabel?.superview?.superview?.superview ?? settingsTitleLabel?.superview?.superview,
+            teamTitleLabel?.superview?.superview?.superview
+        ].compactMap { $0 }
+    }
 
     // MARK: - Life cycle
 
@@ -73,14 +82,14 @@ final class OtherViewController: BaseViewController {
     }
 
     private func updateCardsTheme() {
-        for card in [linkDeviceView?.superview?.superview, settingsTitleLabel?.superview?.superview, teamTitleLabel?.superview?.superview?.superview] {
-            card?.applyAdaptiveBorder()
+        for card in allCards {
+            card.applyAdaptiveBorder()
         }
     }
 
     private func setupCards() {
-        for card in [linkDeviceView?.superview?.superview, settingsTitleLabel?.superview?.superview, teamTitleLabel?.superview?.superview?.superview] {
-            card?.smoothCorners(with: 16)
+        for card in allCards {
+            card.smoothCorners(with: 16)
         }
         updateCardsTheme()
 
@@ -116,6 +125,7 @@ final class OtherViewController: BaseViewController {
         teamTitleLabel.text = L10n.Screen.Other.team
         donateTitleLabel.text = L10n.Screen.Other.donate
         settingsTitleLabel.text = L10n.Screen.Settings.title
+        aboutTitleLabel.text = Language.isEnglish ? "About" : "О программе"
     }
 
     // MARK: - Actions
@@ -138,6 +148,10 @@ final class OtherViewController: BaseViewController {
 
     @IBAction func settingsAction(_ sender: Any) {
         self.handler.settings()
+    }
+
+    @IBAction func aboutAction(_ sender: Any) {
+        self.handler.about()
     }
 
     @IBAction func linkDeviceAction(_ sender: Any) {

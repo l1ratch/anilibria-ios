@@ -13,12 +13,6 @@ final class SettingsViewController: BaseViewController {
     @IBOutlet var customizationTitleLabel: UILabel!
     @IBOutlet var customizationStackView: UIStackView!
 
-    @IBOutlet var aboutTitleLabel: UILabel!
-    @IBOutlet var appNameLabel: UILabel!
-    @IBOutlet var appVersionLabel: UILabel!
-    @IBOutlet var modificationTitleLabel: UILabel!
-    @IBOutlet var modificationAuthorLabel: UILabel!
-
     var handler: SettingsEventHandler!
 
     // MARK: - Life cycle
@@ -32,8 +26,7 @@ final class SettingsViewController: BaseViewController {
         for card in [
             commonStackView?.superview?.superview,
             playerStackView?.superview?.superview,
-            customizationStackView?.superview?.superview,
-            appNameLabel?.superview?.superview?.superview
+            customizationStackView?.superview?.superview
         ] {
             card?.smoothCorners(with: 16)
             card?.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
@@ -48,18 +41,10 @@ final class SettingsViewController: BaseViewController {
         self.commonTitleLabel.text = L10n.Screen.Settings.common
         self.playerTitleLabel?.text = "Плеер"
         self.customizationTitleLabel?.text = "Кастомизация"
-        self.aboutTitleLabel.text = L10n.Screen.Settings.aboutApp
-        self.modificationTitleLabel?.text = Language.isEnglish ? "Modification" : "Модификация"
-        self.modificationAuthorLabel?.text = "l1ratch"
     }
 }
 
 extension SettingsViewController: SettingsViewBehavior {
-    func set(name: String, version: String) {
-        self.appNameLabel.text = name
-        self.appVersionLabel.text = version
-    }
-
     func set(common items: [SettingsControlItem]) {
         commonStackView.arrangedSubviews.forEach {
             commonStackView.removeArrangedSubview($0)

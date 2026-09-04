@@ -14,6 +14,7 @@ protocol OtherEventHandler: ViewControllerEventHandler {
     func donate()
 
     func settings()
+    func about()
     func history()
     func linkDevice()
 

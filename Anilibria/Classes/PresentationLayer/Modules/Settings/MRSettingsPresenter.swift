@@ -117,8 +117,6 @@ extension SettingsPresenter: SettingsEventHandler {
             startupItem.isOn = settings.playOnStartup
         }.store(in: &bag)
 
-        self.view.set(name: Bundle.main.displayName ?? "",
-                      version: Bundle.main.releaseVersionNumber ?? "")
         self.view.set(common: commonItems)
         self.view.set(player: playerItems)
 

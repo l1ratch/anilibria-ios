@@ -82,6 +82,10 @@ extension OtherPresenter: OtherEventHandler {
         self.router.openSettings()
     }
 
+    func about() {
+        self.router.openAbout()
+    }
+
     func history() {
         self.router.openHistory()
     }
