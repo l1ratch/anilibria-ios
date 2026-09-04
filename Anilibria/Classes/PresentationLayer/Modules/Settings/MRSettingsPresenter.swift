@@ -119,6 +119,8 @@ extension SettingsPresenter: SettingsEventHandler {
         let dockEditorItem = SettingsControlItem(
             title: Language.isEnglish ? "Dock Settings" : "Настройка Дока",
             value: "",
+            iconName: "dock.rectangle",
+            iconTint: .systemPurple,
             action: { [weak self] _ in self?.router.openDockEditor() }
         )
         customItems.append(dockEditorItem)
@@ -126,6 +128,8 @@ extension SettingsPresenter: SettingsEventHandler {
         let collectionsEditorItem = SettingsControlItem(
             title: Language.isEnglish ? "Lists Settings" : "Настройка списков",
             value: "",
+            iconName: "list.bullet.rectangle.portrait",
+            iconTint: .systemTeal,
             action: { [weak self] _ in self?.router.openCollectionsEditor() }
         )
         customItems.append(collectionsEditorItem)
@@ -133,6 +137,8 @@ extension SettingsPresenter: SettingsEventHandler {
         let historySettingsItem = SettingsControlItem(
             title: Language.isEnglish ? "History Settings" : "Настройки истории",
             value: "",
+            iconName: "clock.arrow.circlepath",
+            iconTint: .systemIndigo,
             action: { [weak self] _ in self?.router.openHistorySettings() }
         )
         customItems.append(historySettingsItem)

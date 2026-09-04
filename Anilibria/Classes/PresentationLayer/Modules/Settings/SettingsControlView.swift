@@ -19,7 +19,14 @@ final class SettingsControlView: LoadableView {
 
     func configure(item: SettingsControlItem) {
         titleLabel.text = item.title
-        setupIcon(for: item.title)
+        if let iconName = item.iconName {
+            let tint = item.iconTint ?? .Tint.active
+            let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .semibold)
+            iconImageView?.image = UIImage(systemName: iconName, withConfiguration: config)
+            iconImageView?.tintColor = tint
+        } else {
+            setupIcon(for: item.title)
+        }
 
         item.$value
             .sink { [weak self] value in
@@ -33,43 +40,47 @@ final class SettingsControlView: LoadableView {
     }
 
     private func setupIcon(for title: String) {
+        let lower = title.lowercased()
         let symbolName: String
         let tint: UIColor
 
-        if title == L10n.Screen.Settings.language {
+        if title == L10n.Screen.Settings.language || lower.contains("язык") || lower.contains("language") {
             symbolName = "globe"
             tint = .systemBlue
-        } else if title == L10n.Common.appearance {
+        } else if title == L10n.Common.appearance || lower.contains("оформлен") || lower.contains("appearance") || lower.contains("тема") {
             symbolName = "circle.lefthalf.filled"
             tint = .systemIndigo
-        } else if title == L10n.Common.orientation {
+        } else if title == L10n.Common.orientation || lower.contains("ориентац") || lower.contains("orientation") {
             symbolName = "iphone"
             tint = .systemOrange
-        } else if title == L10n.Screen.Settings.videoQuality {
+        } else if title == L10n.Screen.Settings.videoQuality || lower.contains("качеств") || lower.contains("quality") {
             symbolName = "tv"
             tint = .systemPurple
-        } else if title == L10n.Common.playbackRate {
+        } else if title == L10n.Common.playbackRate || lower.contains("скорост") || lower.contains("playback rate") || lower.contains("speed") {
             symbolName = "gauge.with.dots.needle.bottom.50percent"
             tint = .systemGreen
-        } else if title == L10n.Common.skipCredits {
+        } else if title == L10n.Common.skipCredits || lower.contains("пропуск") || lower.contains("skip") {
             symbolName = "forward.fill"
             tint = .systemTeal
-        } else if title == L10n.Common.autoPlayLong {
+        } else if title == L10n.Common.autoPlayLong || lower.contains("автовоспроизвед") || lower.contains("autoplay") {
             symbolName = "play.circle.fill"
             tint = .systemPink
-        } else if title == L10n.Common.playOnStartup {
+        } else if title == L10n.Common.playOnStartup || lower.contains("при запуск") || lower.contains("startup") {
             symbolName = "play.rectangle.fill"
             tint = .systemRed
-        } else if title.contains("новост") || title.contains("News") || title.contains("Баннер") {
+        } else if lower.contains("новост") || lower.contains("news") || lower.contains("баннер") {
             symbolName = "newspaper.fill"
             tint = .systemOrange
-        } else if title.contains("Расписан") || title.contains("Schedule") {
+        } else if lower.contains("расписан") || lower.contains("schedule") {
             symbolName = "calendar"
             tint = .systemTeal
-        } else if title.contains("Док") || title.contains("Dock") || title.contains("панел") {
+        } else if lower.contains("док") || lower.contains("dock") || lower.contains("панел") {
             symbolName = "dock.rectangle"
             tint = .systemPurple
-        } else if title.contains("Истори") || title.contains("History") {
+        } else if lower.contains("списк") || lower.contains("коллекц") || lower.contains("list") || lower.contains("collection") {
+            symbolName = "list.bullet.rectangle.portrait"
+            tint = .systemTeal
+        } else if lower.contains("истор") || lower.contains("history") {
             symbolName = "clock.arrow.circlepath"
             tint = .systemIndigo
         } else {
@@ -86,15 +97,21 @@ final class SettingsControlView: LoadableView {
 public final class SettingsControlItem {
     let title: String
     @Published var value: String
+    let iconName: String?
+    let iconTint: UIColor?
     private let action: ((SettingsControlItem) -> Void)
 
     init(
         title: String,
         value: String,
+        iconName: String? = nil,
+        iconTint: UIColor? = nil,
         action: @escaping (SettingsControlItem) -> Void
     ) {
         self.title = title
         self.value = value
+        self.iconName = iconName
+        self.iconTint = iconTint
         self.action = action
     }
 
