@@ -1,4 +1,4 @@
-﻿//
+//
 //  HistorySettingsViewController.swift
 //  Anilibria
 //
@@ -43,6 +43,7 @@ final class HistorySettingsViewController: BaseViewController {
         let isPromoEnabled = UserDefaults.standard.object(forKey: "showEmptyHistoryPromo") as? Bool ?? true
         promoSwitch.isOn = isPromoEnabled
         promoSwitch.onTintColor = UIColor(named: "buttons/selected") ?? .systemRed
+        promoSwitch.transform = CGAffineTransform(scaleX: 0.82, y: 0.82)
         promoSwitch.addTarget(self, action: #selector(promoSwitchChanged(_:)), for: .valueChanged)
     }
 

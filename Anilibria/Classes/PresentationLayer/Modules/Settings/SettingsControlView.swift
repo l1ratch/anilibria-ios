@@ -20,6 +20,9 @@ final class SettingsControlView: LoadableView {
     private lazy var toggleSwitch: UISwitch = {
         let sw = UISwitch()
         sw.onTintColor = .Tint.active
+        sw.transform = CGAffineTransform(scaleX: 0.82, y: 0.82)
+        sw.setContentCompressionResistancePriority(.required, for: .horizontal)
+        sw.setContentHuggingPriority(.required, for: .horizontal)
         sw.translatesAutoresizingMaskIntoConstraints = false
         sw.addTarget(self, action: #selector(onSwitchChanged(_:)), for: .valueChanged)
         return sw
@@ -48,16 +51,24 @@ final class SettingsControlView: LoadableView {
             valueLabel.isHidden = true
             titleToValueConstraint?.isActive = false
 
+            titleLabel.setContentCompressionResistancePriority(UILayoutPriority(250), for: .horizontal)
+            titleLabel.setContentHuggingPriority(UILayoutPriority(250), for: .horizontal)
+            titleLabel.numberOfLines = 0
+
+            let container = self.view ?? self
             if toggleSwitch.superview == nil {
-                addSubview(toggleSwitch)
-                bringSubviewToFront(toggleSwitch)
+                container.addSubview(toggleSwitch)
+                container.bringSubviewToFront(toggleSwitch)
+                let trailingCst = toggleSwitch.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16)
+                trailingCst.priority = .required
                 NSLayoutConstraint.activate([
-                    toggleSwitch.centerYAnchor.constraint(equalTo: centerYAnchor),
-                    toggleSwitch.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16)
+                    toggleSwitch.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+                    trailingCst
                 ])
             }
             if titleSwitchConstraint == nil {
                 titleSwitchConstraint = titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: toggleSwitch.leadingAnchor, constant: -12)
+                titleSwitchConstraint?.priority = UILayoutPriority(999)
             }
             titleSwitchConstraint?.isActive = true
             toggleSwitch.isHidden = false
@@ -83,6 +94,9 @@ final class SettingsControlView: LoadableView {
             titleToValueConstraint?.isActive = true
             chevronImageView?.isHidden = false
             valueLabel.isHidden = false
+
+            titleLabel.setContentCompressionResistancePriority(UILayoutPriority(750), for: .horizontal)
+            titleLabel.setContentHuggingPriority(UILayoutPriority(251), for: .horizontal)
 
             item.$value
                 .receive(on: DispatchQueue.main)
