@@ -11,8 +11,10 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SettingsControlView" customModule="Anilibria" customModuleProvider="target">
             <connections>
                 <outlet property="button" destination="uf5-iM-U61" id="4uV-Zg-S8q"/>
+                <outlet property="chevronImageView" destination="Z2R-09-mOQ" id="chv-img-out"/>
                 <outlet property="iconImageView" destination="hA7-9f-7XG" id="k9Y-1O-8pL"/>
                 <outlet property="titleLabel" destination="MTl-um-Hwg" id="h6J-7E-wgC"/>
+                <outlet property="titleToValueConstraint" destination="L4s-FZ-FVz" id="ttv-cst-out"/>
                 <outlet property="valueLabel" destination="r5x-ZX-Vql" id="9sK-U0-O7M"/>
             </connections>
         </placeholder>
@@ -67,7 +69,9 @@
                 <constraint firstItem="Z2R-09-mOQ" firstAttribute="centerY" secondItem="C7a-jC-7DP" secondAttribute="centerY" id="pFc-wc-q61"/>
                 <constraint firstItem="r5x-ZX-Vql" firstAttribute="centerY" secondItem="C7a-jC-7DP" secondAttribute="centerY" id="pFc-wc-q6P"/>
                 <constraint firstAttribute="trailing" secondItem="uf5-iM-U61" secondAttribute="trailing" id="v2e-59-ufq"/>
-                <constraint firstAttribute="height" constant="44" id="c7a-height-cst"/>
+                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="44" id="c7a-height-cst"/>
+                <constraint firstItem="MTl-um-Hwg" firstAttribute="top" relation="greaterThanOrEqual" secondItem="C7a-jC-7DP" secondAttribute="top" constant="10" id="mtl-top-cst"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="MTl-um-Hwg" secondAttribute="bottom" constant="10" id="mtl-bot-cst"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="-318" y="-150"/>

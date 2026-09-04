@@ -88,15 +88,23 @@ extension SettingsPresenter: SettingsEventHandler {
 
         let autoplayItem = SettingsControlItem(
             title: L10n.Common.autoPlayLong,
-            value: "",
-            action: { [weak self] _ in self?.selectAutoplay() }
+            isOn: playerSettings?.autoPlay ?? false,
+            iconName: "play.circle.fill",
+            iconTint: .systemPink,
+            onToggle: { [weak self] isOn in
+                self?.update(autoplay: isOn)
+            }
         )
         playerItems.append(autoplayItem)
 
         let startupItem = SettingsControlItem(
             title: L10n.Common.playOnStartup,
-            value: "",
-            action: { [weak self] _ in self?.selectStartupPlay() }
+            isOn: playerSettings?.playOnStartup ?? false,
+            iconName: "play.rectangle.fill",
+            iconTint: .systemRed,
+            onToggle: { [weak self] isOn in
+                self?.update(playOnStartup: isOn)
+            }
         )
         playerItems.append(startupItem)
 
@@ -104,9 +112,9 @@ extension SettingsPresenter: SettingsEventHandler {
             self?.playerSettings = settings
             qualityItem.value = settings.quality.name
             speedItem.value = PlayerSettings.nameFor(rate: settings.playbackRate)
-            autoplayItem.value = PlayerSettings.nameFor(bool: settings.autoPlay)
+            autoplayItem.isOn = settings.autoPlay
             skipItem.value = settings.skipMode.name
-            startupItem.value = PlayerSettings.nameFor(bool: settings.playOnStartup)
+            startupItem.isOn = settings.playOnStartup
         }.store(in: &bag)
 
         self.view.set(name: Bundle.main.displayName ?? "",
@@ -295,35 +303,6 @@ extension SettingsPresenter: SettingsEventHandler {
         self.router.openSheet(with: [ChoiceGroup(items: items)])
     }
 
-    func selectAutoplay() {
-        let items = [true, false].map {
-            ChoiceItem(
-                value: $0,
-                title: PlayerSettings.nameFor(bool: $0),
-                isSelected: playerSettings?.autoPlay == $0,
-                didSelect: { [weak self] item in
-                    self?.update(autoplay: item)
-                    return true
-                }
-            )
-        }
-        self.router.openSheet(with: [ChoiceGroup(items: items)])
-    }
-
-    func selectStartupPlay() {
-        let items = [true, false].map {
-            ChoiceItem(
-                value: $0,
-                title: PlayerSettings.nameFor(bool: $0),
-                isSelected: playerSettings?.playOnStartup == $0,
-                didSelect: { [weak self] item in
-                    self?.update(playOnStartup: item)
-                    return true
-                }
-            )
-        }
-        self.router.openSheet(with: [ChoiceGroup(items: items)])
-    }
 
     private func update(_ quality: VideoQuality) {
         guard var playerSettings else { return }
