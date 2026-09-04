@@ -72,11 +72,11 @@ final class AboutViewController: BaseViewController {
                     url: URL(string: "https://github.com/Allui")
                 ),
                 AboutItem(
-                    title: isEn ? "Contributors" : "Контрибьюторы проекта",
-                    subtitle: "Alexey Haidamaka (@gdmka), Ivan Rachinsky",
+                    title: isEn ? "Contributor" : "Контрибьютор",
+                    subtitle: "teanet (@teanet)",
                     iconName: "person.2.fill",
                     iconColor: .systemTeal,
-                    url: URL(string: "https://github.com/anilibria/anilibria-ios/graphs/contributors")
+                    url: URL(string: "https://github.com/teanet")
                 )
             ],
             footer: nil
@@ -107,9 +107,7 @@ final class AboutViewController: BaseViewController {
                     url: URL(string: "https://anilibria.top")
                 )
             ],
-            footer: isEn
-                ? "Special thanks to the AniLibria team for voice acting and releases, and to all users for feedback and support! ❤️"
-                : "Огромная благодарность команде AniLibria за озвучку и релизы, а также всем пользователям за отзывы и поддержку! ❤️"
+            footer: nil
         )
 
         sections = [devSection, linksSection]
@@ -162,7 +160,7 @@ final class AboutViewController: BaseViewController {
 
         // Version & Build Label
         let versionString = Bundle.main.releaseVersionNumber ?? "3.0.0"
-        let buildString = Bundle.main.buildVersionNumber ?? "101"
+        let buildString = Bundle.main.buildVersionNumber ?? "102"
         let versionLabel = UILabel()
         versionLabel.text = Language.isEnglish
             ? "Version \(versionString) (Build \(buildString))"
