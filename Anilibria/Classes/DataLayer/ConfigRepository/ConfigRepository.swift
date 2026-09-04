@@ -23,6 +23,11 @@ final class ConfigRepositoryImp: ConfigRepository {
     }
 
     func getConfig() -> AniConfigInfo {
-        UserDefaults.standard[keyConfig] ?? AniConfigInfo()
+        if let saved: AniConfigInfo = UserDefaults.standard[keyConfig], !saved.items.isEmpty {
+            return saved
+        }
+        let defaultConfig = AniConfigInfo(config: .default)
+        UserDefaults.standard[keyConfig] = defaultConfig
+        return defaultConfig
     }
 }

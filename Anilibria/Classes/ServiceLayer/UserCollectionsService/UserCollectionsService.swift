@@ -51,7 +51,7 @@ final class UserCollectionsServiceImp: UserCollectionsService {
     }
 
     func getCollection(for seriesID: Int) -> AnyPublisher<UserCollectionType?, Error> {
-        if let collectionsMetadataTime, Date().distance(to: collectionsMetadataTime) > 60 * 60  {
+        if let collectionsMetadataTime, Date().timeIntervalSince(collectionsMetadataTime) < 60 * 60 {
             return .just(collectionsMetadata[seriesID])
         }
 

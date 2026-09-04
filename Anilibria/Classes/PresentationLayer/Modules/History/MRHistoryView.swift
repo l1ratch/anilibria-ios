@@ -114,13 +114,13 @@ final class HistorySeriesCellAdapter: BaseCellAdapter<HistoryItemModel> {
     override func cellForItem(at index: IndexPath, context: CollectionContext) -> UICollectionViewCell? {
         let cell = context.dequeueReusableCell(type: HistorySeriesCell.self, for: index)
         cell.configure(with: viewModel)
-        cell.onPlay = { [weak self] in
-            guard let self else { return }
-            self.handler.continueWatching?(self.viewModel)
+        let item = self.viewModel
+        let handler = self.handler
+        cell.onPlay = { [handler, item] in
+            handler.continueWatching?(item)
         }
-        cell.onDelete = { [weak self] in
-            guard let self else { return }
-            self.handler.delete?(self.viewModel)
+        cell.onDelete = { [handler, item] in
+            handler.delete?(item)
         }
         return cell
     }
@@ -378,11 +378,13 @@ final class HistorySeriesCell: UICollectionViewCell, DraggableViewDelegate {
     }
 
     @objc private func deleteButtonTapped() {
+        draggableView.close(false)
         onDelete?()
     }
 
     // DraggableViewDelegate
     func callPrimaryAction() {
+        draggableView.close(false)
         onDelete?()
     }
 }

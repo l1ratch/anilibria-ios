@@ -42,7 +42,7 @@ final class FavoriteServiceImp: FavoriteService {
     }
 
     func getFavoriteState(for seriesID: Int) -> AnyPublisher<Bool, Error> {
-        if let favoriteIDsTime, Date().distance(to: favoriteIDsTime) > 60 * 60  {
+        if let favoriteIDsTime, Date().timeIntervalSince(favoriteIDsTime) < 60 * 60 {
             return .just(favoriteIDs.contains(seriesID))
         }
 

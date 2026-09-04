@@ -12,10 +12,11 @@ final class PlayerAssembly {
         )
         module.playerView = DefaultPlayerView()
         let router = PlayerRouter(view: module, parent: parent)
+        let resolvedUserID = userID ?? UserRepositoryImp().getUser()?.id
         module.viewModel.bind(
             router: router,
             series: series,
-            userID: userID,
+            userID: resolvedUserID,
             episode: episode
         )
         return module

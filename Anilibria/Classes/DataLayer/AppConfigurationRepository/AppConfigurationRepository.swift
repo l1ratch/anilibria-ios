@@ -113,21 +113,30 @@ private actor AniConfigProvider {
         if isOutdated {
             try? await update()
         }
-        return currentConfigData.config?.urls
+        return currentConfigData.config?.urls ?? AniConfig.default.urls
     }
 
     private func fetch(with url: URL?) async throws -> URL {
         if let baseUrl, url != baseUrl {
             return baseUrl
         }
+        // First try to rotate to alternative mirror immediately if we already have one
+        if (try? extractAlternative()) == true, let url = baseUrl {
+            if isOutdated {
+                Task { [weak self] in
+                    try? await self?.update()
+                }
+            }
+            return url
+        }
         if isOutdated {
             do {
                 try await update()
             } catch {
-                try extractAlternative()
+                _ = try? extractAlternative()
             }
         } else {
-            try extractAlternative()
+            _ = try? extractAlternative()
         }
         if let url = baseUrl {
             return url
@@ -136,23 +145,27 @@ private actor AniConfigProvider {
     }
 
     private func update() async throws {
-        let (data, _) = try await URLSession.shared.data(from: URLS.config)
+        var request = URLRequest(url: URLS.config)
+        request.timeoutInterval = 3
+        let (data, _) = try await URLSession.shared.data(for: request)
         let config = try JSONDecoder().decode(AniConfig.self, from: data)
         currentConfigData.update(with: config)
         configRepository.set(config: currentConfigData)
         infoItem = currentConfigData.topPriorityItem()
     }
 
-    private func extractAlternative() throws {
-        guard var item = infoItem else { return }
+    @discardableResult
+    private func extractAlternative() throws -> Bool {
+        guard var item = infoItem else { return false }
         let count = currentConfigData.items.count
         if count <= 1 {
-            throw AppError.error(code: MRKitErrorCode.noAlternative)
+            return false
         }
         currentConfigData.items.remove(item)
         item.priority -= count
         currentConfigData.items.insert(item)
         configRepository.set(config: currentConfigData)
         infoItem = currentConfigData.topPriorityItem()
+        return true
     }
 }

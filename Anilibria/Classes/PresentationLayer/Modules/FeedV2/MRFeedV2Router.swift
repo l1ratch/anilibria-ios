@@ -32,7 +32,7 @@ final class FeedV2Router: BaseRouter, FeedV2Routable {
         let episode = series.playlist.first(where: { $0.id == episodeID }) ?? series.playlist.first
         let playerVC = PlayerAssembly.createModule(
             series: series,
-            userID: nil,
+            userID: UserRepositoryImp().getUser()?.id,
             episode: episode,
             parent: self
         )
