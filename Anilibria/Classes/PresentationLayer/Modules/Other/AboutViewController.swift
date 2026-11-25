@@ -58,13 +58,6 @@ final class AboutViewController: BaseViewController {
             header: isEn ? "Development & Authors" : "Разработка и авторы",
             items: [
                 AboutItem(
-                    title: isEn ? "Redesign & Improvements v3.0.0" : "Редизайн и улучшения v3.0.0",
-                    subtitle: "l1ratch",
-                    iconName: "sparkles",
-                    iconColor: UIColor(named: "buttons/selected") ?? .systemRed,
-                    url: URL(string: "https://github.com/l1ratch/anilibria-ios")
-                ),
-                AboutItem(
                     title: isEn ? "Creator & Lead Developer" : "Создатель и ведущий разработчик",
                     subtitle: isEn ? "Ivan Morozov (@Allui)" : "Иван Морозов (@Allui)",
                     iconName: "person.fill",
@@ -86,25 +79,18 @@ final class AboutViewController: BaseViewController {
             header: isEn ? "Links" : "Ссылки",
             items: [
                 AboutItem(
-                    title: isEn ? "Fork Repository" : "Репозиторий модификации (GitHub)",
-                    subtitle: "github.com/l1ratch/anilibria-ios",
+                    title: isEn ? "Repository (GitHub)" : "Репозиторий (GitHub)",
+                    subtitle: "github.com/anilibria/anilibria-ios",
                     iconName: "chevron.left.forwardslash.chevron.right",
                     iconColor: .systemPurple,
-                    url: URL(string: "https://github.com/l1ratch/anilibria-ios")
-                ),
-                AboutItem(
-                    title: isEn ? "Original Repository" : "Оригинальный репозиторий (GitHub)",
-                    subtitle: "github.com/anilibria/anilibria-ios",
-                    iconName: "folder.fill",
-                    iconColor: .systemOrange,
                     url: URL(string: "https://github.com/anilibria/anilibria-ios")
                 ),
                 AboutItem(
-                    title: isEn ? "Official Website" : "Официальный сайт AniLibria",
-                    subtitle: "anilibria.top",
+                    title: isEn ? "Official Website" : "Официальный сайт AniLiberty",
+                    subtitle: "aniliberty.top",
                     iconName: "globe",
                     iconColor: .systemGreen,
-                    url: URL(string: "https://anilibria.top")
+                    url: URL(string: "https://www.aniliberty.top/")
                 )
             ],
             footer: nil
@@ -160,7 +146,7 @@ final class AboutViewController: BaseViewController {
 
         // Version & Build Label
         let versionString = Bundle.main.releaseVersionNumber ?? "3.0.0"
-        let buildString = Bundle.main.buildVersionNumber ?? "102"
+        let buildString = Bundle.main.buildVersionNumber ?? "103"
         let versionLabel = UILabel()
         versionLabel.text = Language.isEnglish
             ? "Version \(versionString) (Build \(buildString))"

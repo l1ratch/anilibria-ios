@@ -35,8 +35,8 @@
                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hlb-eq-Zu7">
                             <rect key="frame" x="0.0" y="0.0" width="382" height="54"/>
                             <subviews>
-                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="lbm-cD-8Dy" customClass="MenuTabController" customModule="AniLiberty" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="382" height="54"/>
+                                <stackView opaque="NO" contentMode="scaleToFill" alignment="center" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="lbm-cD-8Dy" customClass="MenuTabController" customModule="AniLiberty" customModuleProvider="target">
+                                    <rect key="frame" x="8" y="0.0" width="366" height="48"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </stackView>
                             </subviews>
@@ -44,8 +44,8 @@
                             <constraints>
                                 <constraint firstItem="lbm-cD-8Dy" firstAttribute="top" secondItem="hlb-eq-Zu7" secondAttribute="top" id="Rte-Zj-iwO"/>
                                 <constraint firstAttribute="bottom" secondItem="lbm-cD-8Dy" secondAttribute="bottom" id="Rte-Zj-btm"/>
-                                <constraint firstAttribute="trailing" secondItem="lbm-cD-8Dy" secondAttribute="trailing" id="hla-Qr-8vg"/>
-                                <constraint firstItem="lbm-cD-8Dy" firstAttribute="leading" secondItem="hlb-eq-Zu7" secondAttribute="leading" id="uWx-US-xAH"/>
+                                <constraint firstAttribute="trailing" secondItem="lbm-cD-8Dy" secondAttribute="trailing" constant="8" id="hla-Qr-8vg"/>
+                                <constraint firstItem="lbm-cD-8Dy" firstAttribute="leading" secondItem="hlb-eq-Zu7" secondAttribute="leading" constant="8" id="uWx-US-xAH"/>
                             </constraints>
                         </view>
                     </subviews>
@@ -55,7 +55,7 @@
                         <constraint firstItem="hlb-eq-Zu7" firstAttribute="top" secondItem="gi0-Ok-EvC" secondAttribute="top" id="PQ4-K1-K4N"/>
                         <constraint firstAttribute="bottom" secondItem="hlb-eq-Zu7" secondAttribute="bottom" id="Sr8-xP-lh1"/>
                         <constraint firstAttribute="trailing" secondItem="hlb-eq-Zu7" secondAttribute="trailing" id="wYi-J7-PPu"/>
-                        <constraint firstAttribute="height" constant="54" id="gi0-height-cst"/>
+                        <constraint firstAttribute="height" constant="48" id="gi0-height-cst"/>
                     </constraints>
                 </view>
             </subviews>

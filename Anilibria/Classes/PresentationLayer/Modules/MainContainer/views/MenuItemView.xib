@@ -9,6 +9,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MenuItemView" customModule="Anilibria" customModuleProvider="target">
             <connections>
+                <outlet property="actionButton" destination="X8a-gB-VtR" id="btn-out-let"/>
                 <outlet property="iconView" destination="yyu-UM-A8a" id="2kj-ap-YEk"/>
             </connections>
         </placeholder>

@@ -31,14 +31,20 @@ final class MainContainerViewController: BaseViewController {
 
     private var dockWidthConstraint: NSLayoutConstraint?
 
+    private struct DockLayout {
+        let width: CGFloat
+        let spacing: CGFloat
+        let buttonSize: CGFloat
+    }
+
     private func setupFloatingDock() {
         shadowView.shadowColor = .black
         shadowView.shadowOpacity = 0.25
-        shadowView.shadowRadius = 16
-        shadowView.shadowY = 6
+        shadowView.shadowRadius = 14
+        shadowView.shadowY = 5
         shadowView.clipsToBounds = false
 
-        tabBarContainer.smoothCorners(with: 27)
+        tabBarContainer.smoothCorners(with: 24)
         tabBarContainer.clipsToBounds = true
 
         dockBlurView.frame = tabBarContainer.bounds
@@ -61,24 +67,54 @@ final class MainContainerViewController: BaseViewController {
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         shadowView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
 
-        let initialWidth = calculateDockWidth(itemCount: 5)
-        let widthConstraint = shadowView.widthAnchor.constraint(equalToConstant: initialWidth)
+        let initialLayout = calculateDockLayout(itemCount: 5)
+        let widthConstraint = shadowView.widthAnchor.constraint(equalToConstant: initialLayout.width)
         widthConstraint.isActive = true
         self.dockWidthConstraint = widthConstraint
     }
 
-    private func calculateDockWidth(itemCount: Int) -> CGFloat {
+    private func calculateDockLayout(itemCount: Int) -> DockLayout {
         let count = max(1, itemCount)
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        let maxAvailableWidth = screenWidth - 32
-        let slotWidth: CGFloat = min(72, maxAvailableWidth / 5.0)
-        let targetWidth = CGFloat(count) * slotWidth
-        return min(targetWidth, maxAvailableWidth)
+        let horizontalPadding: CGFloat = 8
+        let maxAvailableWidth = min(screenWidth - 40, 280)
+        let defaultButtonSize: CGFloat = 42
+
+        let preferredSpacing: CGFloat
+        switch count {
+        case 1: preferredSpacing = 0
+        case 2: preferredSpacing = 12
+        case 3: preferredSpacing = 10
+        case 4: preferredSpacing = 8
+        default: preferredSpacing = 6
+        }
+
+        let rawWidth = horizontalPadding * 2
+            + CGFloat(count) * defaultButtonSize
+            + CGFloat(max(0, count - 1)) * preferredSpacing
+
+        if rawWidth <= maxAvailableWidth {
+            return DockLayout(width: rawWidth, spacing: preferredSpacing, buttonSize: defaultButtonSize)
+        }
+
+        let minSpacing: CGFloat = 2
+        if count > 1 {
+            let availableForSpacing = maxAvailableWidth - horizontalPadding * 2 - CGFloat(count) * defaultButtonSize
+            let fittedSpacing = availableForSpacing / CGFloat(count - 1)
+            if fittedSpacing >= minSpacing {
+                return DockLayout(width: maxAvailableWidth, spacing: fittedSpacing, buttonSize: defaultButtonSize)
+            }
+        }
+
+        let spacing = count > 1 ? minSpacing : 0
+        let fittedButtonSize = max(32, (maxAvailableWidth - horizontalPadding * 2 - CGFloat(max(0, count - 1)) * spacing) / CGFloat(count))
+        return DockLayout(width: maxAvailableWidth, spacing: spacing, buttonSize: fittedButtonSize)
     }
 
-    private func updateDockWidth(for itemCount: Int, animated: Bool = true) {
-        let targetWidth = calculateDockWidth(itemCount: itemCount)
-        dockWidthConstraint?.constant = targetWidth
+    private func updateDockLayout(for itemCount: Int, animated: Bool = true) {
+        let layout = calculateDockLayout(itemCount: itemCount)
+        dockWidthConstraint?.constant = layout.width
+        menuTabBar.applyLayout(spacing: layout.spacing, buttonSize: layout.buttonSize)
         if animated {
             UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut, .allowUserInteraction]) {
                 self.view.layoutIfNeeded()
@@ -150,7 +186,7 @@ extension MainContainerViewController: MainContainerViewBehavior {
         self.menuTabBar.set(items) { [weak self] type in
             self?.handler.select(item: type)
         }
-        self.updateDockWidth(for: items.count)
+        self.updateDockLayout(for: items.count)
     }
 
     func set(selected: MenuItemType) {
@@ -163,7 +199,7 @@ extension MainContainerViewController: MainContainerViewBehavior {
     func change(visible: Bool, for item: MenuItemType) {
         self.menuTabBar.change(visible: visible, for: item)
         let visibleCount = self.menuTabBar.views.filter { !$0.isHidden }.count
-        self.updateDockWidth(for: visibleCount)
+        self.updateDockLayout(for: visibleCount)
     }
 }
 
@@ -171,6 +207,9 @@ final class MenuTabController: UIStackView {
     var views: [MenuItemView] = []
 
     func set(_ items: [MenuItem], selectionChanged: @escaping Action<MenuItemType>) {
+        self.alignment = .center
+        self.distribution = .equalSpacing
+
         self.views.forEach {
             $0.removeFromSuperview()
         }
@@ -184,6 +223,11 @@ final class MenuTabController: UIStackView {
             self.views.append(item)
             self.addArrangedSubview(item)
         }
+    }
+
+    func applyLayout(spacing: CGFloat, buttonSize: CGFloat) {
+        self.spacing = spacing
+        self.views.forEach { $0.updateSize(buttonSize) }
     }
 
     func set(selected: MenuItemType) {
